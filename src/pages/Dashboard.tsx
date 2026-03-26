@@ -15,6 +15,7 @@ import { useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { api } from "../lib/api";
+import logo from "../assets/logo.png";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -178,9 +179,10 @@ function Dashboard() {
             to="/"
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
-            <span className="font-['Outfit'] font-bold text-xl tracking-tight text-black">
+            <img src={logo} alt="SynchGate Logo" className="w-[150px]" />
+            {/* <span className="font-['Outfit'] font-bold text-xl tracking-tight text-black">
               SynchGate
-            </span>
+            </span> */}
           </Link>
           <button
             className="ml-auto lg:hidden text-slate-500 hover:text-slate-900"
@@ -298,8 +300,8 @@ function Dashboard() {
                 <span className="sr-only">Toggle environment</span>
                 <span
                   className={`flex h-3 w-3 sm:h-4 sm:w-4 transform rounded-full bg-white shadow-sm transition-transform items-center justify-center ${merchantMode === "live"
-                      ? "translate-x-5 sm:translate-x-6"
-                      : "translate-x-1"
+                    ? "translate-x-5 sm:translate-x-6"
+                    : "translate-x-1"
                     }`}
                 >
                   {isTogglingMode && (
@@ -309,8 +311,8 @@ function Dashboard() {
               </button>
               <span
                 className={`text-[10px] sm:text-xs font-semibold transition-colors ${merchantMode === "live"
-                    ? "text-emerald-600"
-                    : "text-slate-400"
+                  ? "text-emerald-600"
+                  : "text-slate-400"
                   }`}
               >
                 Live

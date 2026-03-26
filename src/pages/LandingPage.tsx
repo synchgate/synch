@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import logo from "../assets/logo.png";
 
 function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -35,15 +36,16 @@ function LandingPage() {
       {/* Navbar */}
       <header
         className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled
-            ? "glass-panel border-b border-slate-200 py-4"
-            : "bg-transparent py-6"
+          ? "glass-panel border-b border-slate-200 py-4"
+          : "bg-transparent py-6"
           }`}
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer">
-            <span className="font-['Outfit'] font-bold text-xl tracking-tight text-black">
+            <img src={logo} alt="SynchGate Logo" className="w-[150px] " />
+            {/* <span className="font-['Outfit'] font-bold text-xl tracking-tight text-black">
               SynchGate
-            </span>
+            </span> */}
           </div>
 
           <nav className="hidden md:flex items-center gap-8">

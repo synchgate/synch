@@ -1,5 +1,7 @@
 import { ShieldCheck } from "lucide-react";
 import { Link, Outlet } from "react-router-dom";
+import logo from "../../assets/logo-white.png";
+
 
 function AuthLayout() {
   return (
@@ -12,13 +14,8 @@ function AuthLayout() {
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.1] mix-blend-overlay"></div>
 
         <div className="relative z-10">
-          <Link
-            to="/"
-            className="flex items-center gap-3 w-fit hover:opacity-90 transition-opacity"
-          >
-            <span className="font-['Outfit'] font-bold text-2xl tracking-tight text-white">
-              SynchGate
-            </span>
+          <Link to="/" className="flex items-center gap-2 cursor-pointer">
+            <img src={logo} alt="SynchGate Logo" className="w-[150px]" />
           </Link>
         </div>
 
