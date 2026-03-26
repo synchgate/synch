@@ -335,7 +335,7 @@ function Dashboard() {
                 Your account is pending verification. Please complete your KYC
                 to unlock all features.
               </span>
-              <span className="sm:hidden">KYC pending. Unlock features.</span>
+              <span className="sm:hidden">KYC pending. Unlock features</span>
             </span>
             <Link
               to="/dashboard/settings"
