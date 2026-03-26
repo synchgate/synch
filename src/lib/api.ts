@@ -26,11 +26,15 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
+      // Dispatch custom event for AuthContext to handle React state sync
+      window.dispatchEvent(new Event("auth-unauthorized"));
+
       // Clear auth tokens securely when API rejects session
       localStorage.removeItem("authToken");
       localStorage.removeItem("userName");
       localStorage.removeItem("kycStatus");
       localStorage.removeItem("merchantMode");
+      localStorage.removeItem("authTimestamp");
 
       // Redirect to login if not already there
       if (window.location.pathname !== "/auth/login") {

@@ -32,6 +32,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   useEffect(() => {
+    const handleUnauthorized = () => {
+      console.log("🔒 AuthContext: Unauthorized event received, logging out...");
+      logout();
+    };
+
+    window.addEventListener("auth-unauthorized", handleUnauthorized);
+    return () => window.removeEventListener("auth-unauthorized", handleUnauthorized);
+  }, []);
+
+  useEffect(() => {
     const checkExpiration = () => {
       const authTimestamp = localStorage.getItem("authTimestamp");
       if (authTimestamp && isAuthenticated) {
@@ -40,13 +50,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const TWENTY_THREE_HOURS = 23 * 60 * 60 * 1000;
 
         if (currentTime - loginTime >= TWENTY_THREE_HOURS) {
+          console.log("⏰ AuthContext: Session expired (23h), logging out...");
           logout();
-          return true;
+          return;
         }
         
         // Schedule next check/logout
         const remainingTime = (loginTime + TWENTY_THREE_HOURS) - currentTime;
         const timer = setTimeout(() => {
+          console.log("⏰ AuthContext: Session timeout reached, logging out...");
           logout();
         }, remainingTime);
         
