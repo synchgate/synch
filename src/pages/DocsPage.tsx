@@ -9,6 +9,7 @@ import {
 import { useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import logo from "../assets/logo.png";
 
 function DocsPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -39,9 +40,7 @@ function DocsPage() {
               )}
             </button>
             <Link to="/" className="flex items-center gap-2 cursor-pointer">
-              <span className="font-['Outfit'] font-bold text-xl tracking-tight hidden sm:block">
-                SynchGate
-              </span>
+              <img src={logo} alt="SynchGate Logo" className="w-[150px]" />
             </Link>
             <span className="hidden sm:block text-slate-300 font-medium">
               /
