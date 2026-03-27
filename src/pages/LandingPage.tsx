@@ -454,10 +454,6 @@ function LandingPage() {
                     a: "We do not process payments or handle user cards details. All payments are processed by payment gateways (providers) and they securely handle sensitive payment data."
                   },
                   {
-                    q: "Can I use SynchGate for subscriptions?",
-                    a: "Absolutely. Our infrastructure supports one-time charges, recurring billing, and complex multi-tiered subscription models across all supported providers."
-                  },
-                  {
                     q: "How does smart routing work?",
                     a: "(this feature is coming soon)"
                   },
