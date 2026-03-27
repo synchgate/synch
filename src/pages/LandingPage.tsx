@@ -193,7 +193,7 @@ function LandingPage() {
                     {
                       icon: Globe,
                       title: "Smart Savings",
-                      desc: "We automatically find the best way to process every payment, saving you money on every sale.",
+                      desc: "We automatically find the best way to route every payment, saving you money on every sale.",
                     },
                     {
                       icon: Layers,
