@@ -115,10 +115,10 @@ function LandingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="font-['Outfit'] text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-8 leading-[1.1] max-w-5xl text-black"
+              className="font-['Outfit'] text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-8 leading-[1.1] max-w-4xl text-black mx-auto"
             >
-              One integration for <br className="hidden md:block" />
-              <span className="text-blue-600">every provider.</span>
+              Your Payments, <br className="hidden md:block" />
+              <span className="text-blue-600">Intelligently Orchestrated.</span>
             </motion.h1>
 
             <motion.p
@@ -163,10 +163,10 @@ function LandingPage() {
               <div className="order-2 lg:order-1 relative w-full min-w-0">
                 <div className="absolute -inset-1 bg-gradient-to-r from-blue-100 to-slate-200 rounded-2xl blur opacity-50"></div>
                 <div className="relative glass-panel rounded-2xl p-2 overflow-hidden w-full shadow-2xl border border-slate-200/50">
-                  <img 
-                    src={businessOwners} 
-                    alt="Success Stories" 
-                    className="w-full h-auto rounded-xl object-cover hover:scale-[1.02] transition-transform duration-700" 
+                  <img
+                    src={businessOwners}
+                    alt="Success Stories"
+                    className="w-full h-auto rounded-xl object-cover hover:scale-[1.02] transition-transform duration-700"
                   />
                 </div>
               </div>
@@ -178,8 +178,8 @@ function LandingPage() {
                   providers when you only need one?
                 </h2>
                 <p className="text-slate-600 text-lg mb-8 leading-relaxed">
-                  Setting up different payment methods for your business is slow and frustrating. 
-                  Instead of juggling multiple accounts and messy reports, SynchGate gives you 
+                  Setting up different payment methods for your business is slow and frustrating.
+                  Instead of juggling multiple accounts and messy reports, SynchGate gives you
                   one simple way to handle everything.
                 </p>
 

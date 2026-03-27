@@ -31,15 +31,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return localStorage.getItem("merchantMode") || "test";
   });
 
-  useEffect(() => {
-    const handleUnauthorized = () => {
-      console.log("🔒 AuthContext: Unauthorized event received, logging out...");
-      logout();
-    };
-
-    window.addEventListener("auth-unauthorized", handleUnauthorized);
-    return () => window.removeEventListener("auth-unauthorized", handleUnauthorized);
-  }, []);
 
   useEffect(() => {
     const checkExpiration = () => {
@@ -99,15 +90,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("kycStatus");
-    localStorage.removeItem("merchantMode");
-    localStorage.removeItem("authTimestamp");
-    setIsAuthenticated(false);
-    setUserName("");
-    setKycStatus("");
-    setMerchantMode("test");
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = "/auth/login";
   };
 
   return (
