@@ -319,8 +319,8 @@ function LandingPage() {
                     },
                     {
                       icon: TrendingUp,
-                      title: "3. Smart Growth",
-                      desc: "We automatically route your payments for the best rates and success, helping you scale faster.",
+                      title: "3. Routing",
+                      desc: "The current routing system uses explicit provider selection based on your preference.",
                       bgColor: "bg-slate-600/5",
                       iconColor: "text-slate-600"
                     }
