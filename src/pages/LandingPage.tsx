@@ -540,9 +540,7 @@ function LandingPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
             <div className="col-span-2">
               <div className="flex items-center gap-2 mb-4">
-                <span className="font-['Outfit'] font-bold text-lg tracking-tight text-black">
-                  SynchGate
-                </span>
+                <img src={logo} alt="SynchGate Logo" className="w-[130px]" />
               </div>
               <p className="text-slate-600 text-sm max-w-xs mb-6">
                 The unifying infrastructure for modern payments. One API
