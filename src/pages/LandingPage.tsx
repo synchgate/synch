@@ -12,6 +12,7 @@ import {
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
+import businessOwners from "../assets/business-owners.png";
 
 function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -161,52 +162,12 @@ function LandingPage() {
             <div className="grid lg:grid-cols-2 gap-16 items-center w-full">
               <div className="order-2 lg:order-1 relative w-full min-w-0">
                 <div className="absolute -inset-1 bg-gradient-to-r from-blue-100 to-slate-200 rounded-2xl blur opacity-50"></div>
-                <div className="relative glass-panel-dark rounded-2xl p-4 sm:p-6 overflow-hidden w-full">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                    <div className="w-3 h-3 rounded-full bg-amber-400"></div>
-                    <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
-                    <div className="text-xs text-slate-400 ml-2 font-mono">
-                      charge.ts
-                    </div>
-                  </div>
-                  <pre className="text-xs sm:text-sm font-mono text-slate-300 overflow-x-auto pb-4 max-w-full">
-                    <code>
-                      <span className="text-pink-400">import</span> &#123;
-                      SynchGate &#125; <span className="text-pink-400">from</span>{" "}
-                      <span className="text-emerald-300">'@synchgate/node'</span>;
-                      <br />
-                      <br />
-                      <span className="text-blue-400">const</span> SynchGate ={" "}
-                      <span className="text-pink-400">new</span>{" "}
-                      <span className="text-yellow-200">SynchGate</span>
-                      (process.env.SYNCHGATE_KEY);
-                      <br />
-                      <br />
-                      <span className="text-slate-500">
-                        // One endpoint handles any payment method
-                      </span>
-                      <br />
-                      <span className="text-blue-400">const</span> charge ={" "}
-                      <span className="text-pink-400">await</span>{" "}
-                      SynchGate.charges.
-                      <span className="text-blue-300">create</span>(&#123;
-                      <br />
-                      &nbsp;&nbsp;amount:{" "}
-                      <span className="text-orange-300">2000</span>,<br />
-                      &nbsp;&nbsp;currency:{" "}
-                      <span className="text-emerald-300">'usd'</span>,<br />
-                      &nbsp;&nbsp;provider:{" "}
-                      <span className="text-emerald-300">'auto'</span>,{" "}
-                      <span className="text-slate-500">
-                        // Intelligently routes for lowest fee
-                      </span>
-                      <br />
-                      &nbsp;&nbsp;source: req.body.paymentMethodId,
-                      <br />
-                      &#125;);
-                    </code>
-                  </pre>
+                <div className="relative glass-panel rounded-2xl p-2 overflow-hidden w-full shadow-2xl border border-slate-200/50">
+                  <img 
+                    src={businessOwners} 
+                    alt="Success Stories" 
+                    className="w-full h-auto rounded-xl object-cover hover:scale-[1.02] transition-transform duration-700" 
+                  />
                 </div>
               </div>
 
