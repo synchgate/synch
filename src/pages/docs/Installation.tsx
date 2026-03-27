@@ -17,13 +17,16 @@ function Installation() {
     javascript: `const response = await fetch('https://api.synchgate.com/v1/initiate-payment/', {
   method: 'POST',
   headers: {
-    'Client-Secret-Key': 'sk_live_your_key',
+    'Client-Secret-Key': 'synch_live_your_key',
     'Content-Type': 'application/json'
   },
   body: JSON.stringify({
     provider: 'paystack',
     amount: 5000,
-    email: 'user@example.com'
+    email: 'user@example.com',
+    reference: "kskfksjf",
+    callback_url: "https://your-domain.com/payment-success",
+    currency: "NGN",
   })
 });
 
@@ -35,10 +38,13 @@ url = "https://api.synchgate.com/v1/initiate-payment/"
 payload = {
     "provider": "paystack",
     "amount": 5000,
-    "email": "user@example.com"
+    "email": "user@example.com",
+    "reference": "kskfksjf",
+    "callback_url": "https://your-domain.com/payment-success",
+    "currency": "NGN",
 }
 headers = {
-    "Client-Secret-Key": "sk_live_your_key",
+    "Client-Secret-Key": "synch_live_your_key",
     "Content-Type": "application/json"
 }
 
@@ -54,10 +60,13 @@ curl_setopt_array($curl, [
   CURLOPT_POSTFIELDS => json_encode([
     "provider" => "paystack",
     "amount" => 5000,
-    "email" => "user@example.com"
+    "email" => "user@example.com",
+    "reference": "kskfksjf",
+    "callback_url": "https://your-domain.com/payment-success",
+    "currency": "NGN",
   ]),
   CURLOPT_HTTPHEADER => [
-    "Client-Secret-Key: sk_live_your_key",
+    "Client-Secret-Key: synch_live_your_key",
     "Content-Type: application/json"
   ],
 ]);
@@ -70,11 +79,14 @@ require 'json'
 
 uri = URI('https://api.synchgate.com/v1/initiate-payment/')
 req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
-req['Client-Secret-Key'] = 'sk_live_your_key'
+req['Client-Secret-Key'] = 'synch_live_your_key'
 req.body = {
   provider: 'paystack',
   amount: 5000,
-  email: 'user@example.com'
+  email: 'user@example.com',
+  reference: "kskfksjf",
+  callback_url: "https://your-domain.com/payment-success",
+  currency: "NGN",
 }.to_json
 
 res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
@@ -90,10 +102,10 @@ import java.net.http.HttpResponse;
 HttpClient client = HttpClient.newHttpClient();
 HttpRequest request = HttpRequest.newBuilder()
     .uri(URI.create("https://api.synchgate.com/v1/initiate-payment/"))
-    .header("Client-Secret-Key", "sk_live_your_key")
+    .header("Client-Secret-Key", "synch_live_your_key")
     .header("Content-Type", "application/json")
     .POST(HttpRequest.BodyPublishers.ofString(
-        "{\\"provider\\":\\"paystack\\",\\"amount\\":5000,\\"email\\":\\"user@example.com\\"}"
+        "{\\"provider\\":\\"paystack\\",\\"amount\\":5000,\\"email\\":\\"user@example.com\\, \\"reference\\":\\"kskfksjf\\", \\"callback_url\\":\\"https://your-domain.com/payment-success\\", \\"currency\\":\\"NGN\\"}"
     ))
     .build();
 
@@ -139,7 +151,7 @@ client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
       <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-slate-300 mb-12 shadow-inner overflow-x-auto space-y-2">
         <div>
           <span className="text-emerald-300">Client-Secret-Key:</span>{" "}
-          sk_live_xxxxxxxx
+          synch_live_xxxxxxxx
         </div>
       </div>
 
@@ -178,8 +190,8 @@ client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
               key={lang.id}
               onClick={() => setActiveTab(lang.id)}
               className={`px-4 py-2.5 text-sm font-medium transition-all relative whitespace-nowrap ${activeTab === lang.id
-                  ? "text-blue-400"
-                  : "text-slate-400 hover:text-slate-200"
+                ? "text-blue-400"
+                : "text-slate-400 hover:text-slate-200"
                 }`}
             >
               {lang.label}

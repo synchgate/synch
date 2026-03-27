@@ -24,6 +24,7 @@ function Signup() {
   });
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const registerMutation = useMutation({
     mutationFn: (data: RegisterPayload) => authService.register(data),
@@ -54,6 +55,11 @@ function Signup() {
 
     if (!formData.password || formData.password.length < 6) {
       setError("Password must be at least 6 characters long.");
+      return;
+    }
+
+    if (!agreedToTerms) {
+      setError("You must agree to the Terms of Use to sign up.");
       return;
     }
 
@@ -185,6 +191,32 @@ function Signup() {
           <p className="mt-2 text-xs text-slate-500">
             Must be at least 6 characters long.
           </p>
+        </div>
+
+        <div className="flex items-start gap-3">
+          <div className="flex items-center h-5">
+            <input
+              id="terms"
+              name="terms"
+              type="checkbox"
+              checked={agreedToTerms}
+              onChange={(e) => setAgreedToTerms(e.target.checked)}
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded cursor-pointer"
+            />
+          </div>
+          <div className="text-sm">
+            <label htmlFor="terms" className="font-medium text-slate-700 cursor-pointer">
+              I agree to the{" "}
+            </label>
+            <Link
+              to="/terms-of-use"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-blue-600 hover:text-blue-500 cursor-pointer"
+            >
+              terms of use
+            </Link>
+          </div>
         </div>
 
         {error && (
