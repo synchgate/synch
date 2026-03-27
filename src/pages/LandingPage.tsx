@@ -94,11 +94,11 @@ function LandingPage() {
               className="relative group inline-flex h-9 items-center justify-center rounded-md bg-black px-4 text-sm font-medium text-white shadow transition-colors hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 cursor-pointer"
             >
               <span className="relative z-10 hidden sm:flex items-center gap-1">
-                Get API Keys{" "}
+                Get started{" "}
                 <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
               </span>
               <span className="relative z-10 flex sm:hidden items-center gap-1">
-                Try Free
+                Get started
               </span>
             </Link>
           </div>
@@ -240,7 +240,7 @@ function LandingPage() {
             className="py-32 relative overflow-hidden"
           >
             <div className="absolute inset-0 bg-slate-50/50 -z-10"></div>
-            
+
             <div className="max-w-7xl mx-auto px-6">
               <div className="text-center mb-20">
                 <motion.span
@@ -346,16 +346,16 @@ function LandingPage() {
                       {/* Mobile Vertical Connector */}
                       {i < 2 && (
                         <div className="lg:hidden h-20 w-px bg-linear-to-b from-blue-200 to-transparent my-8 relative">
-                          <motion.div 
+                          <motion.div
                             className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-4 bg-blue-400 rounded-full"
-                            animate={{ 
+                            animate={{
                               top: ["0%", "100%"],
                               opacity: [0, 1, 0]
                             }}
-                            transition={{ 
-                              duration: 1.5, 
-                              repeat: Infinity, 
-                              ease: "linear" 
+                            transition={{
+                              duration: 1.5,
+                              repeat: Infinity,
+                              ease: "linear"
                             }}
                           />
                         </div>
@@ -366,7 +366,7 @@ function LandingPage() {
 
                 {/* Mobile Connectors */}
                 <div className="lg:hidden flex flex-col items-center gap-12 mt-12">
-                   {/* Mobile version would be easier with just vertical spacing, 
+                  {/* Mobile version would be easier with just vertical spacing, 
                        but the icons above already show the sequence */}
                 </div>
               </div>
@@ -461,7 +461,7 @@ function LandingPage() {
                     q: "How does smart routing work?",
                     a: "(this feature is coming soon)"
                   },
-                  
+
                 ].map((faq, i) => (
                   <motion.div
                     key={i}
