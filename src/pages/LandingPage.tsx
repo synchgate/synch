@@ -63,6 +63,8 @@ function LandingPage() {
             </a>
             <Link
               to="/docs"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors inline-flex items-center gap-1 cursor-pointer"
             >
               <Code2 className="w-4 h-4" /> Docs
@@ -122,11 +124,9 @@ function LandingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-lg md:text-xl text-slate-600 max-w-2xl mb-12 font-light leading-relaxed"
+              className="text-sm md:text-base text-slate-600 max-w-2xl mb-12 font-light leading-relaxed"
             >
-              Stop wasting engineering time integrating Stripe, PayPal, and
-              Square individually. Use our unified API to route payments, handle
-              webhooks, and unify payouts.
+              An open payments infrastructure that lets you connect any provider and intelligently manage every transaction flow—from unified APIs and webhooks to seamless routing, payouts, and global payment experiences.
             </motion.p>
 
             <motion.div
@@ -143,6 +143,8 @@ function LandingPage() {
               </Link>
               <Link
                 to="/docs"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full sm:w-auto h-12 inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-8 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 hover:border-slate-400 cursor-pointer"
               >
                 <Terminal className="w-4 h-4 mr-2" />
@@ -210,33 +212,32 @@ function LandingPage() {
 
               <div className="order-1 lg:order-2">
                 <h2 className="font-['Outfit'] text-3xl md:text-5xl font-bold mb-6 text-black">
-                  Why integrate thrice
+                  Why manage multiple
                   <br />
-                  when once will do?
+                  providers when you only need one?
                 </h2>
                 <p className="text-slate-600 text-lg mb-8 leading-relaxed">
-                  Building payment infrastructure is hard. Maintaining 3
-                  distinct API integrations, harmonizing webhooks, and
-                  reconciling payouts is a nightmare. SynchGate abstracts the
-                  complexity away.
+                  Setting up different payment methods for your business is slow and frustrating. 
+                  Instead of juggling multiple accounts and messy reports, SynchGate gives you 
+                  one simple way to handle everything.
                 </p>
 
                 <div className="space-y-6">
                   {[
                     {
                       icon: ShieldCheck,
-                      title: "Unified Webhooks",
-                      desc: "Receive formatted, standardized events regardless of the underlying provider.",
+                      title: "One Connection",
+                      desc: "Connect once and get access to every payment method your customers want as you grow.",
                     },
                     {
                       icon: Globe,
-                      title: "Smart Routing",
-                      desc: "Automatically route transactions based on global success rates and processing fees.",
+                      title: "Smart Savings",
+                      desc: "We automatically find the best way to process every payment, saving you money on every sale.",
                     },
                     {
                       icon: Layers,
-                      title: "Single Ledger",
-                      desc: "All your data normalized into one uniform dataset, accessible via one dashboard.",
+                      title: "Simple Dashboard",
+                      desc: "See all your sales and money in one clean view, no matter how your customers choose to pay.",
                     },
                   ].map((feature, i) => (
                     <motion.div
@@ -321,6 +322,8 @@ function LandingPage() {
                 <li>
                   <Link
                     to="/docs"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-slate-600 hover:text-blue-600 transition-colors text-sm cursor-pointer"
                   >
                     Documentation

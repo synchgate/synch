@@ -25,6 +25,7 @@ import InitiatePayment from "./pages/docs/InitiatePayment";
 import PCICompliance from "./pages/docs/PCICompliance";
 import DataPrivacy from "./pages/docs/DataPrivacy";
 import LandingPage from "./pages/LandingPage";
+import TermsOfUse from "./pages/TermsOfUse";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -91,6 +92,8 @@ function App() {
               <Route path="pci-compliance" element={<PCICompliance />} />
               <Route path="data-privacy" element={<DataPrivacy />} />
             </Route>
+
+            <Route path="/terms-of-use" element={<TermsOfUse />} />
 
             <Route
               path="/auth"
