@@ -154,7 +154,6 @@ function LandingPage() {
               </Link>
               <Link
                 to="/docs"
-                target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto h-12 inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-8 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 hover:border-slate-400 cursor-pointer"
               >
