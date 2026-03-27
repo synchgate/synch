@@ -104,7 +104,7 @@ function LandingPage() {
             >
               <span className="flex h-2 w-2 rounded-full bg-blue-500"></span>
               <span className="text-xs font-medium text-slate-600 uppercase tracking-wider">
-                v2.0 API is now live
+                v1.0 API is now live
               </span>
             </motion.div>
 
