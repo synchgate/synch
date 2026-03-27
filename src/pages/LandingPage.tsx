@@ -3,17 +3,20 @@ import {
   ArrowRight,
   ChevronRight,
   Code2,
-  Fingerprint,
-  Globe,
-  Layers,
-  ShieldCheck,
+  Cpu,
+  Plus,
+  Minus,
+  UserPlus,
+  Link as LinkIcon,
+  TrendingUp,
   Terminal,
   Zap,
   Building2,
   ShoppingBag,
-  Cpu,
-  Plus,
-  Minus,
+  Fingerprint,
+  ShieldCheck,
+  Globe,
+  Layers,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -163,12 +166,12 @@ function LandingPage() {
 
           {/* Integration Comparison Feature */}
           <section
-            id="how-it-works"
+            id="benefits"
             className="py-24 border-y border-slate-200 relative"
           >
             <div className="grid lg:grid-cols-2 gap-16 items-center w-full">
               <div className="order-2 lg:order-1 relative w-full min-w-0">
-                <div className="absolute -inset-1 bg-gradient-to-r from-blue-100 to-slate-200 rounded-2xl blur opacity-50"></div>
+                <div className="absolute -inset-1 bg-linear-to-r from-blue-100 to-slate-200 rounded-2xl blur opacity-50"></div>
                 <div className="relative glass-panel rounded-2xl p-2 overflow-hidden w-full shadow-2xl border border-slate-200/50">
                   <img
                     src={businessOwners}
@@ -216,7 +219,7 @@ function LandingPage() {
                       transition={{ delay: i * 0.1 }}
                       className="flex gap-4"
                     >
-                      <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100">
+                      <div className="shrink-0 w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100">
                         <feature.icon className="w-6 h-6 text-blue-600" />
                       </div>
                       <div>
@@ -227,6 +230,145 @@ function LandingPage() {
                       </div>
                     </motion.div>
                   ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* How It Works Section */}
+          <section
+            id="how-it-works"
+            className="py-32 relative overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-slate-50/50 -z-10"></div>
+            
+            <div className="max-w-7xl mx-auto px-6">
+              <div className="text-center mb-20">
+                <motion.span
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="text-blue-600 font-semibold text-sm tracking-wider uppercase mb-4 block"
+                >
+                  Simple 3-Step Process
+                </motion.span>
+                <motion.h2
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1 }}
+                  className="font-['Outfit'] text-4xl md:text-5xl font-bold text-black mb-6"
+                >
+                  How it works
+                </motion.h2>
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 }}
+                  className="text-slate-600 text-lg max-w-2xl mx-auto"
+                >
+                  We've simplified the complex world of global payments into three easy steps. No rocket science, just results.
+                </motion.p>
+              </div>
+
+              <div className="relative">
+                {/* Desktop Connectors */}
+                <div className="hidden lg:block absolute top-[28%] left-[25%] w-[18%] text-blue-200">
+                  <svg viewBox="0 0 100 20" className="w-full">
+                    <motion.path
+                      d="M0 10 Q 50 10 100 10"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeDasharray="4 4"
+                      fill="none"
+                      animate={{ strokeDashoffset: [0, -8] }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    />
+                  </svg>
+                </div>
+                <div className="hidden lg:block absolute top-[28%] right-[25%] w-[18%] text-blue-200">
+                  <svg viewBox="0 0 100 20" className="w-full">
+                    <motion.path
+                      d="M0 10 Q 50 10 100 10"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeDasharray="4 4"
+                      fill="none"
+                      animate={{ strokeDashoffset: [0, -8] }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    />
+                  </svg>
+                </div>
+
+                <div className="grid lg:grid-cols-3 gap-12 relative z-10">
+                  {[
+                    {
+                      icon: UserPlus,
+                      title: "1. Connect & Go",
+                      desc: "Sign up and connect your existing payment providers like Paystack or Flutterwave in minutes.",
+                      bgColor: "bg-blue-600/5",
+                      iconColor: "text-blue-600"
+                    },
+                    {
+                      icon: LinkIcon,
+                      title: "2. One Simple Tool",
+                      desc: "Use our single API or no-code dashboard to power your entire payment stack without the mess.",
+                      bgColor: "bg-indigo-600/5",
+                      iconColor: "text-indigo-600"
+                    },
+                    {
+                      icon: TrendingUp,
+                      title: "3. Smart Growth",
+                      desc: "We automatically route your payments for the best rates and success, helping you scale faster.",
+                      bgColor: "bg-slate-600/5",
+                      iconColor: "text-slate-600"
+                    }
+                  ].map((step, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.2 }}
+                      className="relative flex flex-col items-center text-center group"
+                    >
+                      <div className="w-20 h-20 rounded-3xl glass-panel flex items-center justify-center mb-8 border border-slate-200 shadow-sm group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300 relative">
+                        <div className={`absolute inset-0 ${step.bgColor} rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity`}></div>
+                        <step.icon className={`w-8 h-8 ${step.iconColor} relative z-10`} />
+                      </div>
+                      <h3 className="font-['Outfit'] text-2xl font-bold mb-4 text-black">
+                        {step.title}
+                      </h3>
+                      <p className="text-slate-600 leading-relaxed font-light px-4">
+                        {step.desc}
+                      </p>
+
+                      {/* Mobile Vertical Connector */}
+                      {i < 2 && (
+                        <div className="lg:hidden h-20 w-px bg-linear-to-b from-blue-200 to-transparent my-8 relative">
+                          <motion.div 
+                            className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-4 bg-blue-400 rounded-full"
+                            animate={{ 
+                              top: ["0%", "100%"],
+                              opacity: [0, 1, 0]
+                            }}
+                            transition={{ 
+                              duration: 1.5, 
+                              repeat: Infinity, 
+                              ease: "linear" 
+                            }}
+                          />
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Mobile Connectors */}
+                <div className="lg:hidden flex flex-col items-center gap-12 mt-12">
+                   {/* Mobile version would be easier with just vertical spacing, 
+                       but the icons above already show the sequence */}
                 </div>
               </div>
             </div>
@@ -254,12 +396,12 @@ function LandingPage() {
                   {
                     icon: ShoppingBag,
                     title: "E-commerce Brands",
-                    desc: "Expand to new markets instantly by enabling local payment methods with zero extra code."
+                    desc: "Expand to new markets instantly by enabling multiple payment gateways with a single API."
                   },
                   {
                     icon: Building2,
                     title: "Scaling Platforms",
-                    desc: "Optimize processing costs and improve reliability with smart routing and automated failovers."
+                    desc: "Improve reliability with smart routing and automated failovers."
                   },
                   {
                     icon: Cpu,
@@ -294,7 +436,7 @@ function LandingPage() {
                   Frequently Asked Questions
                 </h2>
                 <p className="text-slate-600 text-lg">
-                  Everything you need to know about SynchGate.
+                  Everything you need to know about Us.
                 </p>
               </div>
 
@@ -302,7 +444,7 @@ function LandingPage() {
                 {[
                   {
                     q: "How long does setup take?",
-                    a: "You can be up and running in minutes. Our simplified dashboard help you setup your account, get your API keys and make your first charge faster than setting up a single provider manually."
+                    a: "You can be up and running in minutes. Our simplified dashboard help you setup your account, get your API keys and make your first charge."
                   },
                   {
                     q: "Which payment providers do you support?",
@@ -318,12 +460,9 @@ function LandingPage() {
                   },
                   {
                     q: "How does smart routing work?",
-                    a: "Our engine analyzes every transaction in real-time to find the provider with the lowest fees and highest success rate, automatically routing the payment to the optimal gateway. (this feature is coming soon)"
+                    a: "(this feature is coming soon)"
                   },
-                  {
-                    q: "What happens if a provider goes down?",
-                    a: "SynchGate detects failures instantly and automatically routes transactions to a healthy fallback provider, ensuring your business never misses a sale due to a gateway outage. (this feature is coming soon)"
-                  }
+                  
                 ].map((faq, i) => (
                   <motion.div
                     key={i}
