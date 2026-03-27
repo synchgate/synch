@@ -12,6 +12,8 @@ import {
   Building2,
   ShoppingBag,
   Cpu,
+  Plus,
+  Minus,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -20,6 +22,7 @@ import businessOwners from "../assets/business-owners.png";
 
 function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -283,6 +286,79 @@ function LandingPage() {
             </div>
           </section>
 
+          {/* FAQ Section */}
+          <section className="py-24 border-b border-slate-200">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-16">
+                <h2 className="font-['Outfit'] text-3xl md:text-5xl font-bold mb-4 text-black">
+                  Frequently Asked Questions
+                </h2>
+                <p className="text-slate-600 text-lg">
+                  Everything you need to know about SynchGate.
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                {[
+                  {
+                    q: "How long does setup take?",
+                    a: "You can be up and running in minutes. Our simplified dashboard help you setup your account, get your API keys and make your first charge faster than setting up a single provider manually."
+                  },
+                  {
+                    q: "Which payment providers do you support?",
+                    a: "We currently support some global providers including Flutterwave, Paystack, and Nomba. We are constantly adding new integrations based on customer demand."
+                  },
+                  {
+                    q: "Is SynchGate PCI compliant?",
+                    a: "We do not process payments or handle user cards details. All payments are processed by payment gateways (providers) and they securely handle sensitive payment data."
+                  },
+                  {
+                    q: "Can I use SynchGate for subscriptions?",
+                    a: "Absolutely. Our infrastructure supports one-time charges, recurring billing, and complex multi-tiered subscription models across all supported providers."
+                  },
+                  {
+                    q: "How does smart routing work?",
+                    a: "Our engine analyzes every transaction in real-time to find the provider with the lowest fees and highest success rate, automatically routing the payment to the optimal gateway. (this feature is coming soon)"
+                  },
+                  {
+                    q: "What happens if a provider goes down?",
+                    a: "SynchGate detects failures instantly and automatically routes transactions to a healthy fallback provider, ensuring your business never misses a sale due to a gateway outage. (this feature is coming soon)"
+                  }
+                ].map((faq, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.05 }}
+                    className="border border-slate-200 rounded-2xl overflow-hidden bg-white"
+                  >
+                    <button
+                      onClick={() => setActiveFaq(activeFaq === i ? null : i)}
+                      className="w-full flex items-center justify-between p-6 text-left hover:bg-slate-50 transition-colors"
+                    >
+                      <span className="font-bold text-slate-900 text-lg">{faq.q}</span>
+                      {activeFaq === i ? (
+                        <Minus className="w-5 h-5 text-blue-600 shrink-0" />
+                      ) : (
+                        <Plus className="w-5 h-5 text-slate-400 shrink-0" />
+                      )}
+                    </button>
+                    <motion.div
+                      initial={false}
+                      animate={{ height: activeFaq === i ? "auto" : 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="p-6 pt-0 text-slate-600 leading-relaxed border-t border-slate-100">
+                        {faq.a}
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
+
           {/* CTA Section */}
           <section className="py-32 relative text-center">
             <div className="absolute inset-0 bg-blue-50 rounded-3xl blur-3xl"></div>
@@ -294,7 +370,7 @@ function LandingPage() {
                 Ready to simplify?
               </h2>
               <p className="text-slate-600 text-lg md:text-xl mb-10 max-w-2xl mx-auto relative z-10">
-                Join hundreds of engineering teams building on SynchGate. Create
+                Join hundreds of businesses building on SynchGate. Create
                 an account, get your API keys, and make your first charge in
                 minutes.
               </p>
