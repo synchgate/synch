@@ -8,6 +8,10 @@ import {
   Layers,
   ShieldCheck,
   Terminal,
+  Zap,
+  Building2,
+  ShoppingBag,
+  Cpu,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -221,6 +225,60 @@ function LandingPage() {
                     </motion.div>
                   ))}
                 </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Target Audience Section */}
+          <section className="py-24 border-b border-slate-200 bg-slate-50/50 -mx-8 px-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-16">
+                <h2 className="font-['Outfit'] text-3xl md:text-5xl font-bold mb-4 text-black">
+                  Built for every stage of business
+                </h2>
+                <p className="text-slate-600 text-lg max-w-2xl mx-auto">
+                  Whether you're just starting or scaling globally, SynchGate provides the infrastructure you need to succeed.
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {[
+                  {
+                    icon: Zap,
+                    title: "Startups & Founders",
+                    desc: "Launch your product faster with a single integration that scales with you from day one."
+                  },
+                  {
+                    icon: ShoppingBag,
+                    title: "E-commerce Brands",
+                    desc: "Expand to new markets instantly by enabling local payment methods with zero extra code."
+                  },
+                  {
+                    icon: Building2,
+                    title: "Scaling Platforms",
+                    desc: "Optimize processing costs and improve reliability with smart routing and automated failovers."
+                  },
+                  {
+                    icon: Cpu,
+                    title: "Fintech Builders",
+                    desc: "Build complex payment experiences and custom flows on top of our robust, developer-first APIs."
+                  }
+                ].map((item, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className="p-8 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-shadow group"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100 mb-6 group-hover:bg-blue-600 group-hover:border-blue-600 transition-colors">
+                      <item.icon className="w-6 h-6 text-blue-600 group-hover:text-white transition-colors" />
+                    </div>
+                    <h3 className="text-slate-900 font-bold text-xl mb-3">{item.title}</h3>
+                    <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+                  </motion.div>
+                ))}
               </div>
             </div>
           </section>
