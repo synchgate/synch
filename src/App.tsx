@@ -2,6 +2,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import ContactUs from "./pages/ContactUs";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { queryClient } from "./lib/react-query";
 import AuthLayout from "./pages/auth/AuthLayout";
@@ -61,6 +62,14 @@ function App() {
               element={
                 <PublicRoute>
                   <LandingPage />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/contact-us"
+              element={
+                <PublicRoute>
+                  <ContactUs />
                 </PublicRoute>
               }
             />

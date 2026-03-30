@@ -60,12 +60,12 @@ function LandingPage() {
           </div>
 
           <nav className="hidden md:flex items-center gap-8">
-            <a
-              href="#features"
+            <Link
+              to="/contact-us"
               className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"
             >
-              Features
-            </a>
+              Contact Us
+            </Link>
             <a
               href="#how-it-works"
               className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"

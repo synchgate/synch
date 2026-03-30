@@ -19,6 +19,13 @@ function InitiatePayment() {
       </p>
 
       <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
+        Base URL
+      </h2>
+      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10">
+        https://api.synchgate.com/v1/api
+      </div>
+
+      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 border-b border-slate-200 pb-2 text-black">
         Endpoint
       </h2>
       <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10">
