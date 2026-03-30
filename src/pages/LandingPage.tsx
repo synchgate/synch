@@ -549,8 +549,6 @@ function LandingPage() {
                 <li>
                   <Link
                     to="/docs"
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="text-slate-600 hover:text-blue-600 transition-colors text-sm cursor-pointer"
                   >
                     Documentation
@@ -558,7 +556,7 @@ function LandingPage() {
                 </li>
                 <li>
                   <a
-                    href="#api"
+                    href="/docs/initiate-payment"
                     className="text-slate-600 hover:text-blue-600 transition-colors text-sm cursor-pointer"
                   >
                     API Reference
@@ -566,7 +564,6 @@ function LandingPage() {
                 </li>
                 <li>
                   <a
-                    href="#status"
                     className="text-slate-600 hover:text-blue-600 transition-colors text-sm cursor-pointer"
                   >
                     System Status
@@ -580,7 +577,6 @@ function LandingPage() {
               <ul className="space-y-3">
                 <li>
                   <a
-                    href="#pricing"
                     className="text-slate-600 hover:text-blue-600 transition-colors text-sm cursor-pointer"
                   >
                     Pricing
