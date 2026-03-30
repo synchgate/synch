@@ -14,8 +14,10 @@ import {
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../../lib/api";
+import { useAuth } from "../../contexts/AuthContext";
 
 function Transactions() {
+  const { userEmail } = useAuth();
   const [selectedTx, setSelectedTx] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProvider, setSelectedProvider] = useState("All Providers");
@@ -24,7 +26,7 @@ function Transactions() {
   const [endDate, setEndDate] = useState("");
 
   const { data: transactionsResponse, isLoading } = useQuery({
-    queryKey: ["transactions"],
+    queryKey: ["transactions", userEmail],
     queryFn: async () => {
       const token = localStorage.getItem("authToken");
       const response = await api.get("/transactions/", {
@@ -34,6 +36,7 @@ function Transactions() {
       });
       return response.data;
     },
+    enabled: !!userEmail,
   });
 
   const transactions = transactionsResponse?.data || [];

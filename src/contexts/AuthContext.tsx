@@ -1,12 +1,15 @@
 import { type ReactNode, createContext, useContext, useState, useEffect } from "react";
+import { queryClient } from "../lib/react-query";
 
 interface AuthContextType {
   isAuthenticated: boolean;
   userName: string;
+  userEmail: string;
   kycStatus: string;
   merchantMode: string;
   login: (
     token: string,
+    email?: string,
     name?: string,
     kycStatus?: string,
     merchantMode?: string,
@@ -23,6 +26,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
   const [userName, setUserName] = useState<string>(() => {
     return localStorage.getItem("userName") || "";
+  });
+  const [userEmail, setUserEmail] = useState<string>(() => {
+    return localStorage.getItem("userEmail") || "";
   });
   const [kycStatus, setKycStatus] = useState<string>(() => {
     return localStorage.getItem("kycStatus") || "";
@@ -45,14 +51,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           logout();
           return;
         }
-        
+
         // Schedule next check/logout
         const remainingTime = (loginTime + TWENTY_THREE_HOURS) - currentTime;
         const timer = setTimeout(() => {
           console.log("⏰ AuthContext: Session timeout reached, logging out...");
           logout();
         }, remainingTime);
-        
+
         return () => clearTimeout(timer);
       }
     };
@@ -63,12 +69,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = (
     token: string,
+    email?: string,
     name?: string,
     kycStatus?: string,
     merchantMode?: string,
   ) => {
     localStorage.setItem("authToken", token);
     localStorage.setItem("authTimestamp", Date.now().toString());
+    if (email) {
+      localStorage.setItem("userEmail", email);
+      setUserEmail(email);
+    }
     if (name) {
       localStorage.setItem("userName", name);
       setUserName(name);
@@ -90,6 +101,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
+    queryClient.clear();
+    queryClient.removeQueries();
+    queryClient.resetQueries();
+    localStorage.removeItem("REACT_QUERY_OFFLINE_CACHE");
     localStorage.clear();
     sessionStorage.clear();
     window.location.href = "/auth/login";
@@ -100,6 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         isAuthenticated,
         userName,
+        userEmail,
         kycStatus,
         merchantMode,
         login,

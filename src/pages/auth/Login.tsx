@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { authService, type LoginPayload } from "../../services/auth";
+import { queryClient } from "../../lib/react-query";
+
 
 function Login() {
   const navigate = useNavigate();
@@ -21,6 +23,7 @@ function Login() {
   const loginMutation = useMutation({
     mutationFn: (data: LoginPayload) => authService.login(data),
     onSuccess: (data) => {
+      queryClient.resetQueries()
       // Store token depending on your backend schema, falling back to a dummy identifier
       const token =
         data?.access || data?.token || data?.access_token || "authenticated";
@@ -37,7 +40,8 @@ function Login() {
         data?.merchant_mode || data?.user?.merchant_mode || "sandbox";
       const merchantMode = rawMerchantMode === "live" ? "live" : "test";
 
-      login(token, fullName, kycStatus, merchantMode);
+      const email = data?.user?.email || data?.email || formData.email;
+      login(token, email, fullName, kycStatus, merchantMode);
       navigate("/dashboard");
     },
     onError: (err: any) => {

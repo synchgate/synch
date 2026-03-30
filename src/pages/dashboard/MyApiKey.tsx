@@ -15,8 +15,10 @@ import {
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../lib/api";
+import { useAuth } from "../../contexts/AuthContext";
 
 function MyApiKey() {
+  const { userEmail } = useAuth();
   const [showLiveSecret, setShowLiveSecret] = useState(false);
   const [showTestSecret, setShowTestSecret] = useState(false);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -39,7 +41,7 @@ function MyApiKey() {
   const queryClient = useQueryClient();
 
   const { data: settingsResponse, isLoading } = useQuery({
-    queryKey: ["settings"],
+    queryKey: ["settings", userEmail],
     queryFn: async () => {
       const token = localStorage.getItem("authToken");
       const response = await api.get("/accounts/user/details/", {
@@ -49,6 +51,7 @@ function MyApiKey() {
       });
       return response.data;
     },
+    enabled: !!userEmail,
   });
 
   const settingsRaw = settingsResponse?.data || settingsResponse || {};
@@ -111,7 +114,7 @@ function MyApiKey() {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["settings"] });
+      queryClient.invalidateQueries({ queryKey: ["settings", userEmail] });
     },
   });
 
@@ -171,7 +174,7 @@ function MyApiKey() {
     },
     onSuccess: () => {
       // Refresh the settings to grab the newly generated keys
-      queryClient.invalidateQueries({ queryKey: ["settings"] });
+      queryClient.invalidateQueries({ queryKey: ["settings", userEmail] });
     },
   });
 
@@ -595,8 +598,8 @@ function MyApiKey() {
         <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300">
           <div
             className={`flex items-center gap-3 px-4 py-3 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border ${notification.type === "success"
-                ? "bg-emerald-50 border-emerald-200 text-emerald-800"
-                : "bg-red-50 border-red-200 text-red-800"
+              ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+              : "bg-red-50 border-red-200 text-red-800"
               }`}
           >
             {notification.type === "success" ? (
@@ -608,8 +611,8 @@ function MyApiKey() {
             <button
               onClick={() => setNotification(null)}
               className={`ml-2 p-1 rounded-md transition-colors cursor-pointer ${notification.type === "success"
-                  ? "hover:bg-emerald-100/80 text-emerald-600"
-                  : "hover:bg-red-100/80 text-red-600"
+                ? "hover:bg-emerald-100/80 text-emerald-600"
+                : "hover:bg-red-100/80 text-red-600"
                 }`}
             >
               <X className="w-4 h-4" />
