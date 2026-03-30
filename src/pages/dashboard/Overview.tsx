@@ -14,6 +14,7 @@ import { useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../../lib/api";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import {
   CartesianGrid,
   Line,
@@ -35,8 +36,8 @@ const chartData = [
 ];
 
 function Overview() {
-  console.log("🔥 Overview component rerendered! Checking logs...");
   const navigate = useNavigate();
+  const { userEmail } = useAuth();
   const [selectedYear, setSelectedYear] = useState("2026");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -60,7 +61,7 @@ function Overview() {
     error,
     isError,
   } = useQuery({
-    queryKey: ["overview"],
+    queryKey: ["overview", userEmail],
     queryFn: async () => {
       const token = localStorage.getItem("authToken");
       const response = await api.get(`/analytics/overview/`, {
@@ -70,13 +71,14 @@ function Overview() {
       });
       return response.data;
     },
+    enabled: !!userEmail,
   });
 
   const {
     data: graphResponse,
     isFetching: isGraphFetching,
   } = useQuery({
-    queryKey: ["overview-graph", selectedYear],
+    queryKey: ["overview-graph", userEmail, selectedYear],
     queryFn: async () => {
       const token = localStorage.getItem("authToken");
       const response = await api.get(`/analytics/overview/graph/?year=${selectedYear}`, {
@@ -86,6 +88,7 @@ function Overview() {
       });
       return response.data;
     },
+    enabled: !!userEmail,
   });
 
   console.log("Raw API Response (overviewResponse):", overviewResponse);
@@ -93,30 +96,30 @@ function Overview() {
 
   const overviewData = overviewResponse?.data ||
     overviewResponse || {
-      transactions: {
-        total_transactions: 0,
-        successful_transactions: 0,
-        failed_transactions: 0,
-        success_rate: "0%",
-        total_value: 0,
-      },
-      provider_performance: [],
-      provider_success_graph: [],
-    };
+    transactions: {
+      total_transactions: 0,
+      successful_transactions: 0,
+      failed_transactions: 0,
+      success_rate: "0%",
+      total_value: 0,
+    },
+    provider_performance: [],
+    provider_success_graph: [],
+  };
 
   const { transactions, provider_performance } = overviewData;
-  
+
   // Use graphResponse for the chart data
   const graphDataFromApi = graphResponse?.data || graphResponse?.provider_success_graph || [];
-  
+
   const displayedChartData = graphDataFromApi.length
     ? graphDataFromApi.map((d: any) => ({
-        month: d.month || "Unknown",
-        success_rate:
-          typeof d.success_rate === "string"
-            ? parseFloat(d.success_rate.replace("%", ""))
-            : d.success_rate || 0,
-      }))
+      month: d.month || "Unknown",
+      success_rate:
+        typeof d.success_rate === "string"
+          ? parseFloat(d.success_rate.replace("%", ""))
+          : d.success_rate || 0,
+    }))
     : chartData;
 
   console.log("Raw API Response (overviewResponse):", overviewResponse);
@@ -223,7 +226,7 @@ function Overview() {
               <Activity className="w-5 h-5 text-blue-500" /> Success Rate Trend
               (Yearly)
             </h3>
-            
+
             {/* Year Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
@@ -233,7 +236,7 @@ function Overview() {
                 {selectedYear}
                 <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
-              
+
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-1 w-24 bg-white border border-slate-200 rounded-lg shadow-lg z-50 py-1 animate-in fade-in zoom-in-95 duration-100">
                   {years.map((year) => (

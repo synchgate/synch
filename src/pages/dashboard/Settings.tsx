@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../lib/api";
 import { COUNTRIES } from "../../data/countries";
@@ -60,6 +61,7 @@ const DEFAULT_ENV_MODAL: EnvModal = {
 };
 
 function Settings() {
+  const { userEmail } = useAuth();
   const queryClient = useQueryClient();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(location.state?.tab || "general");
@@ -83,7 +85,7 @@ function Settings() {
   >("idle");
 
   const { data: settingsResponse, isLoading } = useQuery({
-    queryKey: ["settings"],
+    queryKey: ["settings", userEmail],
     queryFn: async () => {
       const token = localStorage.getItem("authToken");
       const response = await api.get("/accounts/user/details/", {
@@ -91,9 +93,9 @@ function Settings() {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("=== SETTINGS RAW RESPONSE ===", response.data);
       return response.data;
     },
+    enabled: !!userEmail,
   });
 
   const settingsRaw = settingsResponse?.data || settingsResponse || {};
@@ -205,7 +207,7 @@ function Settings() {
       },
       onSuccess: () => {
         setBusinessSaveStatus("success");
-        queryClient.invalidateQueries({ queryKey: ["settings"] });
+        queryClient.invalidateQueries({ queryKey: ["settings", userEmail] });
         setTimeout(() => setBusinessSaveStatus("idle"), 3000);
       },
       onError: () => {
@@ -247,14 +249,14 @@ function Settings() {
       const credentials =
         envModal.provider === "Nomba"
           ? {
-              grant_type: envModal.grantType,
-              client_id: envModal.clientId,
-              client_secret: envModal.clientSecret,
-              accountId: envModal.accountId,
-            }
+            grant_type: envModal.grantType,
+            client_id: envModal.clientId,
+            client_secret: envModal.clientSecret,
+            accountId: envModal.accountId,
+          }
           : {
-              secret_key: envModal.secretKey,
-            };
+            secret_key: envModal.secretKey,
+          };
 
       await setupProvider({
         merchant_id: merchantId.toString(),
@@ -263,7 +265,7 @@ function Settings() {
         credential_type: "api_key",
         credentials,
       });
-      await queryClient.invalidateQueries({ queryKey: ["settings"] });
+      await queryClient.invalidateQueries({ queryKey: ["settings", userEmail] });
       closeEnvModal();
     } catch (error) {
       console.error("Failed to setup provider:", error);
@@ -308,11 +310,10 @@ function Settings() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap cursor-pointer
-                                    ${
-                                      activeTab === tab.id
-                                        ? "bg-blue-50 text-blue-700"
-                                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                                    }
+                                    ${activeTab === tab.id
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }
                                 `}
               >
                 <TabIcon
@@ -688,18 +689,18 @@ function Settings() {
                     </h3>
                     <p className="text-sm text-slate-500 max-w-sm">
                       {activeTab === "billing" ||
-                      activeTab === "security" ||
-                      activeTab === "notifications"
+                        activeTab === "security" ||
+                        activeTab === "notifications"
                         ? "We are currently building out this module. Check back later for updates!"
                         : "These configuration options would be connected to the backend API via your data provider."}
                     </p>
                     {(activeTab === "billing" ||
                       activeTab === "security" ||
                       activeTab === "notifications") && (
-                      <span className="mt-4 px-3 py-1 bg-blue-50 text-blue-600 border border-blue-200 text-xs font-semibold rounded-full uppercase tracking-wider">
-                        Coming Soon
-                      </span>
-                    )}
+                        <span className="mt-4 px-3 py-1 bg-blue-50 text-blue-600 border border-blue-200 text-xs font-semibold rounded-full uppercase tracking-wider">
+                          Coming Soon
+                        </span>
+                      )}
                   </div>
                 )}
 
@@ -964,18 +965,16 @@ function Settings() {
                 </label>
                 {envModal.isEdit || envModal.isFixed ? (
                   <div
-                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${
-                      envModal.environment === "sandbox"
+                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${envModal.environment === "sandbox"
                         ? "bg-amber-100 text-amber-700"
                         : "bg-emerald-100 text-emerald-700"
-                    }`}
+                      }`}
                   >
                     <span
-                      className={`w-1.5 h-1.5 rounded-full ${
-                        envModal.environment === "sandbox"
+                      className={`w-1.5 h-1.5 rounded-full ${envModal.environment === "sandbox"
                           ? "bg-amber-500"
                           : "bg-emerald-500"
-                      }`}
+                        }`}
                     />
                     {envModal.environment === "sandbox" ? "Sandbox" : "Live"}
                   </div>
@@ -1147,12 +1146,12 @@ function Settings() {
                   isSettingUpProvider ||
                   (envModal.provider === "Nomba"
                     ? !envModal.grantType ||
-                      !envModal.clientId ||
-                      !envModal.clientSecret ||
-                      !envModal.accountId
+                    !envModal.clientId ||
+                    !envModal.clientSecret ||
+                    !envModal.accountId
                     : envModal.secretKey.length < 10 ||
-                      (envModal.isEdit &&
-                        envModal.secretKey === envModal.originalKey))
+                    (envModal.isEdit &&
+                      envModal.secretKey === envModal.originalKey))
                 }
                 className="px-5 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm shadow-blue-500/20 text-sm flex items-center gap-2"
               >

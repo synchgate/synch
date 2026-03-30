@@ -12,15 +12,14 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { api } from "../lib/api";
 import logo from "../assets/logo.png";
 
 function Dashboard() {
-  const navigate = useNavigate();
   const location = useLocation();
-  const { logout, userName, kycStatus, merchantMode, updateMerchantMode } =
+  const { logout, userName, kycStatus, merchantMode, updateMerchantMode, userEmail } =
     useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isTogglingMode, setIsTogglingMode] = useState(false);
@@ -49,7 +48,6 @@ function Dashboard() {
 
   const confirmLogout = () => {
     logout();
-    navigate("/auth/login");
   };
 
   const handleToggleMode = async () => {
@@ -93,7 +91,7 @@ function Dashboard() {
   };
 
   return (
-    <div className="flex h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-500/30 overflow-hidden">
+    <div key={userEmail} className="flex h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-500/30 overflow-hidden">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div

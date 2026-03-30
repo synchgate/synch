@@ -1,4 +1,5 @@
 import axios from "axios";
+import { queryClient } from "./react-query";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -14,6 +15,15 @@ api.interceptors.request.use(
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // Add cache-buster to GET requests
+    if (config.method?.toLowerCase() === "get") {
+      config.params = {
+        ...config.params,
+        _t: Date.now(),
+      };
+    }
+
     return config;
   },
   (error) => {
@@ -27,6 +37,8 @@ api.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       // Clear all storage and refresh to login page
+      queryClient.clear();
+      queryClient.removeQueries();
       localStorage.clear();
       sessionStorage.clear();
       
