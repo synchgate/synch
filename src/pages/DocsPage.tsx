@@ -45,7 +45,7 @@ function DocsPage() {
             <span className="hidden sm:block text-slate-300 font-medium">
               /
             </span>
-            <span className="font-medium text-slate-800 truncate">
+            <span className="hidden sm:block font-medium text-slate-800 truncate">
               Documentation
             </span>
           </div>
