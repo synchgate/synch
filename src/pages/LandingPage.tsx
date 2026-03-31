@@ -17,6 +17,8 @@ import {
   ShieldCheck,
   Globe,
   Layers,
+  Menu,
+  X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -26,6 +28,7 @@ import businessOwners from "../assets/business-owners.png";
 function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -60,12 +63,12 @@ function LandingPage() {
           </div>
 
           <nav className="hidden md:flex items-center gap-8">
-            <a
-              href="#features"
+            <Link
+              to="/contact-us"
               className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"
             >
-              Features
-            </a>
+              Contact Us
+            </Link>
             <a
               href="#how-it-works"
               className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"
@@ -91,7 +94,7 @@ function LandingPage() {
             </Link>
             <Link
               to="/auth/signup"
-              className="relative group inline-flex h-9 items-center justify-center rounded-md bg-black px-4 text-sm font-medium text-white shadow transition-colors hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 cursor-pointer"
+              className="relative hidden md:inline-flex group h-9 items-center justify-center rounded-md bg-black px-4 text-sm font-medium text-white shadow transition-colors hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 cursor-pointer"
             >
               <span className="relative z-10 hidden sm:flex items-center gap-1">
                 Get started{" "}
@@ -101,9 +104,73 @@ function LandingPage() {
                 Get started
               </span>
             </Link>
+            <button 
+              className="md:hidden p-1 opacity-70 hover:opacity-100 transition-opacity"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              <Menu className="w-6 h-6" />
+            </button>
           </div>
         </div>
       </header>
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-100 bg-white flex flex-col pt-6 pb-8 px-6 overflow-y-auto">
+          <div className="flex justify-between items-center mb-12">
+            <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
+              <img src={logo} alt="SynchGate Logo" className="w-[150px]" />
+            </Link>
+            <button 
+              onClick={() => setIsMobileMenuOpen(false)} 
+              className="p-2 rounded-full hover:bg-slate-100 text-slate-900 transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+          
+          <nav className="flex flex-col gap-6 items-center flex-1 justify-center">
+            <Link 
+              to="/contact-us" 
+              onClick={() => setIsMobileMenuOpen(false)} 
+              className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors"
+            >
+              Contact Us
+            </Link>
+            <a 
+              href="#how-it-works" 
+              onClick={() => setIsMobileMenuOpen(false)} 
+              className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors"
+            >
+              How it works
+            </a>
+            <Link 
+              to="/docs" 
+              onClick={() => setIsMobileMenuOpen(false)} 
+              className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors inline-flex items-center gap-2"
+            >
+              <Code2 className="w-6 h-6" /> Docs
+            </Link>
+            
+            <hr className="w-full max-w-[250px] border-slate-200 my-4" />
+            
+            <Link 
+              to="/auth/login" 
+              onClick={() => setIsMobileMenuOpen(false)} 
+              className="text-xl font-medium text-slate-600 hover:text-blue-600 transition-colors"
+            >
+              Log in
+            </Link>
+            <Link 
+              to="/auth/signup" 
+              onClick={() => setIsMobileMenuOpen(false)} 
+              className="w-full max-w-[250px] text-center bg-black text-white py-4 rounded-lg font-medium hover:bg-slate-800 transition-colors mt-2 text-lg"
+            >
+              Get started
+            </Link>
+          </nav>
+        </div>
+      )}
 
       <main className="relative z-10 pt-32 pb-20">
         <div className="max-w-7xl mx-auto px-6">

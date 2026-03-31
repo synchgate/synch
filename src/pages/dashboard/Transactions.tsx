@@ -222,7 +222,7 @@ function Transactions() {
                   <th className="px-6 py-4 font-medium">Amount</th>
                   <th className="px-6 py-4 font-medium">Channel</th>
                   <th className="px-6 py-4 font-medium">Status</th>
-                  <th className="px-6 py-4 font-medium">Reason</th>
+                  {/* <th className="px-6 py-4 font-medium">Reason</th> */}
                   <th className="px-6 py-4 font-medium text-right">Time</th>
                   <th className="px-6 py-4 font-medium"></th>
                 </tr>
@@ -250,9 +250,9 @@ function Transactions() {
                       <td className="px-6 py-4">
                         <StatusBadge status={tx.status} />
                       </td>
-                      <td className="px-6 py-4 text-slate-500 text-xs">
+                      {/* <td className="px-6 py-4 text-slate-500 text-xs">
                         {tx.message || "-"}
-                      </td>
+                      </td> */}
                       <td className="px-6 py-4 text-slate-500 text-right whitespace-nowrap">
                         {formatDate(tx.created_at)}
                       </td>

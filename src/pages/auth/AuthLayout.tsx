@@ -1,7 +1,7 @@
 import { ShieldCheck } from "lucide-react";
 import { Link, Outlet } from "react-router-dom";
 import logo from "../../assets/logo-white.png";
-
+import logoDark from "../../assets/logo.png";
 
 function AuthLayout() {
   return (
@@ -40,9 +40,7 @@ function AuthLayout() {
         {/* Mobile Header */}
         <header className="md:hidden p-6 border-b border-slate-100 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <span className="font-['Outfit'] font-bold text-xl tracking-tight text-black">
-              SynchGate
-            </span>
+            <img src={logoDark} alt="SynchGate Logo" className="w-[120px]" />
           </Link>
         </header>
 
