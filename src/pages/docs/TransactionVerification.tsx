@@ -1,5 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import { CopyButton } from "../../components/ui/CopyButton";
 
 function TransactionVerification() {
   return (
@@ -21,15 +22,21 @@ function TransactionVerification() {
       <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
         Base URL
       </h2>
-      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10">
-        https://api.synchgate.com/v1/api
+      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10 relative group flex items-center justify-between">
+        <span>https://api.synchgate.com/v1/api</span>
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+          <CopyButton textToCopy="https://api.synchgate.com/v1/api" />
+        </div>
       </div>
 
       <h2 className="font-['Outfit'] text-3xl font-bold mb-4 border-b border-slate-200 pb-2 text-black">
         Endpoint
       </h2>
-      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10">
-        GET /transaction/verify/{"{"}reference{"}"}
+      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10 relative group flex items-center justify-between">
+        <span>GET /transaction/verify/{"{"}reference{"}"}</span>
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+          <CopyButton textToCopy="GET /transaction/verify/{reference}" />
+        </div>
       </div>
 
       <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
@@ -60,7 +67,10 @@ function TransactionVerification() {
       <p className="text-slate-900 font-bold text-lg mb-2 mt-8">
         Example Request (cURL)
       </p>
-      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10">
+      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
+        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+          <CopyButton textToCopy={`curl --location 'https://api.synchgate.com/v1/api/transaction/verify/{reference}' \\\n--header 'Client-Secret-Key: synch_sk_sandbox_wfpyGcOU0onMQ8zpAjnpEUVMTV8a_V5u00JgPftKzSI' \\\n--header 'Cookie: csrftoken=hDIER5CMGlOCnHVMhxHn8WYgoSm5vi8E' \\\n--data ''`} />
+        </div>
         <pre>
           {`curl --location 'https://api.synchgate.com/v1/api/transaction/verify/{reference}' \\
 --header 'Client-Secret-Key: synch_sk_sandbox_wfpyGcOU0onMQ8zpAjnpEUVMTV8a_V5u00JgPftKzSI' \\

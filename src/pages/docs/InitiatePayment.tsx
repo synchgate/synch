@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { CopyButton } from "../../components/ui/CopyButton";
 
 function InitiatePayment() {
   return (
@@ -21,15 +22,21 @@ function InitiatePayment() {
       <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
         Base URL
       </h2>
-      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10">
-        https://api.synchgate.com/v1/api
+      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10 relative group flex items-center justify-between">
+        <span>https://api.synchgate.com/v1/api</span>
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+          <CopyButton textToCopy="https://api.synchgate.com/v1/api" />
+        </div>
       </div>
 
       <h2 className="font-['Outfit'] text-3xl font-bold mb-4 border-b border-slate-200 pb-2 text-black">
         Endpoint
       </h2>
-      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10">
-        POST /initiate-payment/
+      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10 relative group flex items-center justify-between">
+        <span>POST /initiate-payment/</span>
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+          <CopyButton textToCopy="POST /initiate-payment/" />
+        </div>
       </div>
 
       <h3 className="font-semibold text-slate-900 text-lg mb-3">
@@ -120,7 +127,10 @@ function InitiatePayment() {
       <p className="text-slate-900 font-bold text-lg mb-2 mt-8">
         Example Request (cURL)
       </p>
-      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10">
+      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
+        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+          <CopyButton textToCopy={`curl --location 'https://api.synchgate.com/v1/api/initiate-payment/' \\\n--header 'Client-Secret-Key: sk_live_your_key_here' \\\n--header 'Content-Type: application/json' \\\n--data-raw '{\n    "provider": "flutterwave",\n    "email": "customer@example.com",\n    "amount": 8000,\n    "currency": "NGN"\n}'`} />
+        </div>
         <pre>
           {`curl --location 'https://api.synchgate.com/v1/api/initiate-payment/' \\
 --header 'Client-Secret-Key: sk_live_your_key_here' \\

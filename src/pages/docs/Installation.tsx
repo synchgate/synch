@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ArrowRight, Code2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { CopyButton } from "../../components/ui/CopyButton";
 
 function Installation() {
   const [activeTab, setActiveTab] = useState("javascript");
@@ -134,8 +135,11 @@ client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
         Base URL
       </h2>
 
-      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-amber-200 mb-6 shadow-inner overflow-x-auto">
-        https://api.synchgate.com/v1
+      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-amber-200 mb-6 shadow-inner overflow-x-auto relative group flex items-center justify-between">
+        <span>https://api.synchgate.com/v1</span>
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+          <CopyButton textToCopy="https://api.synchgate.com/v1" />
+        </div>
       </div>
 
       <p className="text-slate-600 mb-12">Local development example:</p>
@@ -158,7 +162,10 @@ client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
       <p className="text-slate-900 font-bold text-lg mb-2 mt-8">
         Example
       </p>
-      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-8 overflow-x-auto shadow-inner leading-relaxed border border-white/10">
+      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-8 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
+        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+          <CopyButton textToCopy={`curl --location 'http://payinfraterminal.onrender.com/v1/api/initiate-payment/' \\\n--header 'Client-Secret-Key: pit_sk_live_U2C8HtHdlHPRvHcjRBYBYn9DyZPJEf2o_xZqQkUFIf0' \\\n--header 'Content-Type: application/json' `} />
+        </div>
         <pre>
           {`curl --location 'http://payinfraterminal.onrender.com/v1/api/initiate-payment/' \\
 --header 'Client-Secret-Key: pit_sk_live_U2C8HtHdlHPRvHcjRBYBYn9DyZPJEf2o_xZqQkUFIf0' \\
@@ -223,6 +230,7 @@ client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
             </span>
           </div>
           <div className="ml-auto flex items-center gap-3">
+            <CopyButton textToCopy={codeSnippets[activeTab]} className="text-slate-400 hover:text-white" />
             <Code2 className="w-3.5 h-3.5 text-slate-600" />
           </div>
         </div>
