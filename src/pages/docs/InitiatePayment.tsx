@@ -232,7 +232,22 @@ abandoned - Customer left the payment page`}
             </span>
           </div>
         </Link>
-        <div></div>
+        <Link
+          to="/docs/transaction-verification"
+          className="flex items-center gap-2 text-slate-600 hover:text-blue-600 transition-colors group cursor-pointer min-w-0 justify-end text-right"
+        >
+          <div className="text-right min-w-0 pl-2">
+            <span className="text-xs text-slate-500 uppercase tracking-wider block">
+              Next
+            </span>
+            <span className="font-medium text-blue-600 group-hover:text-blue-500 block truncate">
+              Transaction Verification
+            </span>
+          </div>
+          <div className="w-10 h-10 shrink-0 rounded-full border border-slate-200 flex items-center justify-center group-hover:bg-blue-50 group-hover:border-blue-200 transition-colors">
+            <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-blue-600" />
+          </div>
+        </Link>
       </div>
     </div>
   );

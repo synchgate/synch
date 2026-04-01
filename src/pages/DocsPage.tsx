@@ -112,6 +112,14 @@ function DocsPage() {
                     Initiate Payment
                   </Link>
                 </li>
+                <li>
+                  <Link
+                    to="/docs/transaction-verification"
+                    className={`block text-sm font-medium ${isActive("/docs/transaction-verification") ? "text-blue-600 cursor-default" : "text-slate-600 hover:text-blue-600 cursor-pointer"} transition-colors`}
+                  >
+                    Transaction Verification
+                  </Link>
+                </li>
               </ul>
             </div>
 
