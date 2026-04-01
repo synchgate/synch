@@ -249,9 +249,9 @@ function LandingPage() {
 
               <div className="order-1 lg:order-2">
                 <h2 className="font-['Outfit'] text-3xl md:text-5xl font-bold mb-6 text-black">
-                  Why manage multiple
+                  All your payment
                   <br />
-                  providers when you only need one?
+                  providers, One Unified control layer.
                 </h2>
                 <p className="text-slate-600 text-lg mb-8 leading-relaxed">
                   Setting up different payment methods for your business is slow and frustrating.

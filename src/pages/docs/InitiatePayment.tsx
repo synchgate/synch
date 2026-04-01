@@ -1,6 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { CopyButton } from "../../components/ui/CopyButton";
+import { SimpleExample } from "../../components/docs/SimpleExample";
 
 function InitiatePayment() {
   return (
@@ -143,6 +144,8 @@ function InitiatePayment() {
 }'`}
         </pre>
       </div>
+
+      <SimpleExample />
 
       <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
         Example Response
