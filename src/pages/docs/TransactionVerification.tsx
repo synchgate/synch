@@ -7,7 +7,7 @@ function TransactionVerification() {
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 text-slate-900">
       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-200 bg-blue-50 mb-6 shadow-sm">
         <span className="text-xs font-medium text-blue-600 uppercase tracking-wider">
-          API
+          COLLECT PAYMENTS
         </span>
       </div>
 
@@ -76,6 +76,56 @@ function TransactionVerification() {
 --header 'Client-Secret-Key: synch_sk_sandbox_wfpyGcOU0onMQ8zpAjnpEUVMTV8a_V5u00JgPftKzSI' \\
 --header 'Cookie: csrftoken=hDIER5CMGlOCnHVMhxHn8WYgoSm5vi8E' \\
 --data ''`}
+        </pre>
+      </div>
+
+      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
+        Example Response
+      </h2>
+      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
+        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+          <CopyButton textToCopy={`{\n    "status": "success",\n    "message": "Verification requested",\n    "data": {\n        "cleaned_data": {\n            "provider": "paystack",\n            "status": "success",\n            "amount": 10000,\n            "reference": "bkhwialqas",\n            "currency": "NGN"\n        },\n        "provider_response": {\n            "status": true,\n            "message": "Verification successful",\n            "data": {\n                "id": 5990835342,\n                "domain": "test",\n                "status": "success",\n                "reference": "bkhwialqas",\n                "receipt_number": null,\n                "amount": 10000,\n                "message": null,\n                "gateway_response": "Successful",\n                "paid_at": "2026-03-31T23:50:04.000Z",\n                "created_at": "2026-03-31T23:49:52.000Z",\n                "channel": "card",\n                "currency": "NGN",\n                "ip_address": "102.89.47.66",\n                "metadata": {\n                    "amount": "100.00"\n                }\n            }\n        }\n    },\n    "meta": {\n        "request_id": "cf0fa31c-d43a-43d3-bc3a-0d41d7bdb18b",\n        "timestamp": "2026-04-01T12:46:41.387939Z"\n    }\n}`} />
+        </div>
+        <pre>
+          {`{
+    "status": "success",
+    "message": "Verification requested",
+    "data": {
+        "cleaned_data": {
+            "provider": "paystack",
+            "status": "success",
+            "amount": 10000,
+            "reference": "bkhwialqas",
+            "currency": "NGN"
+        },
+        "provider_response": {
+            "status": true,
+            "message": "Verification successful",
+            "data": {
+                "id": 5990835342,
+                "domain": "test",
+                "status": "success",
+                "reference": "bkhwialqas",
+                "receipt_number": null,
+                "amount": 10000,
+                "message": null,
+                "gateway_response": "Successful",
+                "paid_at": "2026-03-31T23:50:04.000Z",
+                "created_at": "2026-03-31T23:49:52.000Z",
+                "channel": "card",
+                "currency": "NGN",
+                "ip_address": "102.89.47.66",
+                "metadata": {
+                    "amount": "100.00"
+                }
+            }
+        }
+    },
+    "meta": {
+        "request_id": "cf0fa31c-d43a-43d3-bc3a-0d41d7bdb18b",
+        "timestamp": "2026-04-01T12:46:41.387939Z"
+    }
+}`}
         </pre>
       </div>
 

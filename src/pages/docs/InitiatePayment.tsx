@@ -8,7 +8,7 @@ function InitiatePayment() {
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 text-slate-900">
       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-200 bg-blue-50 mb-6 shadow-sm">
         <span className="text-xs font-medium text-blue-600 uppercase tracking-wider">
-          API
+          COLLECT PAYMENTS
         </span>
       </div>
 
