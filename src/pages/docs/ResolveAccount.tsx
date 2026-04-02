@@ -1,5 +1,6 @@
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { CopyButton } from "../../components/ui/CopyButton";
 
 function ResolveAccount() {
   return (
@@ -15,8 +16,67 @@ function ResolveAccount() {
       </h1>
 
       <p className="text-lg text-slate-600 leading-relaxed mb-8">
-        Coming soon... This endpoint allows you to verify a customer's bank account details before initiating a transfer.
+        This endpoint allows you to verify a customer's bank account details before initiating a transfer.
       </p>
+
+      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
+        Base URL
+      </h2>
+      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10 relative group flex items-center justify-between">
+        <span>https://api.synchgate.com/v1/api</span>
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+          <CopyButton textToCopy="https://api.synchgate.com/v1/api" />
+        </div>
+      </div>
+
+      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 border-b border-slate-200 pb-2 text-black">
+        Endpoint
+      </h2>
+      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10 relative group flex items-center justify-between">
+        <span>POST /resolve-account/</span>
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+          <CopyButton textToCopy="POST /resolve-account/" />
+        </div>
+      </div>
+
+      <h3 className="font-semibold text-slate-900 text-lg mb-3">
+        Request Payload
+      </h3>
+      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-8 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
+        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+          <CopyButton textToCopy={`{\n    "provider": "flutterwave",\n    "account_number": "1243190620",\n    "bank_code": "044"\n}`} />
+        </div>
+        <pre>
+          {`{
+    "provider": "flutterwave",
+    "account_number": "1243190620",
+    "bank_code": "044"
+}`}
+        </pre>
+      </div>
+
+      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
+        Example Response
+      </h2>
+      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
+        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+          <CopyButton textToCopy={`{\n    "status": "success",\n    "message": "Bank Account Details",\n    "data": {\n        "accountName": "John Doe",\n        "accountNumber": "1243190620"\n    },\n    "meta": {\n        "request_id": "922bdcd8-b5e1-4bcc-9f8f-45ec0dc174bb",\n        "timestamp": "2026-04-01T02:03:28.369634Z"\n    }\n}`} />
+        </div>
+        <pre>
+          {`{
+    "status": "success",
+    "message": "Bank Account Details",
+    "data": {
+        "accountName": "John Doe",
+        "accountNumber": "1243190620"
+    },
+    "meta": {
+        "request_id": "922bdcd8-b5e1-4bcc-9f8f-45ec0dc174bb",
+        "timestamp": "2026-04-01T02:03:28.369634Z"
+    }
+}`}
+        </pre>
+      </div>
 
       {/* Navigation Footer */}
       <div className="grid grid-cols-2 gap-4 items-center py-8 mt-16 border-t border-slate-200">

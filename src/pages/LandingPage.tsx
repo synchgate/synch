@@ -24,6 +24,11 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
 import businessOwners from "../assets/business-owners.png";
+import paystackLogo from "../assets/brands/paystack.png";
+import flutterwaveLogo from "../assets/brands/flutterwave.png";
+import pagaLogo from "../assets/brands/paga.png";
+import nombaLogo from "../assets/brands/nomba.png";
+import paypalLogo from "../assets/brands/paypal.png";
 
 function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -233,7 +238,7 @@ function LandingPage() {
           {/* Integration Comparison Feature */}
           <section
             id="benefits"
-            className="py-24 border-y border-slate-200 relative"
+            className="py-24 border-t border-slate-200 relative"
           >
             <div className="grid lg:grid-cols-2 gap-16 items-center w-full">
               <div className="order-2 lg:order-1 relative w-full min-w-0">
@@ -298,6 +303,42 @@ function LandingPage() {
                   ))}
                 </div>
               </div>
+            </div>
+          </section>
+
+          {/* Trusted By / Providers Marquee */}
+          <section className="py-20 overflow-hidden relative border-y border-slate-200">
+            <div className="max-w-7xl mx-auto px-6 mb-12 text-center">
+              <p className="text-sm font-medium text-slate-400 uppercase tracking-widest">
+                Our Available Payment Providers
+              </p>
+            </div>
+            
+            <div className="relative max-w-full mx-auto flex items-center">
+              <motion.div
+                className="flex items-center w-max"
+                animate={{ x: ["0%", "-50%"] }}
+                transition={{ repeat: Infinity, ease: "linear", duration: 30 }}
+              >
+                {[1, 2].map((set) => (
+                  <div key={set} className="flex items-center gap-16 md:gap-32 px-8 md:px-16 shrink-0">
+                    {[
+                      { src: paystackLogo, alt: "Paystack", size: "max-w-[180px] md:max-w-[250px] h-16 md:h-[78px]" },
+                      { src: flutterwaveLogo, alt: "Flutterwave", size: "max-w-[200px] md:max-w-[270px] h-18 md:h-[98px]" },
+                      { src: pagaLogo, alt: "Paga", size: "h-6 md:h-[32px]" },
+                      { src: nombaLogo, alt: "Nomba", size: "h-6 md:h-[30px]" },
+                      { src: paypalLogo, alt: "PayPal", size: "h-7 md:h-[32px]" },
+                    ].map((logo, idx) => (
+                      <img
+                        key={idx}
+                        src={logo.src}
+                        alt={logo.alt}
+                        className={`${logo.size} object-contain brightness-0 opacity-40 hover:brightness-100 hover:opacity-100 transition-all duration-300`}
+                      />
+                    ))}
+                  </div>
+                ))}
+              </motion.div>
             </div>
           </section>
 
