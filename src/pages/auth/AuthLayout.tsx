@@ -5,7 +5,7 @@ import logoDark from "../../assets/logo.png";
 
 function AuthLayout() {
   return (
-    <div className="min-h-screen bg-white text-slate-900 font-sans flex flex-col md:flex-row">
+    <div className="min-h-[100dvh] md:h-screen bg-white text-slate-900 font-sans flex flex-col md:flex-row md:overflow-hidden">
       {/* Branding Sidebar (Hidden on Mobile) */}
       <div className="hidden md:flex md:w-5/12 lg:w-[45%] bg-blue-600 relative overflow-hidden flex-col justify-between p-10 lg:p-14 text-white">
         {/* Dynamic Background */}

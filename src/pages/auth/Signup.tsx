@@ -7,6 +7,7 @@ import {
   Lock,
   Mail,
   User,
+  Phone,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -20,6 +21,7 @@ function Signup() {
     last_name: "",
     business_name: "",
     email: "",
+    business_phone: "",
     password: "",
   });
   const [error, setError] = useState<string | null>(null);
@@ -68,7 +70,7 @@ function Signup() {
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="mb-10 text-center">
+      <div className="mb-10 mt-14 text-center">
         <h1 className="font-['Outfit'] text-3xl font-bold mb-3 text-black">
           Create your account
         </h1>
@@ -119,23 +121,45 @@ function Signup() {
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
-            Business Name
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Briefcase className="h-5 w-5 text-slate-400" />
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Business Name
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Briefcase className="h-5 w-5 text-slate-400" />
+              </div>
+              <input
+                type="text"
+                name="business_name"
+                value={formData.business_name}
+                onChange={handleChange}
+                required
+                className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-slate-50 text-slate-900 transition-colors"
+                placeholder="Acme Corp"
+              />
             </div>
-            <input
-              type="text"
-              name="business_name"
-              value={formData.business_name}
-              onChange={handleChange}
-              required
-              className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-slate-50 text-slate-900 transition-colors"
-              placeholder="Acme Corp"
-            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Business Phone
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Phone className="h-5 w-5 text-slate-400" />
+              </div>
+              <input
+                type="tel"
+                name="business_phone"
+                value={formData.business_phone}
+                onChange={handleChange}
+                required
+                className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-slate-50 text-slate-900 transition-colors"
+                placeholder="+234 800 000 0000"
+              />
+            </div>
           </div>
         </div>
 
