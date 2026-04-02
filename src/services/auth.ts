@@ -6,7 +6,9 @@ export interface RegisterPayload {
   first_name: string;
   last_name: string;
   business_name: string;
+  business_phone: string;
 }
+
 
 export interface LoginPayload {
   email: string;

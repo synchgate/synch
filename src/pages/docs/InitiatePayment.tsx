@@ -1,12 +1,15 @@
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { CopyButton } from "../../components/ui/CopyButton";
+import { SimpleExample } from "../../components/docs/SimpleExample";
+import { SupportedProviders } from "../../components/docs/SupportedProviders";
 
 function InitiatePayment() {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 text-slate-900">
       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-200 bg-blue-50 mb-6 shadow-sm">
         <span className="text-xs font-medium text-blue-600 uppercase tracking-wider">
-          API
+          COLLECT PAYMENTS
         </span>
       </div>
 
@@ -18,18 +21,26 @@ function InitiatePayment() {
         Creates a new payment transaction across any of our supported providers.
       </p>
 
+      <SupportedProviders />
+
       <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
         Base URL
       </h2>
-      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10">
-        https://api.synchgate.com/v1/api
+      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10 relative group flex items-center justify-between">
+        <span>https://api.synchgate.com/v1/api</span>
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+          <CopyButton textToCopy="https://api.synchgate.com/v1/api" />
+        </div>
       </div>
 
       <h2 className="font-['Outfit'] text-3xl font-bold mb-4 border-b border-slate-200 pb-2 text-black">
         Endpoint
       </h2>
-      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10">
-        POST /initiate-payment/
+      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10 relative group flex items-center justify-between">
+        <span>POST /initiate-payment/</span>
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+          <CopyButton textToCopy="POST /initiate-payment/" />
+        </div>
       </div>
 
       <h3 className="font-semibold text-slate-900 text-lg mb-3">
@@ -96,14 +107,6 @@ function InitiatePayment() {
         </table>
       </div>
 
-      <h3 className="font-semibold text-slate-900 text-lg mb-3">
-        Supported Providers
-      </h3>
-      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 shadow-inner border border-white/10">
-        <div>paystack</div>
-        <div>flutterwave</div>
-        <div>nomba</div>
-      </div>
 
       <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
         Routing Logic
@@ -120,7 +123,10 @@ function InitiatePayment() {
       <p className="text-slate-900 font-bold text-lg mb-2 mt-8">
         Example Request (cURL)
       </p>
-      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10">
+      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
+        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+          <CopyButton textToCopy={`curl --location 'https://api.synchgate.com/v1/api/initiate-payment/' \\\n--header 'Client-Secret-Key: sk_live_your_key_here' \\\n--header 'Content-Type: application/json' \\\n--data-raw '{\n    "provider": "flutterwave",\n    "email": "customer@example.com",\n    "amount": 8000,\n    "currency": "NGN"\n}'`} />
+        </div>
         <pre>
           {`curl --location 'https://api.synchgate.com/v1/api/initiate-payment/' \\
 --header 'Client-Secret-Key: sk_live_your_key_here' \\
@@ -133,6 +139,8 @@ function InitiatePayment() {
 }'`}
         </pre>
       </div>
+
+      <SimpleExample />
 
       <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
         Example Response
@@ -232,7 +240,22 @@ abandoned - Customer left the payment page`}
             </span>
           </div>
         </Link>
-        <div></div>
+        <Link
+          to="/docs/transaction-verification"
+          className="flex items-center gap-2 text-slate-600 hover:text-blue-600 transition-colors group cursor-pointer min-w-0 justify-end text-right"
+        >
+          <div className="text-right min-w-0 pl-2">
+            <span className="text-xs text-slate-500 uppercase tracking-wider block">
+              Next
+            </span>
+            <span className="font-medium text-blue-600 group-hover:text-blue-500 block truncate">
+              Transaction Verification
+            </span>
+          </div>
+          <div className="w-10 h-10 shrink-0 rounded-full border border-slate-200 flex items-center justify-center group-hover:bg-blue-50 group-hover:border-blue-200 transition-colors">
+            <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-blue-600" />
+          </div>
+        </Link>
       </div>
     </div>
   );

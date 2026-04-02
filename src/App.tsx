@@ -23,6 +23,11 @@ import Authentication from "./pages/docs/Authentication";
 import Installation from "./pages/docs/Installation";
 import Introduction from "./pages/docs/Introduction";
 import InitiatePayment from "./pages/docs/InitiatePayment";
+import TransactionVerification from "./pages/docs/TransactionVerification";
+import BanksApi from "./pages/docs/BanksApi";
+import ResolveAccount from "./pages/docs/ResolveAccount";
+import InitiateTransfer from "./pages/docs/InitiateTransfer";
+
 import PCICompliance from "./pages/docs/PCICompliance";
 import DataPrivacy from "./pages/docs/DataPrivacy";
 import LandingPage from "./pages/LandingPage";
@@ -98,6 +103,10 @@ function App() {
               <Route path="installation" element={<Installation />} />
               <Route path="authentication" element={<Authentication />} />
               <Route path="initiate-payment" element={<InitiatePayment />} />
+              <Route path="transaction-verification" element={<TransactionVerification />} />
+              <Route path="banks" element={<BanksApi />} />
+              <Route path="resolve-account" element={<ResolveAccount />} />
+              <Route path="initiate-transfer" element={<InitiateTransfer />} />
               <Route path="pci-compliance" element={<PCICompliance />} />
               <Route path="data-privacy" element={<DataPrivacy />} />
             </Route>

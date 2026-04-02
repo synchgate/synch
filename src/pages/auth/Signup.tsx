@@ -7,6 +7,8 @@ import {
   Lock,
   Mail,
   User,
+  Phone,
+  Check,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -20,11 +22,23 @@ function Signup() {
     last_name: "",
     business_name: "",
     email: "",
+    business_phone: "",
     password: "",
   });
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+
+  const password = formData.password || "";
+  const checks = {
+    length: password.length >= 8,
+    uppercase: /[A-Z]/.test(password),
+    lowercase: /[a-z]/.test(password),
+    number: /[0-9]/.test(password),
+    symbol: /[^A-Za-z0-9]/.test(password),
+  };
+  const isPasswordValid = Object.values(checks).every(Boolean);
 
   const registerMutation = useMutation({
     mutationFn: (data: RegisterPayload) => authService.register(data),
@@ -53,8 +67,8 @@ function Signup() {
     e.preventDefault();
     setError(null);
 
-    if (!formData.password || formData.password.length < 6) {
-      setError("Password must be at least 6 characters long.");
+    if (!isPasswordValid) {
+      setError("Please ensure your password meets all the security requirements.");
       return;
     }
 
@@ -68,7 +82,7 @@ function Signup() {
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="mb-10 text-center">
+      <div className="mb-10 mt-14 text-center">
         <h1 className="font-['Outfit'] text-3xl font-bold mb-3 text-black">
           Create your account
         </h1>
@@ -119,23 +133,45 @@ function Signup() {
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
-            Business Name
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Briefcase className="h-5 w-5 text-slate-400" />
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Business Name
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Briefcase className="h-5 w-5 text-slate-400" />
+              </div>
+              <input
+                type="text"
+                name="business_name"
+                value={formData.business_name}
+                onChange={handleChange}
+                required
+                className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-slate-50 text-slate-900 transition-colors"
+                placeholder="Acme Corp"
+              />
             </div>
-            <input
-              type="text"
-              name="business_name"
-              value={formData.business_name}
-              onChange={handleChange}
-              required
-              className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-slate-50 text-slate-900 transition-colors"
-              placeholder="Acme Corp"
-            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Business Phone
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Phone className="h-5 w-5 text-slate-400" />
+              </div>
+              <input
+                type="tel"
+                name="business_phone"
+                value={formData.business_phone}
+                onChange={handleChange}
+                required
+                className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-slate-50 text-slate-900 transition-colors"
+                placeholder="+234 800 000 0000"
+              />
+            </div>
           </div>
         </div>
 
@@ -172,6 +208,8 @@ function Signup() {
               name="password"
               value={formData.password}
               onChange={handleChange}
+              onFocus={() => setIsPasswordFocused(true)}
+              onBlur={() => setIsPasswordFocused(false)}
               required
               className="block w-full pl-10 pr-12 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-slate-50 text-slate-900 transition-colors"
               placeholder="••••••••"
@@ -188,9 +226,35 @@ function Signup() {
               )}
             </button>
           </div>
-          <p className="mt-2 text-xs text-slate-500">
-            Must be at least 6 characters long.
-          </p>
+          
+          <div
+            className={`transition-all duration-300 overflow-hidden ${
+              isPasswordFocused ? "max-h-64 mt-3 opacity-100" : "max-h-0 opacity-0"
+            }`}
+          >
+            <div className="space-y-2 text-xs font-medium">
+              <div className={`flex items-center gap-2 ${checks.uppercase ? "text-emerald-600" : "text-slate-500"}`}>
+                {checks.uppercase ? <Check className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
+                <span>At least one uppercase letter</span>
+              </div>
+              <div className={`flex items-center gap-2 ${checks.lowercase ? "text-emerald-600" : "text-slate-500"}`}>
+                {checks.lowercase ? <Check className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
+                <span>At least one lowercase letter</span>
+              </div>
+              <div className={`flex items-center gap-2 ${checks.number ? "text-emerald-600" : "text-slate-500"}`}>
+                {checks.number ? <Check className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
+                <span>At least one number</span>
+              </div>
+              <div className={`flex items-center gap-2 ${checks.symbol ? "text-emerald-600" : "text-slate-500"}`}>
+                {checks.symbol ? <Check className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
+                <span>At least one symbol</span>
+              </div>
+              <div className={`flex items-center gap-2 ${checks.length ? "text-emerald-600" : "text-slate-500"}`}>
+                {checks.length ? <Check className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
+                <span>At least 8 characters long</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="flex items-start gap-3">

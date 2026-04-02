@@ -1,5 +1,6 @@
 import {
   ArrowRight,
+  ArrowRightLeft,
   BookOpen,
   Menu,
   Shield,
@@ -101,7 +102,7 @@ function DocsPage() {
 
             <div>
               <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                <Shield className="w-4 h-4 text-blue-500" /> API
+                <Shield className="w-4 h-4 text-blue-500" /> Collect Payments
               </h4>
               <ul className="space-y-2 border-l border-slate-200 ml-2 pl-4">
                 <li>
@@ -110,6 +111,46 @@ function DocsPage() {
                     className={`block text-sm font-medium ${isActive("/docs/initiate-payment") ? "text-blue-600 cursor-default" : "text-slate-600 hover:text-blue-600 cursor-pointer"} transition-colors`}
                   >
                     Initiate Payment
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/docs/transaction-verification"
+                    className={`block text-sm font-medium ${isActive("/docs/transaction-verification") ? "text-blue-600 cursor-default" : "text-slate-600 hover:text-blue-600 cursor-pointer"} transition-colors`}
+                  >
+                    Transaction Verification
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                <ArrowRightLeft className="w-4 h-4 text-blue-500" /> Transfer
+              </h4>
+              <ul className="space-y-2 border-l border-slate-200 ml-2 pl-4">
+                <li>
+                  <Link
+                    to="/docs/banks"
+                    className={`block text-sm font-medium ${isActive("/docs/banks") ? "text-blue-600 cursor-default" : "text-slate-600 hover:text-blue-600 cursor-pointer"} transition-colors`}
+                  >
+                    Banks
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/docs/resolve-account"
+                    className={`block text-sm font-medium ${isActive("/docs/resolve-account") ? "text-blue-600 cursor-default" : "text-slate-600 hover:text-blue-600 cursor-pointer"} transition-colors`}
+                  >
+                    Resolve Account
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/docs/initiate-transfer"
+                    className={`block text-sm font-medium ${isActive("/docs/initiate-transfer") ? "text-blue-600 cursor-default" : "text-slate-600 hover:text-blue-600 cursor-pointer"} transition-colors`}
+                  >
+                    Initiate Transfer
                   </Link>
                 </li>
               </ul>
