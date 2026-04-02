@@ -1,6 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { CopyButton } from "../../components/ui/CopyButton";
+import { SupportedProviders } from "../../components/docs/SupportedProviders";
 
 function TransactionVerification() {
   return (
@@ -18,6 +19,9 @@ function TransactionVerification() {
       <p className="text-lg text-slate-600 leading-relaxed mb-8">
         Verifies the status of a specific transaction using its reference.
       </p>
+
+      <SupportedProviders />
+
 
       <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
         Base URL

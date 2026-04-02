@@ -30,6 +30,16 @@ import pagaLogo from "../assets/brands/paga.png";
 import nombaLogo from "../assets/brands/nomba.png";
 import paypalLogo from "../assets/brands/paypal.png";
 
+type Provider = { src: string; alt: string; size: string };
+
+const PROVIDERS: Provider[] = [
+  { src: paystackLogo, alt: "Paystack", size: "max-w-[180px] md:max-w-[250px] h-16 md:h-[78px]" },
+  { src: flutterwaveLogo, alt: "Flutterwave", size: "max-w-[200px] md:max-w-[270px] h-[72px] md:h-[98px]" },
+  { src: pagaLogo, alt: "Paga", size: "h-6 md:h-[32px]" },
+  { src: nombaLogo, alt: "Nomba", size: "h-6 md:h-[30px]" },
+  { src: paypalLogo, alt: "PayPal", size: "h-7 md:h-[32px]" },
+];
+
 function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
@@ -109,7 +119,7 @@ function LandingPage() {
                 Get started
               </span>
             </Link>
-            <button 
+            <button
               className="md:hidden p-1 opacity-70 hover:opacity-100 transition-opacity"
               onClick={() => setIsMobileMenuOpen(true)}
             >
@@ -126,49 +136,49 @@ function LandingPage() {
             <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
               <img src={logo} alt="SynchGate Logo" className="w-[150px]" />
             </Link>
-            <button 
-              onClick={() => setIsMobileMenuOpen(false)} 
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
               className="p-2 rounded-full hover:bg-slate-100 text-slate-900 transition-colors"
             >
               <X className="w-6 h-6" />
             </button>
           </div>
-          
+
           <nav className="flex flex-col gap-6 items-center flex-1 justify-center">
-            <Link 
-              to="/contact-us" 
-              onClick={() => setIsMobileMenuOpen(false)} 
+            <Link
+              to="/contact-us"
+              onClick={() => setIsMobileMenuOpen(false)}
               className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors"
             >
               Contact Us
             </Link>
-            <a 
-              href="#how-it-works" 
-              onClick={() => setIsMobileMenuOpen(false)} 
+            <a
+              href="#how-it-works"
+              onClick={() => setIsMobileMenuOpen(false)}
               className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors"
             >
               How it works
             </a>
-            <Link 
-              to="/docs" 
-              onClick={() => setIsMobileMenuOpen(false)} 
+            <Link
+              to="/docs"
+              onClick={() => setIsMobileMenuOpen(false)}
               className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors inline-flex items-center gap-2"
             >
               <Code2 className="w-6 h-6" /> Docs
             </Link>
-            
+
             <hr className="w-full max-w-[250px] border-slate-200 my-4" />
-            
-            <Link 
-              to="/auth/login" 
-              onClick={() => setIsMobileMenuOpen(false)} 
+
+            <Link
+              to="/auth/login"
+              onClick={() => setIsMobileMenuOpen(false)}
               className="text-xl font-medium text-slate-600 hover:text-blue-600 transition-colors"
             >
               Log in
             </Link>
-            <Link 
-              to="/auth/signup" 
-              onClick={() => setIsMobileMenuOpen(false)} 
+            <Link
+              to="/auth/signup"
+              onClick={() => setIsMobileMenuOpen(false)}
               className="w-full max-w-[250px] text-center bg-black text-white py-4 rounded-lg font-medium hover:bg-slate-800 transition-colors mt-2 text-lg"
             >
               Get started
@@ -313,7 +323,7 @@ function LandingPage() {
                 Our Available Payment Providers
               </p>
             </div>
-            
+
             <div className="relative max-w-full mx-auto flex items-center">
               <motion.div
                 className="flex items-center w-max"
@@ -322,13 +332,7 @@ function LandingPage() {
               >
                 {[1, 2].map((set) => (
                   <div key={set} className="flex items-center gap-16 md:gap-32 px-8 md:px-16 shrink-0">
-                    {[
-                      { src: paystackLogo, alt: "Paystack", size: "max-w-[180px] md:max-w-[250px] h-16 md:h-[78px]" },
-                      { src: flutterwaveLogo, alt: "Flutterwave", size: "max-w-[200px] md:max-w-[270px] h-18 md:h-[98px]" },
-                      { src: pagaLogo, alt: "Paga", size: "h-6 md:h-[32px]" },
-                      { src: nombaLogo, alt: "Nomba", size: "h-6 md:h-[30px]" },
-                      { src: paypalLogo, alt: "PayPal", size: "h-7 md:h-[32px]" },
-                    ].map((logo, idx) => (
+                    {PROVIDERS.map((logo, idx) => (
                       <img
                         key={idx}
                         src={logo.src}

@@ -2,6 +2,7 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { CopyButton } from "../../components/ui/CopyButton";
 import { SimpleExample } from "../../components/docs/SimpleExample";
+import { SupportedProviders } from "../../components/docs/SupportedProviders";
 
 function InitiatePayment() {
   return (
@@ -19,6 +20,8 @@ function InitiatePayment() {
       <p className="text-lg text-slate-600 leading-relaxed mb-8">
         Creates a new payment transaction across any of our supported providers.
       </p>
+
+      <SupportedProviders />
 
       <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
         Base URL
@@ -104,14 +107,6 @@ function InitiatePayment() {
         </table>
       </div>
 
-      <h3 className="font-semibold text-slate-900 text-lg mb-3">
-        Supported Providers
-      </h3>
-      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 shadow-inner border border-white/10">
-        <div>paystack</div>
-        <div>flutterwave</div>
-        <div>nomba</div>
-      </div>
 
       <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
         Routing Logic
