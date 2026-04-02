@@ -8,6 +8,7 @@ import {
   Mail,
   User,
   Phone,
+  Check,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -27,6 +28,17 @@ function Signup() {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+
+  const password = formData.password || "";
+  const checks = {
+    length: password.length >= 8,
+    uppercase: /[A-Z]/.test(password),
+    lowercase: /[a-z]/.test(password),
+    number: /[0-9]/.test(password),
+    symbol: /[^A-Za-z0-9]/.test(password),
+  };
+  const isPasswordValid = Object.values(checks).every(Boolean);
 
   const registerMutation = useMutation({
     mutationFn: (data: RegisterPayload) => authService.register(data),
@@ -55,8 +67,8 @@ function Signup() {
     e.preventDefault();
     setError(null);
 
-    if (!formData.password || formData.password.length < 6) {
-      setError("Password must be at least 6 characters long.");
+    if (!isPasswordValid) {
+      setError("Please ensure your password meets all the security requirements.");
       return;
     }
 
@@ -196,6 +208,8 @@ function Signup() {
               name="password"
               value={formData.password}
               onChange={handleChange}
+              onFocus={() => setIsPasswordFocused(true)}
+              onBlur={() => setIsPasswordFocused(false)}
               required
               className="block w-full pl-10 pr-12 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-slate-50 text-slate-900 transition-colors"
               placeholder="••••••••"
@@ -212,9 +226,35 @@ function Signup() {
               )}
             </button>
           </div>
-          <p className="mt-2 text-xs text-slate-500">
-            Must be at least 6 characters long.
-          </p>
+          
+          <div
+            className={`transition-all duration-300 overflow-hidden ${
+              isPasswordFocused ? "max-h-64 mt-3 opacity-100" : "max-h-0 opacity-0"
+            }`}
+          >
+            <div className="space-y-2 text-xs font-medium">
+              <div className={`flex items-center gap-2 ${checks.uppercase ? "text-emerald-600" : "text-slate-500"}`}>
+                {checks.uppercase ? <Check className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
+                <span>At least one uppercase letter</span>
+              </div>
+              <div className={`flex items-center gap-2 ${checks.lowercase ? "text-emerald-600" : "text-slate-500"}`}>
+                {checks.lowercase ? <Check className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
+                <span>At least one lowercase letter</span>
+              </div>
+              <div className={`flex items-center gap-2 ${checks.number ? "text-emerald-600" : "text-slate-500"}`}>
+                {checks.number ? <Check className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
+                <span>At least one number</span>
+              </div>
+              <div className={`flex items-center gap-2 ${checks.symbol ? "text-emerald-600" : "text-slate-500"}`}>
+                {checks.symbol ? <Check className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
+                <span>At least one symbol</span>
+              </div>
+              <div className={`flex items-center gap-2 ${checks.length ? "text-emerald-600" : "text-slate-500"}`}>
+                {checks.length ? <Check className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
+                <span>At least 8 characters long</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="flex items-start gap-3">
