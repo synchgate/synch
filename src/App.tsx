@@ -14,7 +14,7 @@ import VerifyCode from "./pages/auth/VerifyCode";
 import Dashboard from "./pages/Dashboard";
 import Logs from "./pages/dashboard/Logs";
 import Overview from "./pages/dashboard/Overview";
-import Providers from "./pages/dashboard/Providers";
+import Analytics from "./pages/dashboard/Analytics";
 import Settings from "./pages/dashboard/Settings";
 import Transactions from "./pages/dashboard/Transactions";
 import MyApiKey from "./pages/dashboard/MyApiKey";
@@ -32,6 +32,7 @@ import PCICompliance from "./pages/docs/PCICompliance";
 import DataPrivacy from "./pages/docs/DataPrivacy";
 import LandingPage from "./pages/LandingPage";
 import TermsOfUse from "./pages/TermsOfUse";
+import Providers from "./pages/dashboard/Providers";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -87,6 +88,7 @@ function App() {
               }
             >
               <Route index element={<Overview />} />
+              <Route path="analytics" element={<Analytics />} />
               <Route path="transactions" element={<Transactions />} />
               <Route path="providers" element={<Providers />} />
               <Route path="logs" element={<Logs />} />

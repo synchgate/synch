@@ -1,5 +1,6 @@
 import {
   Activity,
+  LineChart,
   Bell,
   Building2,
   Code2,
@@ -200,6 +201,7 @@ function Dashboard() {
             >
               <LayoutDashboard className="w-5 h-5" /> Overview
             </Link>
+
             <Link
               to="/dashboard/transactions"
               onClick={() => setIsSidebarOpen(false)}
@@ -213,6 +215,13 @@ function Dashboard() {
               className={`flex items-center gap-3 px-3 py-2 ${isActive("/dashboard/providers") ? "bg-slate-100 text-blue-600 font-medium" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"} rounded-lg transition-colors cursor-pointer`}
             >
               <Building2 className="w-5 h-5" /> Providers
+            </Link>
+            <Link
+              to="/dashboard/analytics"
+              onClick={() => setIsSidebarOpen(false)}
+              className={`flex items-center gap-3 px-3 py-2 ${isActive("/dashboard/analytics") ? "bg-slate-100 text-blue-600 font-medium" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"} rounded-lg transition-colors cursor-pointer`}
+            >
+              <LineChart className="w-5 h-5" /> Analytics
             </Link>
             <Link
               to="/dashboard/logs"
