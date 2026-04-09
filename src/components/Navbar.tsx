@@ -20,7 +20,7 @@ const Navbar = () => {
 
   const navLinks = [
     { name: "Contact Us", path: "/contact-us" },
-    { name: "Pricing", path: "/pricing" },
+    // { name: "Pricing", path: "/pricing" },
     ...(isHomePage
       ? [{ name: "How it works", path: "/#how-it-works", isAnchor: true }]
       : []),
@@ -29,11 +29,10 @@ const Navbar = () => {
   return (
     <>
       <header
-        className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-          isScrolled
+        className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled
             ? "bg-white/80 backdrop-blur-md border-b border-slate-200 py-4"
             : "bg-transparent py-6"
-        }`}
+          }`}
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 cursor-pointer">
@@ -45,11 +44,10 @@ const Navbar = () => {
               <Link
                 key={link.name}
                 to={link.path}
-                className={`text-sm font-medium transition-colors cursor-pointer ${
-                  location.pathname === link.path
+                className={`text-sm font-medium transition-colors cursor-pointer ${location.pathname === link.path
                     ? "text-blue-600 font-bold"
                     : "text-slate-600 hover:text-blue-600"
-                }`}
+                  }`}
               >
                 {link.name}
               </Link>
@@ -111,11 +109,10 @@ const Navbar = () => {
                 key={link.name}
                 to={link.path}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className={`text-2xl font-bold transition-colors ${
-                  location.pathname === link.path
+                className={`text-2xl font-bold transition-colors ${location.pathname === link.path
                     ? "text-blue-600"
                     : "text-slate-900 hover:text-blue-600"
-                }`}
+                  }`}
               >
                 {link.name}
               </Link>
