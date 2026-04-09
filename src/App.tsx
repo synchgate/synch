@@ -19,6 +19,7 @@ import Settings from "./pages/dashboard/Settings";
 import Transactions from "./pages/dashboard/Transactions";
 import MyApiKey from "./pages/dashboard/MyApiKey";
 import Billings from "./pages/dashboard/Billings";
+import InvoiceHistory from "./pages/dashboard/InvoiceHistory";
 import SupportTicket from "./pages/dashboard/SupportTicket";
 import PricingPage from "./pages/PricingPage";
 import DocsPage from "./pages/DocsPage";
@@ -102,6 +103,7 @@ function App() {
               <Route path="settings" element={<Settings />} />
               <Route path="api-keys" element={<MyApiKey />} />
               <Route path="billings" element={<Billings />} />
+              <Route path="billings/history" element={<InvoiceHistory />} />
               <Route path="support-ticket" element={<SupportTicket />} />
             </Route>
 

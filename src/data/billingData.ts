@@ -7,12 +7,28 @@ export interface SubscriptionPlan {
   isCurrent?: boolean;
 }
 
+export interface InvoiceItem {
+  description: string;
+  quantity: number;
+  rate: number;
+  amount: number;
+}
+
 export interface Invoice {
   id: string;
   date: string;
+  dueDate: string;
   amount: number;
   status: 'paid' | 'pending' | 'failed';
   downloadUrl: string;
+  billingTo: {
+    businessName: string;
+    address: string;
+    email: string;
+  };
+  items: InvoiceItem[];
+  subtotal: number;
+  tax: number;
 }
 
 export interface ApiCallBreakdown {
@@ -58,10 +74,78 @@ export const subscriptionPlans: SubscriptionPlan[] = [
 ];
 
 export const invoices: Invoice[] = [
-  { id: 'INV-2024-001', date: '2024-03-01', amount: 25000, status: 'paid', downloadUrl: '#' },
-  { id: 'INV-2024-002', date: '2024-02-01', amount: 25000, status: 'paid', downloadUrl: '#' },
-  { id: 'INV-2024-003', date: '2024-01-01', amount: 25000, status: 'paid', downloadUrl: '#' },
-  { id: 'INV-2023-125', date: '2023-12-01', amount: 25000, status: 'paid', downloadUrl: '#' },
+  { 
+    id: 'INV-2024-001', 
+    date: '2024-03-01', 
+    dueDate: '2024-03-15',
+    amount: 35000, 
+    status: 'paid', 
+    downloadUrl: '#',
+    billingTo: {
+      businessName: 'Acme Corp',
+      address: '123 Business Road, Lagos, Nigeria',
+      email: 'finance@acme.com'
+    },
+    items: [
+      { description: 'Growth Plan Subscription - March 2024', quantity: 1, rate: 35000, amount: 35000 }
+    ],
+    subtotal: 35000,
+    tax: 0
+  },
+  { 
+    id: 'INV-2024-002', 
+    date: '2024-02-01', 
+    dueDate: '2024-02-15',
+    amount: 35000, 
+    status: 'paid', 
+    downloadUrl: '#',
+    billingTo: {
+      businessName: 'Acme Corp',
+      address: '123 Business Road, Lagos, Nigeria',
+      email: 'finance@acme.com'
+    },
+    items: [
+      { description: 'Growth Plan Subscription - February 2024', quantity: 1, rate: 35000, amount: 35000 }
+    ],
+    subtotal: 35000,
+    tax: 0
+  },
+  { 
+    id: 'INV-2024-003', 
+    date: '2024-01-01', 
+    dueDate: '2024-01-15',
+    amount: 35000, 
+    status: 'paid', 
+    downloadUrl: '#',
+    billingTo: {
+      businessName: 'Acme Corp',
+      address: '123 Business Road, Lagos, Nigeria',
+      email: 'finance@acme.com'
+    },
+    items: [
+      { description: 'Growth Plan Subscription - January 2024', quantity: 1, rate: 35000, amount: 35000 }
+    ],
+    subtotal: 35000,
+    tax: 0
+  },
+  { 
+    id: 'INV-2023-125', 
+    date: '2023-12-01', 
+    dueDate: '2023-12-15',
+    amount: 20000, 
+    status: 'paid', 
+    downloadUrl: '#',
+    billingTo: {
+      businessName: 'Acme Corp',
+      address: '123 Business Road, Lagos, Nigeria',
+      email: 'finance@acme.com'
+    },
+    items: [
+      { description: 'Starter Plan - December 2023 Usage', quantity: 1000, rate: 20, amount: 20000 }
+    ],
+    subtotal: 20000,
+    tax: 0
+  },
 ];
 
 export const monthlyUsage: MonthlyUsage[] = [

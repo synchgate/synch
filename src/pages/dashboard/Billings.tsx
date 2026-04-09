@@ -357,9 +357,12 @@ const Billings = () => {
                 </div>
               ))}
             </div>
-            <button className="w-full p-4 text-sm font-semibold text-slate-600 hover:text-slate-900 bg-slate-50/50 hover:bg-slate-50 transition-colors border-t border-slate-100">
+            <Link 
+              to="/dashboard/billings/history"
+              className="w-full p-4 text-sm font-semibold text-slate-600 hover:text-slate-900 bg-slate-50/50 hover:bg-slate-50 transition-colors border-t border-slate-100 block text-center"
+            >
               View Invoice History
-            </button>
+            </Link>
           </motion.div>
 
           {/* Billing History / Events */}
