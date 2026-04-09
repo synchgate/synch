@@ -84,12 +84,12 @@ function LandingPage() {
             >
               Contact Us
             </Link>
-            <Link
+            {/* <Link
               to="/pricing"
               className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"
             >
               Pricing
-            </Link>
+            </Link> */}
             <a
               href="#how-it-works"
               className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"
