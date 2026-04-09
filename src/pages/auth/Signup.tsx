@@ -49,11 +49,33 @@ function Signup() {
       });
     },
     onError: (err: any) => {
-      // Extract error message from API response if possible
-      const errorMessage =
-        err.response?.data?.message ||
-        err.response?.data?.detail ||
-        "Registration failed. Please try again.";
+      // Extract specific error messages from the API payload
+      const data = err.response?.data;
+      let errorMessage = "Registration failed. Please try again.";
+
+      if (data) {
+        if (typeof data === "string") {
+          errorMessage = data;
+        } else if (data.email && Array.isArray(data.email)) {
+          errorMessage = data.email[0];
+        } else if (data.business_name && Array.isArray(data.business_name)) {
+          errorMessage = data.business_name[0];
+        } else if (data.message) {
+          errorMessage = data.message;
+        } else if (data.detail) {
+          errorMessage = data.detail;
+        } else if (data.error) {
+          errorMessage = data.error;
+        } else {
+          // Fallback: Get the first available error message from any field
+          const firstError = Object.values(data)[0];
+          if (Array.isArray(firstError)) {
+            errorMessage = String(firstError[0]);
+          } else if (typeof firstError === "string") {
+            errorMessage = firstError;
+          }
+        }
+      }
       setError(errorMessage);
     },
   });
@@ -66,6 +88,12 @@ function Signup() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    // Business Name Validation (Min 6 characters)
+    if (formData.business_name.length < 6) {
+      setError("Business name must be at least 6 characters long.");
+      return;
+    }
 
     if (!isPasswordValid) {
       setError("Please ensure your password meets all the security requirements.");
