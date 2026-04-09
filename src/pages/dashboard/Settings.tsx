@@ -260,14 +260,8 @@ function Settings() {
                           <input
                             type="text"
                             value={businessForm.business_name}
-                            onChange={(e) =>
-                              setBusinessForm({
-                                ...businessForm,
-                                business_name: e.target.value,
-                              })
-                            }
-                            placeholder="Enter your business name"
-                            className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-slate-50 text-slate-900 transition-colors sm:text-sm"
+                            readOnly
+                            className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl bg-slate-100 text-slate-500 cursor-not-allowed sm:text-sm"
                           />
                         </div>
                         <div>
@@ -277,14 +271,8 @@ function Settings() {
                           <input
                             type="email"
                             value={businessForm.business_email}
-                            onChange={(e) =>
-                              setBusinessForm({
-                                ...businessForm,
-                                business_email: e.target.value,
-                              })
-                            }
-                            placeholder="Enter your business email"
-                            className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-slate-50 text-slate-900 transition-colors sm:text-sm"
+                            readOnly
+                            className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl bg-slate-100 text-slate-500 cursor-not-allowed sm:text-sm"
                           />
                         </div>
                         <div>
@@ -294,14 +282,8 @@ function Settings() {
                           <input
                             type="tel"
                             value={businessForm.business_phone}
-                            onChange={(e) =>
-                              setBusinessForm({
-                                ...businessForm,
-                                business_phone: e.target.value,
-                              })
-                            }
-                            placeholder="Enter your business phone number"
-                            className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-slate-50 text-slate-900 transition-colors sm:text-sm"
+                            readOnly
+                            className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl bg-slate-100 text-slate-500 cursor-not-allowed sm:text-sm"
                           />
                         </div>
                         <div>
