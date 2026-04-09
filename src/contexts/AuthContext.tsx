@@ -1,4 +1,10 @@
-import { type ReactNode, createContext, useContext, useState, useEffect } from "react";
+import {
+  createContext,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { queryClient } from "../lib/react-query";
 
 interface AuthContextType {
@@ -37,7 +43,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return localStorage.getItem("merchantMode") || "test";
   });
 
-
   useEffect(() => {
     const checkExpiration = () => {
       const authTimestamp = localStorage.getItem("authTimestamp");
@@ -53,9 +58,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         // Schedule next check/logout
-        const remainingTime = (loginTime + TWENTY_THREE_HOURS) - currentTime;
+        const remainingTime = loginTime + TWENTY_THREE_HOURS - currentTime;
         const timer = setTimeout(() => {
-          console.log("⏰ AuthContext: Session timeout reached, logging out...");
+          console.log(
+            "⏰ AuthContext: Session timeout reached, logging out...",
+          );
           logout();
         }, remainingTime);
 

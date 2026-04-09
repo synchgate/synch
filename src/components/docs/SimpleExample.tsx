@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { Code2 } from "lucide-react";
+import { useState } from "react";
 import { CopyButton } from "../ui/CopyButton";
 
 export function SimpleExample() {
@@ -121,7 +121,8 @@ client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
       </h2>
 
       <p className="text-lg text-slate-600 leading-relaxed mb-8">
-        Get started quickly by implementing our API in your preferred language. Select a tab below to see the implementation details.
+        Get started quickly by implementing our API in your preferred language.
+        Select a tab below to see the implementation details.
       </p>
 
       {/* Multilingual Code Editor */}
@@ -132,10 +133,11 @@ client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
             <button
               key={lang.id}
               onClick={() => setActiveTab(lang.id)}
-              className={`px-4 py-2.5 text-sm font-medium transition-all relative whitespace-nowrap ${activeTab === lang.id
-                ? "text-blue-400"
-                : "text-slate-400 hover:text-slate-200"
-                }`}
+              className={`px-4 py-2.5 text-sm font-medium transition-all relative whitespace-nowrap ${
+                activeTab === lang.id
+                  ? "text-blue-400"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
             >
               {lang.label}
               {activeTab === lang.id && (
@@ -166,7 +168,10 @@ client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
             </span>
           </div>
           <div className="ml-auto flex items-center gap-3">
-            <CopyButton textToCopy={codeSnippets[activeTab]} className="text-slate-400 hover:text-white" />
+            <CopyButton
+              textToCopy={codeSnippets[activeTab]}
+              className="text-slate-400 hover:text-white"
+            />
             <Code2 className="w-3.5 h-3.5 text-slate-600" />
           </div>
         </div>

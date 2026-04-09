@@ -1,7 +1,7 @@
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { CopyButton } from "../../components/ui/CopyButton";
 import { SupportedProviders } from "../../components/docs/SupportedProviders";
+import { CopyButton } from "../../components/ui/CopyButton";
 
 function ResolveAccount() {
   return (
@@ -17,11 +17,11 @@ function ResolveAccount() {
       </h1>
 
       <p className="text-lg text-slate-600 leading-relaxed mb-8">
-        This endpoint allows you to verify a customer's bank account details before initiating a transfer.
+        This endpoint allows you to verify a customer's bank account details
+        before initiating a transfer.
       </p>
 
       <SupportedProviders />
-
 
       <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
         Base URL
@@ -48,7 +48,9 @@ function ResolveAccount() {
       </h3>
       <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-8 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-          <CopyButton textToCopy={`{\n    "provider": "flutterwave",\n    "account_number": "1243190620",\n    "bank_code": "044"\n}`} />
+          <CopyButton
+            textToCopy={`{\n    "provider": "flutterwave",\n    "account_number": "1243190620",\n    "bank_code": "044"\n}`}
+          />
         </div>
         <pre>
           {`{
@@ -64,7 +66,9 @@ function ResolveAccount() {
       </h2>
       <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-          <CopyButton textToCopy={`{\n    "status": "success",\n    "message": "Bank Account Details",\n    "data": {\n        "accountName": "John Doe",\n        "accountNumber": "1243190620"\n    },\n    "meta": {\n        "request_id": "922bdcd8-b5e1-4bcc-9f8f-45ec0dc174bb",\n        "timestamp": "2026-04-01T02:03:28.369634Z"\n    }\n}`} />
+          <CopyButton
+            textToCopy={`{\n    "status": "success",\n    "message": "Bank Account Details",\n    "data": {\n        "accountName": "John Doe",\n        "accountNumber": "1243190620"\n    },\n    "meta": {\n        "request_id": "922bdcd8-b5e1-4bcc-9f8f-45ec0dc174bb",\n        "timestamp": "2026-04-01T02:03:28.369634Z"\n    }\n}`}
+          />
         </div>
         <pre>
           {`{

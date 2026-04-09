@@ -3,9 +3,8 @@ import { ArrowRight, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { authService, type LoginPayload } from "../../services/auth";
 import { queryClient } from "../../lib/react-query";
-
+import { authService, type LoginPayload } from "../../services/auth";
 
 function Login() {
   const navigate = useNavigate();
@@ -23,7 +22,7 @@ function Login() {
   const loginMutation = useMutation({
     mutationFn: (data: LoginPayload) => authService.login(data),
     onSuccess: (data) => {
-      queryClient.resetQueries()
+      queryClient.resetQueries();
       // Store token depending on your backend schema, falling back to a dummy identifier
       const token =
         data?.access || data?.token || data?.access_token || "authenticated";
@@ -90,7 +89,10 @@ function Login() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-slate-700 mb-2"
+          >
             Email Address
           </label>
           <div className="relative">
@@ -98,6 +100,7 @@ function Login() {
               <Mail className="h-5 w-5 text-slate-400" />
             </div>
             <input
+              id="email"
               type="email"
               name="email"
               value={formData.email}
@@ -111,7 +114,10 @@ function Login() {
 
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-medium text-slate-700">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-slate-700"
+            >
               Password
             </label>
             <Link
@@ -126,6 +132,7 @@ function Login() {
               <Lock className="h-5 w-5 text-slate-400" />
             </div>
             <input
+              id="password"
               type={showPassword ? "text" : "password"}
               name="password"
               value={formData.password}

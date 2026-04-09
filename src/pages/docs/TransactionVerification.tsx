@@ -1,7 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-import { CopyButton } from "../../components/ui/CopyButton";
 import { SupportedProviders } from "../../components/docs/SupportedProviders";
+import { CopyButton } from "../../components/ui/CopyButton";
 
 function TransactionVerification() {
   return (
@@ -22,7 +22,6 @@ function TransactionVerification() {
 
       <SupportedProviders />
 
-
       <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
         Base URL
       </h2>
@@ -37,7 +36,9 @@ function TransactionVerification() {
         Endpoint
       </h2>
       <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10 relative group flex items-center justify-between">
-        <span>GET /transaction/verify/{"{"}reference{"}"}</span>
+        <span>
+          GET /transaction/verify/{"{"}reference{"}"}
+        </span>
         <div className="opacity-0 group-hover:opacity-100 transition-opacity">
           <CopyButton textToCopy="GET /transaction/verify/{reference}" />
         </div>
@@ -73,7 +74,9 @@ function TransactionVerification() {
       </p>
       <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-          <CopyButton textToCopy={`curl --location 'https://api.synchgate.com/v1/api/transaction/verify/{reference}' \\\n--header 'Client-Secret-Key: synch_sk_sandbox_wfpyGcOU0onMQ8zpAjnpEUVMTV8a_V5u00JgPftKzSI' \\\n--header 'Cookie: csrftoken=hDIER5CMGlOCnHVMhxHn8WYgoSm5vi8E' \\\n--data ''`} />
+          <CopyButton
+            textToCopy={`curl --location 'https://api.synchgate.com/v1/api/transaction/verify/{reference}' \\\n--header 'Client-Secret-Key: synch_sk_sandbox_wfpyGcOU0onMQ8zpAjnpEUVMTV8a_V5u00JgPftKzSI' \\\n--header 'Cookie: csrftoken=hDIER5CMGlOCnHVMhxHn8WYgoSm5vi8E' \\\n--data ''`}
+          />
         </div>
         <pre>
           {`curl --location 'https://api.synchgate.com/v1/api/transaction/verify/{reference}' \\
@@ -88,7 +91,9 @@ function TransactionVerification() {
       </h2>
       <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-          <CopyButton textToCopy={`{\n    "status": "success",\n    "message": "Verification requested",\n    "data": {\n        "cleaned_data": {\n            "provider": "paystack",\n            "status": "success",\n            "amount": 10000,\n            "reference": "bkhwialqas",\n            "currency": "NGN"\n        },\n        "provider_response": {\n            "status": true,\n            "message": "Verification successful",\n            "data": {\n                "id": 5990835342,\n                "domain": "test",\n                "status": "success",\n                "reference": "bkhwialqas",\n                "receipt_number": null,\n                "amount": 10000,\n                "message": null,\n                "gateway_response": "Successful",\n                "paid_at": "2026-03-31T23:50:04.000Z",\n                "created_at": "2026-03-31T23:49:52.000Z",\n                "channel": "card",\n                "currency": "NGN",\n                "ip_address": "102.89.47.66",\n                "metadata": {\n                    "amount": "100.00"\n                }\n            }\n        }\n    },\n    "meta": {\n        "request_id": "cf0fa31c-d43a-43d3-bc3a-0d41d7bdb18b",\n        "timestamp": "2026-04-01T12:46:41.387939Z"\n    }\n}`} />
+          <CopyButton
+            textToCopy={`{\n    "status": "success",\n    "message": "Verification requested",\n    "data": {\n        "cleaned_data": {\n            "provider": "paystack",\n            "status": "success",\n            "amount": 10000,\n            "reference": "bkhwialqas",\n            "currency": "NGN"\n        },\n        "provider_response": {\n            "status": true,\n            "message": "Verification successful",\n            "data": {\n                "id": 5990835342,\n                "domain": "test",\n                "status": "success",\n                "reference": "bkhwialqas",\n                "receipt_number": null,\n                "amount": 10000,\n                "message": null,\n                "gateway_response": "Successful",\n                "paid_at": "2026-03-31T23:50:04.000Z",\n                "created_at": "2026-03-31T23:49:52.000Z",\n                "channel": "card",\n                "currency": "NGN",\n                "ip_address": "102.89.47.66",\n                "metadata": {\n                    "amount": "100.00"\n                }\n            }\n        }\n    },\n    "meta": {\n        "request_id": "cf0fa31c-d43a-43d3-bc3a-0d41d7bdb18b",\n        "timestamp": "2026-04-01T12:46:41.387939Z"\n    }\n}`}
+          />
         </div>
         <pre>
           {`{

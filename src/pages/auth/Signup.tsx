@@ -2,13 +2,13 @@ import { useMutation } from "@tanstack/react-query";
 import {
   ArrowRight,
   Briefcase,
+  Check,
   Eye,
   EyeOff,
   Lock,
   Mail,
-  User,
   Phone,
-  Check,
+  User,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -49,11 +49,33 @@ function Signup() {
       });
     },
     onError: (err: any) => {
-      // Extract error message from API response if possible
-      const errorMessage =
-        err.response?.data?.message ||
-        err.response?.data?.detail ||
-        "Registration failed. Please try again.";
+      // Extract specific error messages from the API payload
+      const data = err.response?.data;
+      let errorMessage = "Registration failed. Please try again.";
+
+      if (data) {
+        if (typeof data === "string") {
+          errorMessage = data;
+        } else if (data.email && Array.isArray(data.email)) {
+          errorMessage = data.email[0];
+        } else if (data.business_name && Array.isArray(data.business_name)) {
+          errorMessage = data.business_name[0];
+        } else if (data.message) {
+          errorMessage = data.message;
+        } else if (data.detail) {
+          errorMessage = data.detail;
+        } else if (data.error) {
+          errorMessage = data.error;
+        } else {
+          // Fallback: Get the first available error message from any field
+          const firstError = Object.values(data)[0];
+          if (Array.isArray(firstError)) {
+            errorMessage = String(firstError[0]);
+          } else if (typeof firstError === "string") {
+            errorMessage = firstError;
+          }
+        }
+      }
       setError(errorMessage);
     },
   });
@@ -67,8 +89,16 @@ function Signup() {
     e.preventDefault();
     setError(null);
 
+    // Business Name Validation (Min 6 characters)
+    if (formData.business_name.length < 6) {
+      setError("Business name must be at least 6 characters long.");
+      return;
+    }
+
     if (!isPasswordValid) {
-      setError("Please ensure your password meets all the security requirements.");
+      setError(
+        "Please ensure your password meets all the security requirements.",
+      );
       return;
     }
 
@@ -94,7 +124,10 @@ function Signup() {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label
+              htmlFor="first_name"
+              className="block text-sm font-medium text-slate-700 mb-2"
+            >
               First Name
             </label>
             <div className="relative">
@@ -102,6 +135,7 @@ function Signup() {
                 <User className="h-5 w-5 text-slate-400" />
               </div>
               <input
+                id="first_name"
                 type="text"
                 name="first_name"
                 value={formData.first_name}
@@ -113,7 +147,10 @@ function Signup() {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label
+              htmlFor="last_name"
+              className="block text-sm font-medium text-slate-700 mb-2"
+            >
               Last Name
             </label>
             <div className="relative">
@@ -121,6 +158,7 @@ function Signup() {
                 <User className="h-5 w-5 text-slate-400" />
               </div>
               <input
+                id="last_name"
                 type="text"
                 name="last_name"
                 value={formData.last_name}
@@ -135,7 +173,10 @@ function Signup() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label
+              htmlFor="business_name"
+              className="block text-sm font-medium text-slate-700 mb-2"
+            >
               Business Name
             </label>
             <div className="relative">
@@ -143,6 +184,7 @@ function Signup() {
                 <Briefcase className="h-5 w-5 text-slate-400" />
               </div>
               <input
+                id="business_name"
                 type="text"
                 name="business_name"
                 value={formData.business_name}
@@ -155,7 +197,10 @@ function Signup() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label
+              htmlFor="business_phone"
+              className="block text-sm font-medium text-slate-700 mb-2"
+            >
               Business Phone
             </label>
             <div className="relative">
@@ -163,6 +208,7 @@ function Signup() {
                 <Phone className="h-5 w-5 text-slate-400" />
               </div>
               <input
+                id="business_phone"
                 type="tel"
                 name="business_phone"
                 value={formData.business_phone}
@@ -176,7 +222,10 @@ function Signup() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-slate-700 mb-2"
+          >
             Email Address
           </label>
           <div className="relative">
@@ -184,6 +233,7 @@ function Signup() {
               <Mail className="h-5 w-5 text-slate-400" />
             </div>
             <input
+              id="email"
               type="email"
               name="email"
               value={formData.email}
@@ -196,7 +246,10 @@ function Signup() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-slate-700 mb-2"
+          >
             Password
           </label>
           <div className="relative">
@@ -204,6 +257,7 @@ function Signup() {
               <Lock className="h-5 w-5 text-slate-400" />
             </div>
             <input
+              id="password"
               type={showPassword ? "text" : "password"}
               name="password"
               value={formData.password}
@@ -226,31 +280,63 @@ function Signup() {
               )}
             </button>
           </div>
-          
+
           <div
             className={`transition-all duration-300 overflow-hidden ${
-              isPasswordFocused ? "max-h-64 mt-3 opacity-100" : "max-h-0 opacity-0"
+              isPasswordFocused
+                ? "max-h-64 mt-3 opacity-100"
+                : "max-h-0 opacity-0"
             }`}
           >
             <div className="space-y-2 text-xs font-medium">
-              <div className={`flex items-center gap-2 ${checks.uppercase ? "text-emerald-600" : "text-slate-500"}`}>
-                {checks.uppercase ? <Check className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
+              <div
+                className={`flex items-center gap-2 ${checks.uppercase ? "text-emerald-600" : "text-slate-500"}`}
+              >
+                {checks.uppercase ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  <div className="w-4 h-4 rounded-full border border-slate-300" />
+                )}
                 <span>At least one uppercase letter</span>
               </div>
-              <div className={`flex items-center gap-2 ${checks.lowercase ? "text-emerald-600" : "text-slate-500"}`}>
-                {checks.lowercase ? <Check className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
+              <div
+                className={`flex items-center gap-2 ${checks.lowercase ? "text-emerald-600" : "text-slate-500"}`}
+              >
+                {checks.lowercase ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  <div className="w-4 h-4 rounded-full border border-slate-300" />
+                )}
                 <span>At least one lowercase letter</span>
               </div>
-              <div className={`flex items-center gap-2 ${checks.number ? "text-emerald-600" : "text-slate-500"}`}>
-                {checks.number ? <Check className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
+              <div
+                className={`flex items-center gap-2 ${checks.number ? "text-emerald-600" : "text-slate-500"}`}
+              >
+                {checks.number ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  <div className="w-4 h-4 rounded-full border border-slate-300" />
+                )}
                 <span>At least one number</span>
               </div>
-              <div className={`flex items-center gap-2 ${checks.symbol ? "text-emerald-600" : "text-slate-500"}`}>
-                {checks.symbol ? <Check className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
+              <div
+                className={`flex items-center gap-2 ${checks.symbol ? "text-emerald-600" : "text-slate-500"}`}
+              >
+                {checks.symbol ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  <div className="w-4 h-4 rounded-full border border-slate-300" />
+                )}
                 <span>At least one symbol</span>
               </div>
-              <div className={`flex items-center gap-2 ${checks.length ? "text-emerald-600" : "text-slate-500"}`}>
-                {checks.length ? <Check className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
+              <div
+                className={`flex items-center gap-2 ${checks.length ? "text-emerald-600" : "text-slate-500"}`}
+              >
+                {checks.length ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  <div className="w-4 h-4 rounded-full border border-slate-300" />
+                )}
                 <span>At least 8 characters long</span>
               </div>
             </div>
@@ -269,7 +355,10 @@ function Signup() {
             />
           </div>
           <div className="text-sm">
-            <label htmlFor="terms" className="font-medium text-slate-700 cursor-pointer">
+            <label
+              htmlFor="terms"
+              className="font-medium text-slate-700 cursor-pointer"
+            >
               I agree to the{" "}
             </label>
             <Link

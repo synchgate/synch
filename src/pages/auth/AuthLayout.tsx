@@ -1,7 +1,7 @@
 import { ShieldCheck } from "lucide-react";
 import { Link, Outlet } from "react-router-dom";
-import logo from "../../assets/logo-white.png";
 import logoDark from "../../assets/logo.png";
+import logo from "../../assets/logo-white.png";
 
 function AuthLayout() {
   return (

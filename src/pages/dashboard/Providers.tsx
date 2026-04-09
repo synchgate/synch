@@ -1,15 +1,7 @@
-import {
-  Eye,
-  EyeOff,
-  Key,
-  Pencil,
-  Plus,
-  Trash2,
-  X,
-} from "lucide-react";
-import { useState, useEffect } from "react";
-import { useAuth } from "../../contexts/AuthContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Eye, EyeOff, Key, Pencil, Plus, Trash2, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 import { api } from "../../lib/api";
 
 type ApiKeyConfig = {
@@ -173,14 +165,14 @@ function Providers() {
       const credentials =
         envModal.provider === "Nomba"
           ? {
-            grant_type: envModal.grantType,
-            client_id: envModal.clientId,
-            client_secret: envModal.clientSecret,
-            accountId: envModal.accountId,
-          }
+              grant_type: envModal.grantType,
+              client_id: envModal.clientId,
+              client_secret: envModal.clientSecret,
+              accountId: envModal.accountId,
+            }
           : {
-            secret_key: envModal.secretKey,
-          };
+              secret_key: envModal.secretKey,
+            };
 
       await setupProvider({
         merchant_id: merchantId.toString(),
@@ -189,7 +181,9 @@ function Providers() {
         credential_type: "api_key",
         credentials,
       });
-      await queryClient.invalidateQueries({ queryKey: ["settings", userEmail] });
+      await queryClient.invalidateQueries({
+        queryKey: ["settings", userEmail],
+      });
       closeEnvModal();
     } catch (error) {
       console.error("Failed to setup provider:", error);
@@ -230,15 +224,13 @@ function Providers() {
               Provider Integrations
             </h3>
             <p className="text-xs text-slate-500 mt-1">
-              Your API keys are highly encrypted, very safe, and
-              secure.
+              Your API keys are highly encrypted, very safe, and secure.
             </p>
           </div>
           <button
+            type="button"
             onClick={() => {
-              const configuredProviders = apiKeys.map(
-                (k) => k.provider,
-              );
+              const configuredProviders = apiKeys.map((k) => k.provider);
               const firstUnconfigured =
                 AVAILABLE_PROVIDERS.find(
                   (p) => !configuredProviders.includes(p),
@@ -261,13 +253,12 @@ function Providers() {
                 No providers configured
               </p>
               <p className="text-sm">
-                Click the Add Key button to integrate a new
-                provider.
+                Click the Add Key button to integrate a new provider.
               </p>
             </div>
           ) : (
-            apiKeys.map((config, index) => (
-              <div key={index} className="p-6">
+            apiKeys.map((config) => (
+              <div key={config.provider} className="p-6">
                 {/* Provider Header */}
                 <div className="flex items-center gap-3 mb-5">
                   <div className="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center border border-slate-200 shrink-0">
@@ -287,6 +278,7 @@ function Providers() {
                   {/* Top-right delete (coming soon) */}
                   <div className="ml-auto">
                     <button
+                      type="button"
                       disabled
                       className="p-2 text-slate-300 cursor-not-allowed rounded-lg"
                       title="Delete Provider (Coming Soon)"
@@ -305,6 +297,7 @@ function Providers() {
                       </span>
                       {config.testSecretKey ? (
                         <button
+                          type="button"
                           onClick={() =>
                             openEnvModal(
                               config.provider,
@@ -318,6 +311,7 @@ function Providers() {
                         </button>
                       ) : (
                         <button
+                          type="button"
                           onClick={() =>
                             openEnvModal(
                               config.provider,
@@ -355,6 +349,7 @@ function Providers() {
                       </span>
                       {config.liveSecretKey ? (
                         <button
+                          type="button"
                           onClick={() =>
                             openEnvModal(
                               config.provider,
@@ -368,6 +363,7 @@ function Providers() {
                         </button>
                       ) : (
                         <button
+                          type="button"
                           onClick={() =>
                             openEnvModal(
                               config.provider,
@@ -405,8 +401,20 @@ function Providers() {
 
       {/* Environment Key Modal */}
       {envModal.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-xl animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"
+            onClick={closeEnvModal}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                closeEnvModal();
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label="Close modal"
+          />
+          <div className="relative bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-xl animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
               <div>
@@ -424,6 +432,7 @@ function Providers() {
                 )}
               </div>
               <button
+                type="button"
                 onClick={closeEnvModal}
                 className="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
               >
@@ -434,7 +443,10 @@ function Providers() {
             <div className="p-6 space-y-5">
               {/* Provider selector */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label
+                  htmlFor="provider-select"
+                  className="block text-sm font-medium text-slate-700 mb-2"
+                >
                   Provider
                 </label>
                 {envModal.isEdit || envModal.isFixed ? (
@@ -447,6 +459,7 @@ function Providers() {
                   </div>
                 ) : (
                   <select
+                    id="provider-select"
                     value={envModal.provider}
                     onChange={(e) =>
                       setEnvModal({ ...envModal, provider: e.target.value })
@@ -470,26 +483,32 @@ function Providers() {
 
               {/* Environment */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label
+                  htmlFor="env-select"
+                  className="block text-sm font-medium text-slate-700 mb-2"
+                >
                   Environment
                 </label>
                 {envModal.isEdit || envModal.isFixed ? (
                   <div
-                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${envModal.environment === "sandbox"
+                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${
+                      envModal.environment === "sandbox"
                         ? "bg-amber-100 text-amber-700"
                         : "bg-emerald-100 text-emerald-700"
-                      }`}
+                    }`}
                   >
                     <span
-                      className={`w-1.5 h-1.5 rounded-full ${envModal.environment === "sandbox"
+                      className={`w-1.5 h-1.5 rounded-full ${
+                        envModal.environment === "sandbox"
                           ? "bg-amber-500"
                           : "bg-emerald-500"
-                        }`}
+                      }`}
                     />
                     {envModal.environment === "sandbox" ? "Sandbox" : "Live"}
                   </div>
                 ) : (
                   <select
+                    id="env-select"
                     value={envModal.environment}
                     onChange={(e) =>
                       setEnvModal({
@@ -509,10 +528,14 @@ function Providers() {
               {envModal.provider === "Nomba" ? (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                    <label
+                      htmlFor="grant-type"
+                      className="block text-sm font-medium text-slate-700 mb-2"
+                    >
                       Grant Type
                     </label>
                     <input
+                      id="grant-type"
                       type="text"
                       value={envModal.grantType}
                       onChange={(e) =>
@@ -523,10 +546,14 @@ function Providers() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                    <label
+                      htmlFor="client-id"
+                      className="block text-sm font-medium text-slate-700 mb-2"
+                    >
                       Client ID
                     </label>
                     <input
+                      id="client-id"
                       type="text"
                       value={envModal.clientId}
                       onChange={(e) =>
@@ -537,11 +564,15 @@ function Providers() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                    <label
+                      htmlFor="client-secret"
+                      className="block text-sm font-medium text-slate-700 mb-2"
+                    >
                       Client Secret
                     </label>
                     <div className="relative">
                       <input
+                        id="client-secret"
                         type={showKey ? "text" : "password"}
                         value={envModal.clientSecret}
                         onChange={(e) =>
@@ -568,10 +599,14 @@ function Providers() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                    <label
+                      htmlFor="account-id"
+                      className="block text-sm font-medium text-slate-700 mb-2"
+                    >
                       Account ID
                     </label>
                     <input
+                      id="account-id"
                       type="text"
                       value={envModal.accountId}
                       onChange={(e) =>
@@ -585,11 +620,15 @@ function Providers() {
               ) : (
                 /* Existing Secret key input for other providers */
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label
+                    htmlFor="secret-key"
+                    className="block text-sm font-medium text-slate-700 mb-2"
+                  >
                     Secret Key
                   </label>
                   <div className="relative">
                     <input
+                      id="secret-key"
                       type={showKey ? "text" : "password"}
                       value={envModal.secretKey}
                       onKeyDown={(e) => {
@@ -645,23 +684,25 @@ function Providers() {
 
             <div className="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-3 rounded-b-2xl">
               <button
+                type="button"
                 onClick={closeEnvModal}
                 className="px-4 py-2 font-medium text-slate-600 hover:text-slate-900 transition-colors cursor-pointer text-sm"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleSaveEnvKey}
                 disabled={
                   isSettingUpProvider ||
                   (envModal.provider === "Nomba"
                     ? !envModal.grantType ||
-                    !envModal.clientId ||
-                    !envModal.clientSecret ||
-                    !envModal.accountId
+                      !envModal.clientId ||
+                      !envModal.clientSecret ||
+                      !envModal.accountId
                     : envModal.secretKey.length < 10 ||
-                    (envModal.isEdit &&
-                      envModal.secretKey === envModal.originalKey))
+                      (envModal.isEdit &&
+                        envModal.secretKey === envModal.originalKey))
                 }
                 className="px-5 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm shadow-blue-500/20 text-sm flex items-center gap-2"
               >
@@ -682,8 +723,20 @@ function Providers() {
       )}
       {/* Delete Confirmation Modal */}
       {keyToDelete && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-xl animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"
+            onClick={() => setKeyToDelete(null)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                setKeyToDelete(null);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label="Close modal"
+          />
+          <div className="relative bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-xl animate-in zoom-in-95 duration-200">
             <div className="p-6 text-center">
               <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-4">
                 <Trash2 className="w-6 h-6" />
@@ -698,12 +751,14 @@ function Providers() {
               </p>
               <div className="flex items-center gap-3">
                 <button
+                  type="button"
                   onClick={() => setKeyToDelete(null)}
                   className="flex-1 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg transition-colors cursor-pointer text-sm"
                 >
                   Cancel
                 </button>
                 <button
+                  type="button"
                   onClick={handleDeleteKey}
                   className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg shadow-sm shadow-red-500/20 transition-colors cursor-pointer text-sm"
                 >

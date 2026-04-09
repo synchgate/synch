@@ -1,9 +1,4 @@
-import {
-  Terminal,
-  Search,
-  Database,
-  ShieldAlert,
-} from "lucide-react";
+import { Database, Search, ShieldAlert, Terminal } from "lucide-react";
 
 function Logs() {
   return (
@@ -41,9 +36,7 @@ function Logs() {
             <span className="absolute -top-2 -right-2 flex h-6 w-6">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-50"></span>
               <span className="relative inline-flex rounded-full h-6 w-6 bg-indigo-500 items-center justify-center">
-                <span className="text-white text-[9px] font-bold">
-                  !
-                </span>
+                <span className="text-white text-[9px] font-bold">!</span>
               </span>
             </span>
           </div>
@@ -56,8 +49,9 @@ function Logs() {
             The Logging Console is coming soon
           </h4>
           <p className="text-sm text-slate-500 max-w-sm leading-relaxed">
-            We're building a powerful, real-time logging engine that will let you trace every single 
-            request across all providers with millisecond precision.
+            We're building a powerful, real-time logging engine that will let
+            you trace every single request across all providers with millisecond
+            precision.
           </p>
 
           <div className="mt-8 grid grid-cols-3 gap-4 w-full max-w-sm">
@@ -65,9 +59,9 @@ function Logs() {
               { icon: Search, label: "Advanced Search" },
               { icon: Database, label: "Raw Payloads" },
               { icon: ShieldAlert, label: "Error Tracing" },
-            ].map((item, i) => (
+            ].map((item) => (
               <div
-                key={i}
+                key={item.label}
                 className="flex flex-col items-center gap-2 p-3 rounded-xl bg-slate-50 border border-slate-200"
               >
                 <div className="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center">

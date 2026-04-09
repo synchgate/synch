@@ -41,7 +41,7 @@ api.interceptors.response.use(
       queryClient.removeQueries();
       localStorage.clear();
       sessionStorage.clear();
-      
+
       // Redirect to login if not already there
       if (window.location.pathname !== "/auth/login") {
         window.location.href = "/auth/login";

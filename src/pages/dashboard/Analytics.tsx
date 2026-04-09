@@ -1,8 +1,4 @@
-import {
-  Building2,
-  Activity,
-  ShieldCheck,
-} from "lucide-react";
+import { Activity, Building2, ShieldCheck } from "lucide-react";
 
 function Analytics() {
   return (
@@ -40,9 +36,7 @@ function Analytics() {
             <span className="absolute -top-2 -right-2 flex h-6 w-6">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-50"></span>
               <span className="relative inline-flex rounded-full h-6 w-6 bg-blue-500 items-center justify-center">
-                <span className="text-white text-[9px] font-bold">
-                  !
-                </span>
+                <span className="text-white text-[9px] font-bold">!</span>
               </span>
             </span>
           </div>
@@ -55,8 +49,9 @@ function Analytics() {
             Advanced Analytics is coming soon
           </h4>
           <p className="text-sm text-slate-500 max-w-sm leading-relaxed">
-            We're building a comprehensive analytics dashboard for all your payment transactions. 
-            Soon you'll be able to monitor volume, success rates, and customer trends in real-time.
+            We're building a comprehensive analytics dashboard for all your
+            payment transactions. Soon you'll be able to monitor volume, success
+            rates, and customer trends in real-time.
           </p>
 
           <div className="mt-8 grid grid-cols-3 gap-4 w-full max-w-sm">
@@ -64,9 +59,9 @@ function Analytics() {
               { icon: Activity, label: "Volume Trends" },
               { icon: ShieldCheck, label: "Fraud Detection" },
               { icon: Building2, label: "Settlement reports" },
-            ].map((item, i) => (
+            ].map((item) => (
               <div
-                key={i}
+                key={item.label}
                 className="flex flex-col items-center gap-2 p-3 rounded-xl bg-slate-50 border border-slate-200"
               >
                 <div className="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center">

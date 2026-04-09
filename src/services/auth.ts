@@ -9,7 +9,6 @@ export interface RegisterPayload {
   business_phone: string;
 }
 
-
 export interface LoginPayload {
   email: string;
   password?: string;

@@ -9,8 +9,8 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
 import logo from "../assets/logo.png";
+import { useAuth } from "../contexts/AuthContext";
 
 function DocsPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -31,6 +31,7 @@ function DocsPage() {
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <button
+              type="button"
               className="lg:hidden text-slate-600 hover:text-blue-600 cursor-pointer"
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             >
@@ -75,7 +76,15 @@ function DocsPage() {
             ${isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
           `}
         >
-          <nav className="space-y-8" onClick={() => setIsSidebarOpen(false)}>
+          <nav
+            className="space-y-8"
+            onClick={() => setIsSidebarOpen(false)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                setIsSidebarOpen(false);
+              }
+            }}
+          >
             <div>
               <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-blue-500" /> Getting Started
@@ -162,19 +171,21 @@ function DocsPage() {
               </h4>
               <ul className="space-y-2 border-l border-slate-200 ml-2 pl-4">
                 <li>
-                  <a
-                    href="#"
-                    className="block text-sm text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"
+                  <button
+                    type="button"
+                    className="block text-sm text-slate-600 hover:text-blue-600 transition-colors cursor-pointer text-left w-full"
+                    onClick={(e) => e.preventDefault()}
                   >
                     Overview
-                  </a>
+                  </button>
                 </li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                <Shield className="w-4 h-4 text-blue-500" /> Compliance & Privacy
+                <Shield className="w-4 h-4 text-blue-500" /> Compliance &
+                Privacy
               </h4>
               <ul className="space-y-2 border-l border-slate-200 ml-2 pl-4">
                 <li>
@@ -200,10 +211,17 @@ function DocsPage() {
 
         {/* Overlay for mobile sidebar */}
         {isSidebarOpen && (
-          <div
-            className="fixed inset-0 bg-slate-900/50 z-30 lg:hidden backdrop-blur-sm"
+          <button
+            type="button"
+            className="fixed inset-0 bg-slate-900/50 z-30 lg:hidden backdrop-blur-sm w-full h-full border-none p-0"
             onClick={() => setIsSidebarOpen(false)}
-          ></div>
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                setIsSidebarOpen(false);
+              }
+            }}
+            aria-label="Close sidebar"
+          ></button>
         )}
 
         {/* Main Content Area (Outlet renders the matching child route) */}

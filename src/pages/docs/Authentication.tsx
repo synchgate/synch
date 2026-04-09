@@ -9,8 +9,8 @@ function Authentication() {
       </h1>
 
       <p className="text-lg text-slate-600 leading-relaxed mb-8">
-        The SynchGate API uses secret keys to authenticate requests. You can view
-        and manage your API keys in the SynchGate Dashboard.
+        The SynchGate API uses secret keys to authenticate requests. You can
+        view and manage your API keys in the SynchGate Dashboard.
       </p>
 
       <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-xl mb-10 flex gap-4 text-yellow-800 shadow-sm">
@@ -44,8 +44,8 @@ function Authentication() {
         </div>
         <pre className="text-sm font-mono text-slate-800 bg-white p-6 overflow-x-auto shadow-inner">
           <code>
-            <span className="text-pink-600">import</span> &#123; SynchGate &#125;{" "}
-            <span className="text-pink-600">from</span>{" "}
+            <span className="text-pink-600">import</span> &#123; SynchGate
+            &#125; <span className="text-pink-600">from</span>{" "}
             <span className="text-blue-600">'@synchgate/node'</span>;<br />
             <br />
             <span className="text-slate-400">

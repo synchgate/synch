@@ -1,21 +1,21 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  AlertTriangle,
   CheckCircle2,
   Copy,
   Eye,
   EyeOff,
   Key,
+  Loader2,
+  RefreshCw,
   Shield,
   ShieldAlert,
-  Loader2,
   Webhook,
-  RefreshCw,
-  AlertTriangle,
   X,
 } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api } from "../../lib/api";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
+import { api } from "../../lib/api";
 
 function MyApiKey() {
   const { userEmail } = useAuth();
@@ -220,12 +220,16 @@ function MyApiKey() {
 
     return (
       <div className="mb-6 last:mb-0">
-        <label className="block text-sm font-medium text-slate-700 mb-2">
+        <label
+          htmlFor={id}
+          className="block text-sm font-medium text-slate-700 mb-2"
+        >
           {label}
         </label>
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <input
+              id={id}
               type={isSecret && !showSecret ? "password" : "text"}
               value={value || ""}
               readOnly
@@ -248,6 +252,7 @@ function MyApiKey() {
           </div>
 
           <button
+            type="button"
             onClick={() => copyToClipboard(value, id)}
             className="flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-700 font-medium rounded-xl hover:bg-slate-50 transition-all active:scale-[0.98] sm:w-auto w-full group cursor-pointer shadow-sm"
           >
@@ -308,6 +313,7 @@ function MyApiKey() {
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => handleRegenerate("live")}
                 disabled={regeneratingKey === "live"}
                 className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-emerald-700 bg-emerald-100/50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors disabled:opacity-50 cursor-pointer shrink-0"
@@ -359,6 +365,7 @@ function MyApiKey() {
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => handleRegenerate("test")}
                 disabled={regeneratingKey === "test"}
                 className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-amber-700 bg-amber-100/50 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors disabled:opacity-50 cursor-pointer shrink-0"
@@ -431,6 +438,7 @@ function MyApiKey() {
                 />
               </div>
               <button
+                type="button"
                 onClick={() => saveWebhook("live")}
                 disabled={webhookSavingLive || !webhookUrlLive.trim()}
                 className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] sm:w-auto w-full shadow-sm cursor-pointer"
@@ -477,6 +485,7 @@ function MyApiKey() {
                 />
               </div>
               <button
+                type="button"
                 onClick={() => saveWebhook("test")}
                 disabled={webhookSavingTest || !webhookUrlTest.trim()}
                 className="flex items-center justify-center gap-2 px-6 py-3 bg-amber-600 text-white font-medium rounded-xl hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] sm:w-auto w-full shadow-sm cursor-pointer"
@@ -536,8 +545,20 @@ function MyApiKey() {
 
       {/* Confirmation Modal */}
       {confirmRegenerateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-xl animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"
+            onClick={() => setConfirmRegenerateModal(null)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                setConfirmRegenerateModal(null);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label="Close modal"
+          />
+          <div className="relative bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-xl animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -550,6 +571,7 @@ function MyApiKey() {
                 </h3>
               </div>
               <button
+                type="button"
                 onClick={() => setConfirmRegenerateModal(null)}
                 className="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
               >
@@ -576,13 +598,15 @@ function MyApiKey() {
             </div>
 
             <div className="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-3 rounded-b-2xl">
-              <button
+               <button
+                type="button"
                 onClick={() => setConfirmRegenerateModal(null)}
                 className="px-4 py-2 font-medium text-slate-600 hover:text-slate-900 transition-colors cursor-pointer text-sm"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={confirmRegeneration}
                 className="px-5 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors shadow-sm shadow-red-500/20 text-sm flex items-center gap-2 cursor-pointer"
               >
@@ -597,10 +621,11 @@ function MyApiKey() {
       {notification && (
         <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300">
           <div
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border ${notification.type === "success"
-              ? "bg-emerald-50 border-emerald-200 text-emerald-800"
-              : "bg-red-50 border-red-200 text-red-800"
-              }`}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border ${
+              notification.type === "success"
+                ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+                : "bg-red-50 border-red-200 text-red-800"
+            }`}
           >
             {notification.type === "success" ? (
               <CheckCircle2 className="w-5 h-5 text-emerald-600" />
@@ -609,11 +634,13 @@ function MyApiKey() {
             )}
             <p className="text-sm font-medium">{notification.message}</p>
             <button
+              type="button"
               onClick={() => setNotification(null)}
-              className={`ml-2 p-1 rounded-md transition-colors cursor-pointer ${notification.type === "success"
-                ? "hover:bg-emerald-100/80 text-emerald-600"
-                : "hover:bg-red-100/80 text-red-600"
-                }`}
+              className={`ml-2 p-1 rounded-md transition-colors cursor-pointer ${
+                notification.type === "success"
+                  ? "hover:bg-emerald-100/80 text-emerald-600"
+                  : "hover:bg-red-100/80 text-red-600"
+              }`}
             >
               <X className="w-4 h-4" />
             </button>

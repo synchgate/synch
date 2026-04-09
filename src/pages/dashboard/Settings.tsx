@@ -1,3 +1,4 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Bell,
   Building2,
@@ -8,22 +9,17 @@ import {
   Shield,
   User,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api } from "../../lib/api";
 import { COUNTRIES } from "../../data/countries";
-
-
-
+import { api } from "../../lib/api";
 
 function Settings() {
   const { userEmail } = useAuth();
   const queryClient = useQueryClient();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(location.state?.tab || "general");
-
 
   const [businessForm, setBusinessForm] = useState({
     business_name: "",
@@ -89,12 +85,6 @@ function Settings() {
     }
   }, [settingsResponse]);
 
-
-
-
-
-
-
   const { mutateAsync: updateMerchant, isPending: isUpdatingBusiness } =
     useMutation({
       mutationFn: async (payload: typeof businessForm) => {
@@ -118,9 +108,6 @@ function Settings() {
       },
     });
 
-
-
-
   return (
     <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
@@ -141,7 +128,6 @@ function Settings() {
             { id: "general", label: "General", icon: User },
             { id: "business", label: "Business Profile", icon: Building2 },
 
-
             { id: "kyc", label: "KYC Documents", icon: FileText },
             { id: "billing", label: "Billing Plans", icon: CreditCardIcon },
             { id: "security", label: "Security", icon: Shield },
@@ -151,12 +137,14 @@ function Settings() {
             return (
               <button
                 key={tab.id}
+                type="button"
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap cursor-pointer
-                                    ${activeTab === tab.id
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                  }
+                                    ${
+                                      activeTab === tab.id
+                                        ? "bg-blue-50 text-blue-700"
+                                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                                    }
                                 `}
               >
                 <TabIcon
@@ -200,10 +188,14 @@ function Settings() {
 
                       <div className="grid sm:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="firstName"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             First Name
                           </label>
                           <input
+                            id="firstName"
                             type="text"
                             value={firstName}
                             readOnly
@@ -211,10 +203,14 @@ function Settings() {
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="lastName"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             Last Name
                           </label>
                           <input
+                            id="lastName"
                             type="text"
                             value={lastName}
                             readOnly
@@ -222,10 +218,14 @@ function Settings() {
                           />
                         </div>
                         <div className="sm:col-span-2">
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="emailAddress"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             Email Address
                           </label>
                           <input
+                            id="emailAddress"
                             type="email"
                             value={emailAddress}
                             readOnly
@@ -254,61 +254,59 @@ function Settings() {
                     <div className="p-6">
                       <div className="grid sm:grid-cols-2 gap-6">
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="businessName"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             Business Name
                           </label>
                           <input
+                            id="businessName"
                             type="text"
                             value={businessForm.business_name}
-                            onChange={(e) =>
-                              setBusinessForm({
-                                ...businessForm,
-                                business_name: e.target.value,
-                              })
-                            }
-                            placeholder="Enter your business name"
-                            className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-slate-50 text-slate-900 transition-colors sm:text-sm"
+                            readOnly
+                            className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl bg-slate-100 text-slate-500 cursor-not-allowed sm:text-sm"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="businessEmail"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             Business Email
                           </label>
                           <input
+                            id="businessEmail"
                             type="email"
                             value={businessForm.business_email}
-                            onChange={(e) =>
-                              setBusinessForm({
-                                ...businessForm,
-                                business_email: e.target.value,
-                              })
-                            }
-                            placeholder="Enter your business email"
-                            className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-slate-50 text-slate-900 transition-colors sm:text-sm"
+                            readOnly
+                            className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl bg-slate-100 text-slate-500 cursor-not-allowed sm:text-sm"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="businessPhone"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             Business Phone
                           </label>
                           <input
+                            id="businessPhone"
                             type="tel"
                             value={businessForm.business_phone}
-                            onChange={(e) =>
-                              setBusinessForm({
-                                ...businessForm,
-                                business_phone: e.target.value,
-                              })
-                            }
-                            placeholder="Enter your business phone number"
-                            className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-slate-50 text-slate-900 transition-colors sm:text-sm"
+                            readOnly
+                            className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl bg-slate-100 text-slate-500 cursor-not-allowed sm:text-sm"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="businessType"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             Business Type
                           </label>
                           <input
+                            id="businessType"
                             type="text"
                             value={businessForm.business_type}
                             onChange={(e) =>
@@ -322,10 +320,14 @@ function Settings() {
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="website"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             Website
                           </label>
                           <input
+                            id="website"
                             type="url"
                             value={businessForm.website}
                             onChange={(e) =>
@@ -339,10 +341,14 @@ function Settings() {
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="registrationNumber"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             Registration Number
                           </label>
                           <input
+                            id="registrationNumber"
                             type="text"
                             value={businessForm.registration_number}
                             onChange={(e) =>
@@ -356,10 +362,14 @@ function Settings() {
                           />
                         </div>
                         <div className="sm:col-span-2">
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="address"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             Address
                           </label>
                           <input
+                            id="address"
                             type="text"
                             value={businessForm.address}
                             onChange={(e) =>
@@ -373,10 +383,14 @@ function Settings() {
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="country"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             Country
                           </label>
                           <select
+                            id="country"
                             value={businessForm.country}
                             onChange={(e) =>
                               setBusinessForm({
@@ -395,10 +409,14 @@ function Settings() {
                           </select>
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="stateProvince"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             State/Province
                           </label>
                           <input
+                            id="stateProvince"
                             type="text"
                             value={businessForm.state}
                             onChange={(e) =>
@@ -428,6 +446,7 @@ function Settings() {
                       )}
                       <div className="ml-auto">
                         <button
+                          type="button"
                           onClick={() => updateMerchant(businessForm)}
                           disabled={isUpdatingBusiness}
                           className="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors shadow-sm shadow-blue-500/20 text-sm flex items-center gap-2 cursor-pointer"
@@ -532,30 +551,24 @@ function Settings() {
                     </h3>
                     <p className="text-sm text-slate-500 max-w-sm">
                       {activeTab === "billing" ||
-                        activeTab === "security" ||
-                        activeTab === "notifications"
+                      activeTab === "security" ||
+                      activeTab === "notifications"
                         ? "We are currently building out this module. Check back later for updates!"
                         : "These configuration options would be connected to the backend API via your data provider."}
                     </p>
                     {(activeTab === "billing" ||
                       activeTab === "security" ||
                       activeTab === "notifications") && (
-                        <span className="mt-4 px-3 py-1 bg-blue-50 text-blue-600 border border-blue-200 text-xs font-semibold rounded-full uppercase tracking-wider">
-                          Coming Soon
-                        </span>
-                      )}
+                      <span className="mt-4 px-3 py-1 bg-blue-50 text-blue-600 border border-blue-200 text-xs font-semibold rounded-full uppercase tracking-wider">
+                        Coming Soon
+                      </span>
+                    )}
                   </div>
                 )}
-
-
-
             </>
           )}
         </div>
       </div>
-
-
-
     </div>
   );
 }

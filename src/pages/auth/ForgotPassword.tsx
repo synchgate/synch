@@ -51,7 +51,10 @@ function ForgotPassword() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-slate-700 mb-2"
+          >
             Email Address
           </label>
           <div className="relative">
@@ -59,6 +62,7 @@ function ForgotPassword() {
               <Mail className="h-5 w-5 text-slate-400" />
             </div>
             <input
+              id="email"
               type="email"
               required
               value={email}

@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
   CheckCircle2,
@@ -5,16 +6,17 @@ import {
   ChevronRight,
   Clock,
   Copy,
+  GitBranch,
+  Loader2,
   Search,
   Server,
   X,
   XCircle,
-  Loader2,
+  Zap,
 } from "lucide-react";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { api } from "../../lib/api";
 import { useAuth } from "../../contexts/AuthContext";
+import { api } from "../../lib/api";
 
 function Transactions() {
   const { userEmail } = useAuth();
@@ -24,6 +26,7 @@ function Transactions() {
   const [selectedStatus, setSelectedStatus] = useState("All Statuses");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [selectedRoute, setSelectedRoute] = useState("All Routes");
 
   const { data: transactionsResponse, isLoading } = useQuery({
     queryKey: ["transactions", userEmail],
@@ -78,7 +81,18 @@ function Transactions() {
       }
     }
 
-    return matchesSearch && matchesProvider && matchesStatus && matchesDate;
+    const routeType = (tx.route_type || "basic").toLowerCase();
+    const routeFilter = selectedRoute.toLowerCase();
+    const matchesRoute =
+      selectedRoute === "All Routes" || routeType === routeFilter;
+
+    return (
+      matchesSearch &&
+      matchesProvider &&
+      matchesStatus &&
+      matchesDate &&
+      matchesRoute
+    );
   });
 
   const formatCurrency = (amount: string, currency: string) => {
@@ -138,7 +152,7 @@ function Transactions() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
+          <div className="relative w-full sm:w-64 shrink-0">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
@@ -184,24 +198,36 @@ function Transactions() {
               <option value="Failed">Failed</option>
               <option value="Pending">Pending</option>
             </select>
+            <select
+              value={selectedRoute}
+              onChange={(e) => setSelectedRoute(e.target.value)}
+              className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+            >
+              <option value="All Routes">All Routes</option>
+              <option value="Basic">Basic</option>
+              <option value="Auto">Auto</option>
+            </select>
             {(startDate ||
               endDate ||
               selectedProvider !== "All Providers" ||
               selectedStatus !== "All Statuses" ||
+              selectedRoute !== "All Routes" ||
               searchTerm) && (
-                <button
-                  onClick={() => {
-                    setStartDate("");
-                    setEndDate("");
-                    setSearchTerm("");
-                    setSelectedProvider("All Providers");
-                    setSelectedStatus("All Statuses");
-                  }}
-                  className="px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
-                >
-                  Clear Filters
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => {
+                  setStartDate("");
+                  setEndDate("");
+                  setSearchTerm("");
+                  setSelectedProvider("All Providers");
+                  setSelectedStatus("All Statuses");
+                  setSelectedRoute("All Routes");
+                }}
+                className="px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
+              >
+                Clear Filters
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -221,9 +247,12 @@ function Transactions() {
                   <th className="px-6 py-4 font-medium">Provider</th>
                   <th className="px-6 py-4 font-medium">Amount</th>
                   <th className="px-6 py-4 font-medium">Channel</th>
+                  <th className="px-6 py-4 font-medium text-center">Route</th>
                   <th className="px-6 py-4 font-medium">Status</th>
                   {/* <th className="px-6 py-4 font-medium">Reason</th> */}
-                  <th className="px-6 py-4 font-medium text-right">Time</th>
+                  <th className="px-6 py-4 font-medium text-left">
+                    Date & Time
+                  </th>
                   <th className="px-6 py-4 font-medium"></th>
                 </tr>
               </thead>
@@ -247,17 +276,35 @@ function Transactions() {
                       <td className="px-6 py-4 text-slate-600 capitalize">
                         {tx.channel || "-"}
                       </td>
+                      <td className="px-6 py-4 text-center">
+                        <span
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                            (tx.route_type || "basic").toLowerCase() === "auto"
+                              ? "bg-indigo-100 text-indigo-700 border border-indigo-200"
+                              : "bg-slate-100 text-slate-600 border border-slate-200"
+                          }`}
+                        >
+                          {(tx.route_type || "basic").toLowerCase() ===
+                          "auto" ? (
+                            <Zap className="w-2.5 h-2.5" />
+                          ) : (
+                            <GitBranch className="w-2.5 h-2.5" />
+                          )}
+                          {tx.route_type || "Basic"}
+                        </span>
+                      </td>
                       <td className="px-6 py-4">
                         <StatusBadge status={tx.status} />
                       </td>
                       {/* <td className="px-6 py-4 text-slate-500 text-xs">
                         {tx.message || "-"}
                       </td> */}
-                      <td className="px-6 py-4 text-slate-500 text-right whitespace-nowrap">
+                      <td className="px-6 py-4 text-slate-500 text-left whitespace-nowrap">
                         {formatDate(tx.created_at)}
                       </td>
                       <td className="px-6 py-4 text-right">
                         <button
+                          type="button"
                           onClick={() => setSelectedTx(tx)}
                           className="text-xs font-medium text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:underline"
                         >
@@ -287,12 +334,16 @@ function Transactions() {
           </span>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               className="p-1 rounded bg-white border border-slate-200 text-slate-400 hover:text-slate-600 shadow-sm cursor-pointer disabled:opacity-50"
               disabled
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <button className="p-1 rounded bg-white border border-slate-200 text-slate-600 hover:text-slate-900 shadow-sm cursor-pointer">
+            <button
+              type="button"
+              className="p-1 rounded bg-white border border-slate-200 text-slate-600 hover:text-slate-900 shadow-sm cursor-pointer"
+            >
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
@@ -303,9 +354,11 @@ function Transactions() {
       {selectedTx && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"
+          <button
+            type="button"
+            className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity w-full h-full border-none p-0 m-0"
             onClick={() => setSelectedTx(null)}
+            aria-label="Close modal"
           />
 
           {/* Modal */}
@@ -321,6 +374,7 @@ function Transactions() {
                 </p>
               </div>
               <button
+                type="button"
                 onClick={() => setSelectedTx(null)}
                 className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
               >
@@ -365,6 +419,18 @@ function Transactions() {
                     <p className="font-medium text-slate-900 capitalize">
                       {selectedTx.channel || "-"}
                     </p>
+                  </div>
+                  <div>
+                    <p className="text-slate-500 text-xs mb-1">Routing Mode</p>
+                    <div className="flex items-center gap-1.5 font-medium text-slate-900 capitalize">
+                      {(selectedTx.route_type || "basic").toLowerCase() ===
+                      "auto" ? (
+                        <Zap className="w-3.5 h-3.5 text-indigo-500" />
+                      ) : (
+                        <GitBranch className="w-3.5 h-3.5 text-slate-500" />
+                      )}
+                      {selectedTx.route_type || "Basic"}
+                    </div>
                   </div>
                   <div>
                     <p className="text-slate-500 text-xs mb-1">
@@ -443,6 +509,7 @@ function Transactions() {
                     Provider Response (Raw)
                   </h3>
                   <button
+                    type="button"
                     onClick={() =>
                       navigator.clipboard.writeText(
                         JSON.stringify(

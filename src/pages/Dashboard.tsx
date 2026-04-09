@@ -1,28 +1,34 @@
 import {
   Activity,
-  LineChart,
   Bell,
   Building2,
   Code2,
+  CreditCard,
   LayoutDashboard,
+  LineChart,
   LogOut,
   Menu,
   Settings,
   ShieldCheck,
   Terminal,
   X,
-  CreditCard,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
+import logo from "../assets/logo.png";
 import { useAuth } from "../contexts/AuthContext";
 import { api } from "../lib/api";
-import logo from "../assets/logo.png";
 
 function Dashboard() {
   const location = useLocation();
-  const { logout, userName, kycStatus, merchantMode, updateMerchantMode, userEmail } =
-    useAuth();
+  const {
+    logout,
+    userName,
+    kycStatus,
+    merchantMode,
+    updateMerchantMode,
+    userEmail,
+  } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isTogglingMode, setIsTogglingMode] = useState(false);
   const [showKycPopup, setShowKycPopup] = useState(false);
@@ -93,12 +99,23 @@ function Dashboard() {
   };
 
   return (
-    <div key={userEmail} className="flex h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-500/30 overflow-hidden">
+    <div
+      key={userEmail}
+      className="flex h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-500/30 overflow-hidden"
+    >
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-slate-900/50 z-40 lg:hidden backdrop-blur-sm"
           onClick={() => setIsSidebarOpen(false)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              setIsSidebarOpen(false);
+            }
+          }}
+          role="button"
+          tabIndex={0}
+          aria-label="Close sidebar"
         ></div>
       )}
 
@@ -117,6 +134,7 @@ function Dashboard() {
             </p>
             <div className="flex gap-3 justify-center">
               <button
+                type="button"
                 onClick={() => setShowKycPopup(false)}
                 className="px-4 py-2 bg-slate-100 text-slate-700 font-medium rounded-lg hover:bg-slate-200 transition-colors cursor-pointer text-sm"
               >
@@ -142,20 +160,20 @@ function Dashboard() {
             <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <LogOut className="w-6 h-6 text-red-600" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 mb-2">
-              Sign Out
-            </h3>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Sign Out</h3>
             <p className="text-sm text-slate-500 mb-6">
               Are you sure you want to sign out?
             </p>
             <div className="flex gap-3 justify-center">
               <button
+                type="button"
                 onClick={() => setShowLogoutPopup(false)}
                 className="flex-1 px-4 py-2 bg-slate-100 text-slate-700 font-medium rounded-lg hover:bg-slate-200 transition-colors cursor-pointer text-sm"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={confirmLogout}
                 className="flex-1 px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors shadow-sm cursor-pointer text-sm"
               >
@@ -185,6 +203,7 @@ function Dashboard() {
             </span> */}
           </Link>
           <button
+            type="button"
             className="ml-auto lg:hidden text-slate-500 hover:text-slate-900"
             onClick={() => setIsSidebarOpen(false)}
           >
@@ -277,6 +296,7 @@ function Dashboard() {
               <Settings className="w-5 h-5 text-slate-400" /> Settings
             </Link>
             <button
+              type="button"
               onClick={handleLogout}
               className="w-full flex items-center gap-3 px-3 py-2 text-slate-600 font-medium rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer"
             >
@@ -291,6 +311,7 @@ function Dashboard() {
         {/* Top Header */}
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 lg:px-8 z-10 shrink-0">
           <button
+            type="button"
             className="lg:hidden text-slate-500 hover:text-slate-900 mr-4"
             onClick={() => setIsSidebarOpen(true)}
           >
@@ -301,23 +322,27 @@ function Dashboard() {
           <div className="ml-auto flex items-center gap-4 sm:gap-6">
             <div className="flex items-center gap-2 sm:gap-3 bg-slate-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-slate-200">
               <span
-                className={`text-[10px] sm:text-xs font-semibold transition-colors ${merchantMode === "test" ? "text-amber-600" : "text-slate-400"
-                  }`}
+                className={`text-[10px] sm:text-xs font-semibold transition-colors ${
+                  merchantMode === "test" ? "text-amber-600" : "text-slate-400"
+                }`}
               >
                 Test
               </span>
               <button
+                type="button"
                 onClick={handleToggleMode}
                 disabled={isTogglingMode}
-                className={`relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-colors ${isTogglingMode ? "cursor-wait opacity-80" : "cursor-pointer"} focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${merchantMode === "live" ? "bg-emerald-500" : "bg-amber-500"
-                  }`}
+                className={`relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-colors ${isTogglingMode ? "cursor-wait opacity-80" : "cursor-pointer"} focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${
+                  merchantMode === "live" ? "bg-emerald-500" : "bg-amber-500"
+                }`}
               >
                 <span className="sr-only">Toggle environment</span>
                 <span
-                  className={`flex h-3 w-3 sm:h-4 sm:w-4 transform rounded-full bg-white shadow-sm transition-transform items-center justify-center ${merchantMode === "live"
-                    ? "translate-x-5 sm:translate-x-6"
-                    : "translate-x-1"
-                    }`}
+                  className={`flex h-3 w-3 sm:h-4 sm:w-4 transform rounded-full bg-white shadow-sm transition-transform items-center justify-center ${
+                    merchantMode === "live"
+                      ? "translate-x-5 sm:translate-x-6"
+                      : "translate-x-1"
+                  }`}
                 >
                   {isTogglingMode && (
                     <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 border border-slate-200 border-t-slate-500 rounded-full animate-spin" />
@@ -325,16 +350,20 @@ function Dashboard() {
                 </span>
               </button>
               <span
-                className={`text-[10px] sm:text-xs font-semibold transition-colors ${merchantMode === "live"
-                  ? "text-emerald-600"
-                  : "text-slate-400"
-                  }`}
+                className={`text-[10px] sm:text-xs font-semibold transition-colors ${
+                  merchantMode === "live"
+                    ? "text-emerald-600"
+                    : "text-slate-400"
+                }`}
               >
                 Live
               </span>
             </div>
 
-            <button className="text-slate-400 hover:text-slate-600 transition-colors relative cursor-pointer">
+            <button
+              type="button"
+              className="text-slate-400 hover:text-slate-600 transition-colors relative cursor-pointer"
+            >
               <Bell className="w-5 h-5" />
               <span className="absolute top-0 right-0 w-2 h-2 bg-blue-600 rounded-full border border-white"></span>
             </button>
