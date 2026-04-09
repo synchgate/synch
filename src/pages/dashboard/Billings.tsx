@@ -1,32 +1,32 @@
-import {
-  CreditCard,
-  Download,
-  CheckCircle2,
-  Zap,
-  History as HistoryIcon,
-  TrendingUp,
-  FileText,
-  AlertCircle,
-} from "lucide-react";
 import { motion } from "framer-motion";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
+  AlertCircle,
+  CheckCircle2,
+  CreditCard,
+  Download,
+  FileText,
+  History as HistoryIcon,
+  TrendingUp,
+  Zap,
+} from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  subscriptionPlans,
-  invoices,
-  monthlyUsage,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import {
   apiCalls,
   billingHistory,
+  invoices,
+  monthlyUsage,
+  subscriptionPlans,
 } from "../../data/billingData";
 
 const CustomTooltip = ({ active, payload, label, chartMode }: any) => {

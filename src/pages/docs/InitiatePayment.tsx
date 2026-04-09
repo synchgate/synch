@@ -1,8 +1,8 @@
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { CopyButton } from "../../components/ui/CopyButton";
 import { SimpleExample } from "../../components/docs/SimpleExample";
 import { SupportedProviders } from "../../components/docs/SupportedProviders";
+import { CopyButton } from "../../components/ui/CopyButton";
 
 function InitiatePayment() {
   return (

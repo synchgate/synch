@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
   Download,
@@ -8,10 +9,9 @@ import {
   Printer,
   X,
 } from "lucide-react";
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { invoices, type Invoice } from "../../data/billingData";
-import { motion, AnimatePresence } from "framer-motion";
+import { type Invoice, invoices } from "../../data/billingData";
 
 function InvoiceHistory() {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);

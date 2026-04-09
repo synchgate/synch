@@ -1,30 +1,30 @@
 import { motion } from "framer-motion";
 import {
+  Building2,
   ChevronRight,
   Cpu,
-  Plus,
-  Minus,
-  UserPlus,
-  Link as LinkIcon,
-  TrendingUp,
-  Terminal,
-  Zap,
-  Building2,
-  ShoppingBag,
-  ShieldCheck,
   Globe,
   Layers,
+  Link as LinkIcon,
+  Minus,
+  Plus,
+  ShieldCheck,
+  ShoppingBag,
+  Terminal,
+  TrendingUp,
+  UserPlus,
+  Zap,
 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import businessOwners from "../assets/business-owners.png";
-import paystackLogo from "../assets/brands/paystack.png";
 import flutterwaveLogo from "../assets/brands/flutterwave.png";
-import pagaLogo from "../assets/brands/paga.png";
 import nombaLogo from "../assets/brands/nomba.png";
+import pagaLogo from "../assets/brands/paga.png";
 import paypalLogo from "../assets/brands/paypal.png";
-import Navbar from "../components/Navbar";
+import paystackLogo from "../assets/brands/paystack.png";
+import businessOwners from "../assets/business-owners.png";
 import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
 
 type Provider = { src: string; alt: string; size: string };
 

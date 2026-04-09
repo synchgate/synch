@@ -1,7 +1,7 @@
 import { useState } from "react";
 import contactHero from "../assets/contact_us_hero.png";
-import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
 
 export default function ContactUs() {
   const [form, setForm] = useState({

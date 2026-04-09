@@ -1,20 +1,18 @@
+import { useQuery } from "@tanstack/react-query";
 import {
   Activity,
   ArrowUpRight,
   CheckCircle2,
+  ChevronDown,
   Clock,
+  Loader2,
   Server,
   TrendingDown,
   TrendingUp,
   XCircle,
-  Loader2,
-  ChevronDown,
 } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { api } from "../../lib/api";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
 import {
   CartesianGrid,
   Line,
@@ -24,6 +22,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useAuth } from "../../contexts/AuthContext";
+import { api } from "../../lib/api";
 
 const chartData = [
   { month: "Jan", success_rate: 94 },

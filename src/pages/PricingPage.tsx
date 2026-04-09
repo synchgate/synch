@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
-import { Check, Zap, LineChart, Sparkles, Star, Info } from "lucide-react";
-import Navbar from "../components/Navbar";
+import { Check, Info, LineChart, Sparkles, Star, Zap } from "lucide-react";
 import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
 
 const PricingPage = () => {
   const plans = [

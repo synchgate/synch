@@ -1,14 +1,14 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  Send,
-  ArrowLeft,
-  MessageSquare,
-  LifeBuoy,
-  ShieldCheck,
-  CreditCard,
   AlertCircle,
+  ArrowLeft,
+  CreditCard,
+  LifeBuoy,
+  MessageSquare,
+  Send,
+  ShieldCheck,
 } from "lucide-react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const SupportTicket = () => {

@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { Code2 } from "lucide-react";
+import { useState } from "react";
 import { CopyButton } from "../ui/CopyButton";
 
 export function SimpleExample() {

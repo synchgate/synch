@@ -1,4 +1,4 @@
-import { Terminal, Search, Database, ShieldAlert } from "lucide-react";
+import { Database, Search, ShieldAlert, Terminal } from "lucide-react";
 
 function Logs() {
   return (

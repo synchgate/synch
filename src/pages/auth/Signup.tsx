@@ -2,13 +2,13 @@ import { useMutation } from "@tanstack/react-query";
 import {
   ArrowRight,
   Briefcase,
+  Check,
   Eye,
   EyeOff,
   Lock,
   Mail,
-  User,
   Phone,
-  Check,
+  User,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";

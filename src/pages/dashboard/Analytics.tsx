@@ -1,4 +1,4 @@
-import { Building2, Activity, ShieldCheck } from "lucide-react";
+import { Activity, Building2, ShieldCheck } from "lucide-react";
 
 function Analytics() {
   return (

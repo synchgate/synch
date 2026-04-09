@@ -1,7 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-import { CopyButton } from "../../components/ui/CopyButton";
 import { SupportedProviders } from "../../components/docs/SupportedProviders";
+import { CopyButton } from "../../components/ui/CopyButton";
 
 function TransactionVerification() {
   return (

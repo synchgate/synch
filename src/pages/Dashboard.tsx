@@ -1,23 +1,23 @@
 import {
   Activity,
-  LineChart,
   Bell,
   Building2,
   Code2,
+  CreditCard,
   LayoutDashboard,
+  LineChart,
   LogOut,
   Menu,
   Settings,
   ShieldCheck,
   Terminal,
   X,
-  CreditCard,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
+import logo from "../assets/logo.png";
 import { useAuth } from "../contexts/AuthContext";
 import { api } from "../lib/api";
-import logo from "../assets/logo.png";
 
 function Dashboard() {
   const location = useLocation();

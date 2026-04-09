@@ -1,5 +1,5 @@
+import { Fingerprint, Globe } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Globe, Fingerprint } from "lucide-react";
 import logo from "../assets/logo.png";
 
 const Footer = () => {

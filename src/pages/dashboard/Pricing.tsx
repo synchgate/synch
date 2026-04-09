@@ -1,14 +1,14 @@
 import { motion } from "framer-motion";
 import {
+  ArrowLeft,
   Check,
-  Zap,
+  CreditCard,
+  Globe,
   LineChart,
   Lock,
-  ArrowLeft,
   Sparkles,
   TrendingUp,
-  Globe,
-  CreditCard,
+  Zap,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 

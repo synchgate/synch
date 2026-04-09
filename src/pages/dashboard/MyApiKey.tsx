@@ -1,21 +1,21 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  AlertTriangle,
   CheckCircle2,
   Copy,
   Eye,
   EyeOff,
   Key,
+  Loader2,
+  RefreshCw,
   Shield,
   ShieldAlert,
-  Loader2,
   Webhook,
-  RefreshCw,
-  AlertTriangle,
   X,
 } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api } from "../../lib/api";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
+import { api } from "../../lib/api";
 
 function MyApiKey() {
   const { userEmail } = useAuth();

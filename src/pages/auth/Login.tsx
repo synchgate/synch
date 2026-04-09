@@ -3,8 +3,8 @@ import { ArrowRight, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { authService, type LoginPayload } from "../../services/auth";
 import { queryClient } from "../../lib/react-query";
+import { authService, type LoginPayload } from "../../services/auth";
 
 function Login() {
   const navigate = useNavigate();
