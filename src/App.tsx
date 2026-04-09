@@ -19,6 +19,8 @@ import Settings from "./pages/dashboard/Settings";
 import Transactions from "./pages/dashboard/Transactions";
 import MyApiKey from "./pages/dashboard/MyApiKey";
 import Billings from "./pages/dashboard/Billings";
+import SupportTicket from "./pages/dashboard/SupportTicket";
+import PricingPage from "./pages/PricingPage";
 import DocsPage from "./pages/DocsPage";
 import Authentication from "./pages/docs/Authentication";
 import Installation from "./pages/docs/Installation";
@@ -73,6 +75,10 @@ function App() {
               }
             />
             <Route
+              path="/pricing"
+              element={<PricingPage />}
+            />
+            <Route
               path="/contact-us"
               element={
                 <PublicRoute>
@@ -96,6 +102,7 @@ function App() {
               <Route path="settings" element={<Settings />} />
               <Route path="api-keys" element={<MyApiKey />} />
               <Route path="billings" element={<Billings />} />
+              <Route path="support-ticket" element={<SupportTicket />} />
             </Route>
 
             <Route path="/docs" element={<DocsPage />}>
