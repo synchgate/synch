@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { 
-  Send, 
-  ArrowLeft, 
-  MessageSquare, 
-  LifeBuoy, 
-  ShieldCheck, 
+import {
+  Send,
+  ArrowLeft,
+  MessageSquare,
+  LifeBuoy,
+  ShieldCheck,
   CreditCard,
-  AlertCircle 
+  AlertCircle,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -44,9 +44,12 @@ const SupportTicket = () => {
           <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-sm">
             <ShieldCheck className="w-10 h-10" />
           </div>
-          <h2 className="text-3xl font-bold text-slate-900 mb-4">Ticket Created!</h2>
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">
+            Ticket Created!
+          </h2>
           <p className="text-slate-600 mb-8 leading-relaxed max-w-sm mx-auto">
-            Your support ticket has been submitted successfully. Our team will get back to you within 24 hours.
+            Your support ticket has been submitted successfully. Our team will
+            get back to you within 24 hours.
           </p>
           <button
             onClick={() => navigate("/dashboard/billings")}
@@ -72,9 +75,12 @@ const SupportTicket = () => {
 
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Create Support Ticket</h1>
+          <h1 className="text-3xl font-bold text-slate-900">
+            Create Support Ticket
+          </h1>
           <p className="text-slate-500 mt-2">
-            Have a question or issue? Fill out the form below and we'll help you out.
+            Have a question or issue? Fill out the form below and we'll help you
+            out.
           </p>
         </div>
 
@@ -87,7 +93,10 @@ const SupportTicket = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Email Field */}
               <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-bold text-slate-700">
+                <label
+                  htmlFor="email"
+                  className="text-sm font-bold text-slate-700"
+                >
                   Contact Email
                 </label>
                 <input
@@ -101,7 +110,10 @@ const SupportTicket = () => {
 
               {/* Support Type Field */}
               <div className="space-y-2">
-                <label htmlFor="type" className="text-sm font-bold text-slate-700">
+                <label
+                  htmlFor="type"
+                  className="text-sm font-bold text-slate-700"
+                >
                   Support Category
                 </label>
                 <select
@@ -121,7 +133,10 @@ const SupportTicket = () => {
 
             {/* Subject Field */}
             <div className="space-y-2">
-              <label htmlFor="subject" className="text-sm font-bold text-slate-700">
+              <label
+                htmlFor="subject"
+                className="text-sm font-bold text-slate-700"
+              >
                 Subject
               </label>
               <input
@@ -135,7 +150,10 @@ const SupportTicket = () => {
 
             {/* Message Field */}
             <div className="space-y-2">
-              <label htmlFor="message" className="text-sm font-bold text-slate-700">
+              <label
+                htmlFor="message"
+                className="text-sm font-bold text-slate-700"
+              >
                 How can we help?
               </label>
               <textarea
@@ -173,8 +191,9 @@ const SupportTicket = () => {
         <div className="flex items-start gap-4 p-6 bg-blue-50 rounded-2xl border border-blue-100">
           <AlertCircle className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
           <div className="text-sm text-blue-900 leading-relaxed">
-            <span className="font-bold">Pro-tip:</span> Including transaction IDs, route types 
-            (Auto/Manual), and timestamps will help us resolve your issue much faster.
+            <span className="font-bold">Pro-tip:</span> Including transaction
+            IDs, route types (Auto/Manual), and timestamps will help us resolve
+            your issue much faster.
           </div>
         </div>
       </div>

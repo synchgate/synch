@@ -1,7 +1,13 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useEffect } from "react";
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import ContactUs from "./pages/ContactUs";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { queryClient } from "./lib/react-query";
@@ -75,10 +81,7 @@ function App() {
                 </PublicRoute>
               }
             />
-            <Route
-              path="/pricing"
-              element={<PricingPage />}
-            />
+            <Route path="/pricing" element={<PricingPage />} />
             <Route
               path="/contact-us"
               element={
@@ -116,7 +119,10 @@ function App() {
               <Route path="installation" element={<Installation />} />
               <Route path="authentication" element={<Authentication />} />
               <Route path="initiate-payment" element={<InitiatePayment />} />
-              <Route path="transaction-verification" element={<TransactionVerification />} />
+              <Route
+                path="transaction-verification"
+                element={<TransactionVerification />}
+              />
               <Route path="banks" element={<BanksApi />} />
               <Route path="resolve-account" element={<ResolveAccount />} />
               <Route path="initiate-transfer" element={<InitiateTransfer />} />

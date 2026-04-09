@@ -213,20 +213,20 @@ function Transactions() {
               selectedStatus !== "All Statuses" ||
               selectedRoute !== "All Routes" ||
               searchTerm) && (
-                <button
-                  onClick={() => {
-                    setStartDate("");
-                    setEndDate("");
-                    setSearchTerm("");
-                    setSelectedProvider("All Providers");
-                    setSelectedStatus("All Statuses");
-                    setSelectedRoute("All Routes");
-                  }}
-                  className="px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
-                >
-                  Clear Filters
-                </button>
-              )}
+              <button
+                onClick={() => {
+                  setStartDate("");
+                  setEndDate("");
+                  setSearchTerm("");
+                  setSelectedProvider("All Providers");
+                  setSelectedStatus("All Statuses");
+                  setSelectedRoute("All Routes");
+                }}
+                className="px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
+              >
+                Clear Filters
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -249,7 +249,9 @@ function Transactions() {
                   <th className="px-6 py-4 font-medium text-center">Route</th>
                   <th className="px-6 py-4 font-medium">Status</th>
                   {/* <th className="px-6 py-4 font-medium">Reason</th> */}
-                  <th className="px-6 py-4 font-medium text-left">Date & Time</th>
+                  <th className="px-6 py-4 font-medium text-left">
+                    Date & Time
+                  </th>
                   <th className="px-6 py-4 font-medium"></th>
                 </tr>
               </thead>
@@ -274,11 +276,19 @@ function Transactions() {
                         {tx.channel || "-"}
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${(tx.route_type || "basic").toLowerCase() === "auto"
-                            ? "bg-indigo-100 text-indigo-700 border border-indigo-200"
-                            : "bg-slate-100 text-slate-600 border border-slate-200"
-                          }`}>
-                          {(tx.route_type || "basic").toLowerCase() === "auto" ? <Zap className="w-2.5 h-2.5" /> : <GitBranch className="w-2.5 h-2.5" />}
+                        <span
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                            (tx.route_type || "basic").toLowerCase() === "auto"
+                              ? "bg-indigo-100 text-indigo-700 border border-indigo-200"
+                              : "bg-slate-100 text-slate-600 border border-slate-200"
+                          }`}
+                        >
+                          {(tx.route_type || "basic").toLowerCase() ===
+                          "auto" ? (
+                            <Zap className="w-2.5 h-2.5" />
+                          ) : (
+                            <GitBranch className="w-2.5 h-2.5" />
+                          )}
                           {tx.route_type || "Basic"}
                         </span>
                       </td>
@@ -404,7 +414,8 @@ function Transactions() {
                   <div>
                     <p className="text-slate-500 text-xs mb-1">Routing Mode</p>
                     <div className="flex items-center gap-1.5 font-medium text-slate-900 capitalize">
-                      {(selectedTx.route_type || "basic").toLowerCase() === "auto" ? (
+                      {(selectedTx.route_type || "basic").toLowerCase() ===
+                      "auto" ? (
                         <Zap className="w-3.5 h-3.5 text-indigo-500" />
                       ) : (
                         <GitBranch className="w-3.5 h-3.5 text-slate-500" />

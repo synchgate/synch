@@ -17,11 +17,11 @@ function BanksApi() {
       </h1>
 
       <p className="text-lg text-slate-600 leading-relaxed mb-8">
-        Retrieve a list of supported banks for transfers using a specific provider.
+        Retrieve a list of supported banks for transfers using a specific
+        provider.
       </p>
 
       <SupportedProviders />
-
 
       <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
         Base URL
@@ -62,7 +62,9 @@ function BanksApi() {
       </h2>
       <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-          <CopyButton textToCopy={`{\n    "status": "success",\n    "message": "List of NGN banks",\n    "data": [\n        {\n            "name": "Enterprise Bank",\n            "code": "000019"\n        },\n        {\n            "name": "Titan Trust Bank",\n            "code": "000025"\n        },\n        {\n            "name": "Taj Bank Limited",\n            "code": "000026"\n        },\n        {\n            "name": "Globus Bank",\n            "code": "000027"\n        }\n    ],\n    "meta": {\n        "request_id": "f7d3ad77-f327-4314-9c64-00501d9ebaec",\n        "timestamp": "2026-04-01T12:44:01.060968Z"\n    }\n}`} />
+          <CopyButton
+            textToCopy={`{\n    "status": "success",\n    "message": "List of NGN banks",\n    "data": [\n        {\n            "name": "Enterprise Bank",\n            "code": "000019"\n        },\n        {\n            "name": "Titan Trust Bank",\n            "code": "000025"\n        },\n        {\n            "name": "Taj Bank Limited",\n            "code": "000026"\n        },\n        {\n            "name": "Globus Bank",\n            "code": "000027"\n        }\n    ],\n    "meta": {\n        "request_id": "f7d3ad77-f327-4314-9c64-00501d9ebaec",\n        "timestamp": "2026-04-01T12:44:01.060968Z"\n    }\n}`}
+          />
         </div>
         <pre>
           {`{

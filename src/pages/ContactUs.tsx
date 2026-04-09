@@ -14,7 +14,9 @@ export default function ContactUs() {
   });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -47,14 +49,13 @@ export default function ContactUs() {
 
       <main className="relative z-10 pt-32 pb-20 min-h-screen flex items-center">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-6 lg:gap-10 items-stretch">
-          
           {/* Left Column - Hero Image */}
           <div className="w-full lg:w-1/2 flex">
             <div className="w-full rounded-4xl overflow-hidden shadow-xs relative">
-              <img 
-                src={contactHero} 
-                alt="Team discussing in modern office" 
-                className="absolute inset-0 w-full h-full object-cover" 
+              <img
+                src={contactHero}
+                alt="Team discussing in modern office"
+                className="absolute inset-0 w-full h-full object-cover"
               />
             </div>
           </div>
@@ -63,93 +64,116 @@ export default function ContactUs() {
           <div className="w-full lg:w-1/2 flex">
             <div className="w-full bg-white rounded-4xl border border-slate-100 p-8 md:p-10 lg:p-12 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05),0_10px_20px_-2px_rgba(0,0,0,0.02)] flex flex-col justify-center">
               <form onSubmit={handleSubmit} className="space-y-6">
-                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="flex flex-col gap-2">
-                    <label className="text-[13px] font-semibold text-slate-800 tracking-wide">Business Email *</label>
-                    <input 
-                      type="email" 
+                    <label className="text-[13px] font-semibold text-slate-800 tracking-wide">
+                      Business Email *
+                    </label>
+                    <input
+                      type="email"
                       name="businessEmail"
                       value={form.businessEmail}
                       onChange={handleChange}
-                      required 
-                      className="w-full px-4 py-[10px] rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-[15px]" 
+                      required
+                      className="w-full px-4 py-[10px] rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-[15px]"
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <label className="text-[13px] font-semibold text-slate-800 tracking-wide">First Name *</label>
-                    <input 
-                      type="text" 
+                    <label className="text-[13px] font-semibold text-slate-800 tracking-wide">
+                      First Name *
+                    </label>
+                    <input
+                      type="text"
                       name="firstName"
                       value={form.firstName}
                       onChange={handleChange}
-                      required 
-                      className="w-full px-4 py-[10px] rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-[15px]" 
+                      required
+                      className="w-full px-4 py-[10px] rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-[15px]"
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <label className="text-[13px] font-semibold text-slate-800 tracking-wide">Last Name *</label>
-                    <input 
-                      type="text" 
+                    <label className="text-[13px] font-semibold text-slate-800 tracking-wide">
+                      Last Name *
+                    </label>
+                    <input
+                      type="text"
                       name="lastName"
                       value={form.lastName}
                       onChange={handleChange}
-                      required 
-                      className="w-full px-4 py-[10px] rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-[15px]" 
+                      required
+                      className="w-full px-4 py-[10px] rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-[15px]"
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <label className="text-[13px] font-semibold text-slate-800 tracking-wide">Company *</label>
-                    <input 
-                      type="text" 
+                    <label className="text-[13px] font-semibold text-slate-800 tracking-wide">
+                      Company *
+                    </label>
+                    <input
+                      type="text"
                       name="company"
                       value={form.company}
                       onChange={handleChange}
-                      required 
-                      className="w-full px-4 py-[10px] rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-[15px]" 
+                      required
+                      className="w-full px-4 py-[10px] rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-[15px]"
                     />
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-2 pt-2">
-                  <label className="text-[13px] font-semibold text-slate-800 tracking-wide">Product You're Interested In *</label>
+                  <label className="text-[13px] font-semibold text-slate-800 tracking-wide">
+                    Product You're Interested In *
+                  </label>
                   <div className="relative">
-                    <select 
+                    <select
                       name="product"
                       value={form.product}
                       onChange={handleChange}
-                      required 
+                      required
                       className="w-full px-4 py-[10px] rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white appearance-none text-[15px] cursor-pointer"
                     >
                       <option value="" disabled></option>
                       <option value="Payments">Payments API</option>
                       <option value="Payouts">Payouts</option>
-                      <option value="Orchestration">Payment Orchestration</option>
+                      <option value="Orchestration">
+                        Payment Orchestration
+                      </option>
                       <option value="Other">Other</option>
                     </select>
                     <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
-                      <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                      <svg
+                        className="w-4 h-4 text-slate-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M19 9l-7 7-7-7"
+                        ></path>
                       </svg>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-2 pt-2">
-                  <label className="text-[13px] font-semibold text-slate-800 tracking-wide">Give us details on your interest in SynchGate. *</label>
-                  <textarea 
+                  <label className="text-[13px] font-semibold text-slate-800 tracking-wide">
+                    Give us details on your interest in SynchGate. *
+                  </label>
+                  <textarea
                     name="details"
                     value={form.details}
                     onChange={handleChange}
-                    required 
-                    rows={6} 
+                    required
+                    rows={6}
                     className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white resize-none text-[15px]"
                   ></textarea>
                 </div>
 
                 <div className="pt-4">
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="w-full bg-[#007edc] hover:bg-[#006bbd] text-white font-medium py-[10px] px-6 rounded-lg transition-colors shadow-sm text-[15px]"
                   >
                     Send Message

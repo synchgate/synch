@@ -45,7 +45,10 @@ function Overview() {
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsDropdownOpen(false);
       }
     }
@@ -74,18 +77,18 @@ function Overview() {
     enabled: !!userEmail,
   });
 
-  const {
-    data: graphResponse,
-    isFetching: isGraphFetching,
-  } = useQuery({
+  const { data: graphResponse, isFetching: isGraphFetching } = useQuery({
     queryKey: ["overview-graph", userEmail, selectedYear],
     queryFn: async () => {
       const token = localStorage.getItem("authToken");
-      const response = await api.get(`/analytics/overview/graph/?year=${selectedYear}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await api.get(
+        `/analytics/overview/graph/?year=${selectedYear}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
       return response.data;
     },
     enabled: !!userEmail,
@@ -96,30 +99,31 @@ function Overview() {
 
   const overviewData = overviewResponse?.data ||
     overviewResponse || {
-    transactions: {
-      total_transactions: 0,
-      successful_transactions: 0,
-      failed_transactions: 0,
-      success_rate: "0%",
-      total_value: 0,
-    },
-    provider_performance: [],
-    provider_success_graph: [],
-  };
+      transactions: {
+        total_transactions: 0,
+        successful_transactions: 0,
+        failed_transactions: 0,
+        success_rate: "0%",
+        total_value: 0,
+      },
+      provider_performance: [],
+      provider_success_graph: [],
+    };
 
   const { transactions, provider_performance } = overviewData;
 
   // Use graphResponse for the chart data
-  const graphDataFromApi = graphResponse?.data || graphResponse?.provider_success_graph || [];
+  const graphDataFromApi =
+    graphResponse?.data || graphResponse?.provider_success_graph || [];
 
   const displayedChartData = graphDataFromApi.length
     ? graphDataFromApi.map((d: any) => ({
-      month: d.month || "Unknown",
-      success_rate:
-        typeof d.success_rate === "string"
-          ? parseFloat(d.success_rate.replace("%", ""))
-          : d.success_rate || 0,
-    }))
+        month: d.month || "Unknown",
+        success_rate:
+          typeof d.success_rate === "string"
+            ? parseFloat(d.success_rate.replace("%", ""))
+            : d.success_rate || 0,
+      }))
     : chartData;
 
   console.log("Raw API Response (overviewResponse):", overviewResponse);
@@ -234,7 +238,9 @@ function Overview() {
                 className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 hover:border-slate-300 transition-all cursor-pointer"
               >
                 {selectedYear}
-                <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown
+                  className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`}
+                />
               </button>
 
               {isDropdownOpen && (
@@ -246,7 +252,7 @@ function Overview() {
                         setSelectedYear(year);
                         setIsDropdownOpen(false);
                       }}
-                      className={`w-full text-left px-4 py-2 text-sm hover:bg-blue-50 hover:text-blue-600 transition-colors ${selectedYear === year ? 'text-blue-600 font-semibold bg-blue-50/50' : 'text-slate-600'}`}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-blue-50 hover:text-blue-600 transition-colors ${selectedYear === year ? "text-blue-600 font-semibold bg-blue-50/50" : "text-slate-600"}`}
                     >
                       {year}
                     </button>
@@ -261,7 +267,9 @@ function Overview() {
               <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-[1px] flex items-center justify-center rounded-xl animate-in fade-in duration-200">
                 <div className="flex flex-col items-center gap-2">
                   <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
-                  <span className="text-xs font-medium text-slate-500">Updating data...</span>
+                  <span className="text-xs font-medium text-slate-500">
+                    Updating data...
+                  </span>
                 </div>
               </div>
             )}

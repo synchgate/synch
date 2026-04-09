@@ -37,9 +37,7 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <a
-                  className="text-slate-600 hover:text-blue-600 transition-colors text-sm cursor-pointer"
-                >
+                <a className="text-slate-600 hover:text-blue-600 transition-colors text-sm cursor-pointer">
                   System Status
                 </a>
               </li>

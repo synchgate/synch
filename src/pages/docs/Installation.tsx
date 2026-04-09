@@ -4,7 +4,6 @@ import { CopyButton } from "../../components/ui/CopyButton";
 import { SimpleExample } from "../../components/docs/SimpleExample";
 
 function Installation() {
-
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 text-slate-900">
       <h1 className="font-['Outfit'] text-4xl md:text-5xl font-bold mb-6 text-black">
@@ -49,12 +48,12 @@ function Installation() {
         </div>
       </div>
 
-      <p className="text-slate-900 font-bold text-lg mb-2 mt-8">
-        Example
-      </p>
+      <p className="text-slate-900 font-bold text-lg mb-2 mt-8">Example</p>
       <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-8 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-          <CopyButton textToCopy={`curl --location 'http://payinfraterminal.onrender.com/v1/api/initiate-payment/' \\\n--header 'Client-Secret-Key: pit_sk_live_U2C8HtHdlHPRvHcjRBYBYn9DyZPJEf2o_xZqQkUFIf0' \\\n--header 'Content-Type: application/json' `} />
+          <CopyButton
+            textToCopy={`curl --location 'http://payinfraterminal.onrender.com/v1/api/initiate-payment/' \\\n--header 'Client-Secret-Key: pit_sk_live_U2C8HtHdlHPRvHcjRBYBYn9DyZPJEf2o_xZqQkUFIf0' \\\n--header 'Content-Type: application/json' `}
+          />
         </div>
         <pre>
           {`curl --location 'http://payinfraterminal.onrender.com/v1/api/initiate-payment/' \\
@@ -86,7 +85,8 @@ function Installation() {
       </ul>
       <p className="text-slate-600 mb-12">
         These metrics will be used in future versions to power{" "}
-        <strong>automatic routing decisions</strong> and smart failover mechanisms.
+        <strong>automatic routing decisions</strong> and smart failover
+        mechanisms.
       </p>
 
       {/* Navigation Footer */}

@@ -36,9 +36,11 @@ const CustomTooltip = ({ active, payload, label, chartMode }: any) => {
       <div className="bg-white p-4 rounded-xl shadow-xl border border-slate-100 animate-in fade-in zoom-in-95 duration-200 min-w-[160px]">
         <p className="text-sm font-bold text-slate-900 mb-2">{label}</p>
         <div className="space-y-1.5">
-          {chartMode === 'revenue' ? (
+          {chartMode === "revenue" ? (
             <div className="flex items-center justify-between gap-4">
-              <span className="text-xs font-medium text-slate-500">Revenue</span>
+              <span className="text-xs font-medium text-slate-500">
+                Revenue
+              </span>
               <span className="text-sm font-bold text-blue-600">
                 ₦{data.cost?.toLocaleString()}
               </span>
@@ -46,13 +48,17 @@ const CustomTooltip = ({ active, payload, label, chartMode }: any) => {
           ) : (
             <>
               <div className="flex items-center justify-between gap-4">
-                <span className="text-xs font-medium text-slate-500">Successful</span>
+                <span className="text-xs font-medium text-slate-500">
+                  Successful
+                </span>
                 <span className="text-sm font-bold text-emerald-600">
                   {data.successful?.toLocaleString()}
                 </span>
               </div>
               <div className="flex items-center justify-between gap-4">
-                <span className="text-xs font-medium text-slate-500">Failed</span>
+                <span className="text-xs font-medium text-slate-500">
+                  Failed
+                </span>
                 <span className="text-sm font-bold text-rose-600">
                   {data.failed?.toLocaleString()}
                 </span>
@@ -68,19 +74,24 @@ const CustomTooltip = ({ active, payload, label, chartMode }: any) => {
 
 const Billings = () => {
   const currentPlan = subscriptionPlans.find((p) => p.isCurrent) || null;
-  const [activeChartTab, setActiveChartTab] = useState<'volume' | 'revenue'>('volume');
+  const [activeChartTab, setActiveChartTab] = useState<"volume" | "revenue">(
+    "volume",
+  );
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[500px] text-center p-8 bg-slate-50/30 rounded-[2.5rem] border-2 border-dashed border-slate-200 animate-in fade-in zoom-in-95 duration-700">
       <div className="w-24 h-24 bg-blue-600 rounded-[2rem] flex items-center justify-center mb-8 text-white shadow-2xl shadow-blue-200 animate-pulse">
         <CreditCard className="w-10 h-10" />
       </div>
-      <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight font-['Outfit']">Billing Center Coming Soon</h2>
+      <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight font-['Outfit']">
+        Billing Center Coming Soon
+      </h2>
       <p className="text-slate-500 max-w-md mx-auto leading-relaxed font-semibold text-lg">
-        We're building a state-of-the-art billing and subscription engine. 
-        You'll soon be able to manage your growth, track usage, and automate invoices right here.
+        We're building a state-of-the-art billing and subscription engine.
+        You'll soon be able to manage your growth, track usage, and automate
+        invoices right here.
       </p>
-      
+
       <div className="mt-10 flex flex-wrap justify-center gap-4">
         <span className="px-4 py-2 bg-white text-blue-600 text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl border border-blue-100 shadow-sm">
           Infrastructure Ready

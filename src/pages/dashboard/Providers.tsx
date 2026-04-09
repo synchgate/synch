@@ -1,12 +1,4 @@
-import {
-  Eye,
-  EyeOff,
-  Key,
-  Pencil,
-  Plus,
-  Trash2,
-  X,
-} from "lucide-react";
+import { Eye, EyeOff, Key, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -173,14 +165,14 @@ function Providers() {
       const credentials =
         envModal.provider === "Nomba"
           ? {
-            grant_type: envModal.grantType,
-            client_id: envModal.clientId,
-            client_secret: envModal.clientSecret,
-            accountId: envModal.accountId,
-          }
+              grant_type: envModal.grantType,
+              client_id: envModal.clientId,
+              client_secret: envModal.clientSecret,
+              accountId: envModal.accountId,
+            }
           : {
-            secret_key: envModal.secretKey,
-          };
+              secret_key: envModal.secretKey,
+            };
 
       await setupProvider({
         merchant_id: merchantId.toString(),
@@ -189,7 +181,9 @@ function Providers() {
         credential_type: "api_key",
         credentials,
       });
-      await queryClient.invalidateQueries({ queryKey: ["settings", userEmail] });
+      await queryClient.invalidateQueries({
+        queryKey: ["settings", userEmail],
+      });
       closeEnvModal();
     } catch (error) {
       console.error("Failed to setup provider:", error);
@@ -230,15 +224,12 @@ function Providers() {
               Provider Integrations
             </h3>
             <p className="text-xs text-slate-500 mt-1">
-              Your API keys are highly encrypted, very safe, and
-              secure.
+              Your API keys are highly encrypted, very safe, and secure.
             </p>
           </div>
           <button
             onClick={() => {
-              const configuredProviders = apiKeys.map(
-                (k) => k.provider,
-              );
+              const configuredProviders = apiKeys.map((k) => k.provider);
               const firstUnconfigured =
                 AVAILABLE_PROVIDERS.find(
                   (p) => !configuredProviders.includes(p),
@@ -261,8 +252,7 @@ function Providers() {
                 No providers configured
               </p>
               <p className="text-sm">
-                Click the Add Key button to integrate a new
-                provider.
+                Click the Add Key button to integrate a new provider.
               </p>
             </div>
           ) : (
@@ -475,16 +465,18 @@ function Providers() {
                 </label>
                 {envModal.isEdit || envModal.isFixed ? (
                   <div
-                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${envModal.environment === "sandbox"
+                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${
+                      envModal.environment === "sandbox"
                         ? "bg-amber-100 text-amber-700"
                         : "bg-emerald-100 text-emerald-700"
-                      }`}
+                    }`}
                   >
                     <span
-                      className={`w-1.5 h-1.5 rounded-full ${envModal.environment === "sandbox"
+                      className={`w-1.5 h-1.5 rounded-full ${
+                        envModal.environment === "sandbox"
                           ? "bg-amber-500"
                           : "bg-emerald-500"
-                        }`}
+                      }`}
                     />
                     {envModal.environment === "sandbox" ? "Sandbox" : "Live"}
                   </div>
@@ -656,12 +648,12 @@ function Providers() {
                   isSettingUpProvider ||
                   (envModal.provider === "Nomba"
                     ? !envModal.grantType ||
-                    !envModal.clientId ||
-                    !envModal.clientSecret ||
-                    !envModal.accountId
+                      !envModal.clientId ||
+                      !envModal.clientSecret ||
+                      !envModal.accountId
                     : envModal.secretKey.length < 10 ||
-                    (envModal.isEdit &&
-                      envModal.secretKey === envModal.originalKey))
+                      (envModal.isEdit &&
+                        envModal.secretKey === envModal.originalKey))
                 }
                 className="px-5 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm shadow-blue-500/20 text-sm flex items-center gap-2"
               >

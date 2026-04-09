@@ -96,7 +96,9 @@ function Signup() {
     }
 
     if (!isPasswordValid) {
-      setError("Please ensure your password meets all the security requirements.");
+      setError(
+        "Please ensure your password meets all the security requirements.",
+      );
       return;
     }
 
@@ -254,31 +256,63 @@ function Signup() {
               )}
             </button>
           </div>
-          
+
           <div
             className={`transition-all duration-300 overflow-hidden ${
-              isPasswordFocused ? "max-h-64 mt-3 opacity-100" : "max-h-0 opacity-0"
+              isPasswordFocused
+                ? "max-h-64 mt-3 opacity-100"
+                : "max-h-0 opacity-0"
             }`}
           >
             <div className="space-y-2 text-xs font-medium">
-              <div className={`flex items-center gap-2 ${checks.uppercase ? "text-emerald-600" : "text-slate-500"}`}>
-                {checks.uppercase ? <Check className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
+              <div
+                className={`flex items-center gap-2 ${checks.uppercase ? "text-emerald-600" : "text-slate-500"}`}
+              >
+                {checks.uppercase ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  <div className="w-4 h-4 rounded-full border border-slate-300" />
+                )}
                 <span>At least one uppercase letter</span>
               </div>
-              <div className={`flex items-center gap-2 ${checks.lowercase ? "text-emerald-600" : "text-slate-500"}`}>
-                {checks.lowercase ? <Check className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
+              <div
+                className={`flex items-center gap-2 ${checks.lowercase ? "text-emerald-600" : "text-slate-500"}`}
+              >
+                {checks.lowercase ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  <div className="w-4 h-4 rounded-full border border-slate-300" />
+                )}
                 <span>At least one lowercase letter</span>
               </div>
-              <div className={`flex items-center gap-2 ${checks.number ? "text-emerald-600" : "text-slate-500"}`}>
-                {checks.number ? <Check className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
+              <div
+                className={`flex items-center gap-2 ${checks.number ? "text-emerald-600" : "text-slate-500"}`}
+              >
+                {checks.number ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  <div className="w-4 h-4 rounded-full border border-slate-300" />
+                )}
                 <span>At least one number</span>
               </div>
-              <div className={`flex items-center gap-2 ${checks.symbol ? "text-emerald-600" : "text-slate-500"}`}>
-                {checks.symbol ? <Check className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
+              <div
+                className={`flex items-center gap-2 ${checks.symbol ? "text-emerald-600" : "text-slate-500"}`}
+              >
+                {checks.symbol ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  <div className="w-4 h-4 rounded-full border border-slate-300" />
+                )}
                 <span>At least one symbol</span>
               </div>
-              <div className={`flex items-center gap-2 ${checks.length ? "text-emerald-600" : "text-slate-500"}`}>
-                {checks.length ? <Check className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
+              <div
+                className={`flex items-center gap-2 ${checks.length ? "text-emerald-600" : "text-slate-500"}`}
+              >
+                {checks.length ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  <div className="w-4 h-4 rounded-full border border-slate-300" />
+                )}
                 <span>At least 8 characters long</span>
               </div>
             </div>
@@ -297,7 +331,10 @@ function Signup() {
             />
           </div>
           <div className="text-sm">
-            <label htmlFor="terms" className="font-medium text-slate-700 cursor-pointer">
+            <label
+              htmlFor="terms"
+              className="font-medium text-slate-700 cursor-pointer"
+            >
               I agree to the{" "}
             </label>
             <Link

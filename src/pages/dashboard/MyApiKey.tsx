@@ -597,10 +597,11 @@ function MyApiKey() {
       {notification && (
         <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300">
           <div
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border ${notification.type === "success"
-              ? "bg-emerald-50 border-emerald-200 text-emerald-800"
-              : "bg-red-50 border-red-200 text-red-800"
-              }`}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border ${
+              notification.type === "success"
+                ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+                : "bg-red-50 border-red-200 text-red-800"
+            }`}
           >
             {notification.type === "success" ? (
               <CheckCircle2 className="w-5 h-5 text-emerald-600" />
@@ -610,10 +611,11 @@ function MyApiKey() {
             <p className="text-sm font-medium">{notification.message}</p>
             <button
               onClick={() => setNotification(null)}
-              className={`ml-2 p-1 rounded-md transition-colors cursor-pointer ${notification.type === "success"
-                ? "hover:bg-emerald-100/80 text-emerald-600"
-                : "hover:bg-red-100/80 text-red-600"
-                }`}
+              className={`ml-2 p-1 rounded-md transition-colors cursor-pointer ${
+                notification.type === "success"
+                  ? "hover:bg-emerald-100/80 text-emerald-600"
+                  : "hover:bg-red-100/80 text-red-600"
+              }`}
             >
               <X className="w-4 h-4" />
             </button>

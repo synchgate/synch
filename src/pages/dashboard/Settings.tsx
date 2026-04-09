@@ -15,15 +15,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../lib/api";
 import { COUNTRIES } from "../../data/countries";
 
-
-
-
 function Settings() {
   const { userEmail } = useAuth();
   const queryClient = useQueryClient();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(location.state?.tab || "general");
-
 
   const [businessForm, setBusinessForm] = useState({
     business_name: "",
@@ -89,12 +85,6 @@ function Settings() {
     }
   }, [settingsResponse]);
 
-
-
-
-
-
-
   const { mutateAsync: updateMerchant, isPending: isUpdatingBusiness } =
     useMutation({
       mutationFn: async (payload: typeof businessForm) => {
@@ -118,9 +108,6 @@ function Settings() {
       },
     });
 
-
-
-
   return (
     <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
@@ -141,7 +128,6 @@ function Settings() {
             { id: "general", label: "General", icon: User },
             { id: "business", label: "Business Profile", icon: Building2 },
 
-
             { id: "kyc", label: "KYC Documents", icon: FileText },
             { id: "billing", label: "Billing Plans", icon: CreditCardIcon },
             { id: "security", label: "Security", icon: Shield },
@@ -153,10 +139,11 @@ function Settings() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap cursor-pointer
-                                    ${activeTab === tab.id
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                  }
+                                    ${
+                                      activeTab === tab.id
+                                        ? "bg-blue-50 text-blue-700"
+                                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                                    }
                                 `}
               >
                 <TabIcon
@@ -514,30 +501,24 @@ function Settings() {
                     </h3>
                     <p className="text-sm text-slate-500 max-w-sm">
                       {activeTab === "billing" ||
-                        activeTab === "security" ||
-                        activeTab === "notifications"
+                      activeTab === "security" ||
+                      activeTab === "notifications"
                         ? "We are currently building out this module. Check back later for updates!"
                         : "These configuration options would be connected to the backend API via your data provider."}
                     </p>
                     {(activeTab === "billing" ||
                       activeTab === "security" ||
                       activeTab === "notifications") && (
-                        <span className="mt-4 px-3 py-1 bg-blue-50 text-blue-600 border border-blue-200 text-xs font-semibold rounded-full uppercase tracking-wider">
-                          Coming Soon
-                        </span>
-                      )}
+                      <span className="mt-4 px-3 py-1 bg-blue-50 text-blue-600 border border-blue-200 text-xs font-semibold rounded-full uppercase tracking-wider">
+                        Coming Soon
+                      </span>
+                    )}
                   </div>
                 )}
-
-
-
             </>
           )}
         </div>
       </div>
-
-
-
     </div>
   );
 }

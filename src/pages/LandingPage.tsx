@@ -29,8 +29,16 @@ import Footer from "../components/Footer";
 type Provider = { src: string; alt: string; size: string };
 
 const PROVIDERS: Provider[] = [
-  { src: paystackLogo, alt: "Paystack", size: "max-w-[180px] md:max-w-[250px] h-16 md:h-[78px]" },
-  { src: flutterwaveLogo, alt: "Flutterwave", size: "max-w-[200px] md:max-w-[270px] h-[72px] md:h-[98px]" },
+  {
+    src: paystackLogo,
+    alt: "Paystack",
+    size: "max-w-[180px] md:max-w-[250px] h-16 md:h-[78px]",
+  },
+  {
+    src: flutterwaveLogo,
+    alt: "Flutterwave",
+    size: "max-w-[200px] md:max-w-[270px] h-[72px] md:h-[98px]",
+  },
   { src: pagaLogo, alt: "Paga", size: "h-6 md:h-[32px]" },
   { src: nombaLogo, alt: "Nomba", size: "h-6 md:h-[30px]" },
   { src: paypalLogo, alt: "PayPal", size: "h-7 md:h-[32px]" },
@@ -82,7 +90,10 @@ function LandingPage() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-sm md:text-base text-slate-600 max-w-2xl mb-12 font-light leading-relaxed"
             >
-              An open payments infrastructure that lets you connect any provider and intelligently manage every transaction flow—from unified APIs and webhooks to seamless routing, payouts, and global payment experiences.
+              An open payments infrastructure that lets you connect any provider
+              and intelligently manage every transaction flow—from unified APIs
+              and webhooks to seamless routing, payouts, and global payment
+              experiences.
             </motion.p>
 
             <motion.div
@@ -132,9 +143,10 @@ function LandingPage() {
                   providers, One Unified control layer.
                 </h2>
                 <p className="text-slate-600 text-lg mb-8 leading-relaxed">
-                  Setting up different payment methods for your business is slow and frustrating.
-                  Instead of juggling multiple accounts and messy reports, SynchGate gives you
-                  one simple way to handle everything.
+                  Setting up different payment methods for your business is slow
+                  and frustrating. Instead of juggling multiple accounts and
+                  messy reports, SynchGate gives you one simple way to handle
+                  everything.
                 </p>
 
                 <div className="space-y-6">
@@ -194,7 +206,10 @@ function LandingPage() {
                 transition={{ repeat: Infinity, ease: "linear", duration: 30 }}
               >
                 {[1, 2].map((set) => (
-                  <div key={set} className="flex items-center gap-16 md:gap-32 px-8 md:px-16 shrink-0">
+                  <div
+                    key={set}
+                    className="flex items-center gap-16 md:gap-32 px-8 md:px-16 shrink-0"
+                  >
                     {PROVIDERS.map((logo, idx) => (
                       <img
                         key={idx}
@@ -210,10 +225,7 @@ function LandingPage() {
           </section>
 
           {/* How It Works Section */}
-          <section
-            id="how-it-works"
-            className="py-32 relative overflow-hidden"
-          >
+          <section id="how-it-works" className="py-32 relative overflow-hidden">
             <div className="absolute inset-0 bg-slate-50/50 -z-10"></div>
 
             <div className="max-w-7xl mx-auto px-6">
@@ -242,7 +254,8 @@ function LandingPage() {
                   transition={{ delay: 0.2 }}
                   className="text-slate-600 text-lg max-w-2xl mx-auto"
                 >
-                  We've simplified the complex world of global payments into three easy steps. No rocket science, just results.
+                  We've simplified the complex world of global payments into
+                  three easy steps. No rocket science, just results.
                 </motion.p>
               </div>
 
@@ -257,7 +270,11 @@ function LandingPage() {
                       strokeDasharray="4 4"
                       fill="none"
                       animate={{ strokeDashoffset: [0, -8] }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      transition={{
+                        duration: 1,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
                     />
                   </svg>
                 </div>
@@ -270,7 +287,11 @@ function LandingPage() {
                       strokeDasharray="4 4"
                       fill="none"
                       animate={{ strokeDashoffset: [0, -8] }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      transition={{
+                        duration: 1,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
                     />
                   </svg>
                 </div>
@@ -282,22 +303,22 @@ function LandingPage() {
                       title: "1. Connect & Go",
                       desc: "Sign up and connect your existing payment providers like Paystack or Flutterwave in minutes.",
                       bgColor: "bg-blue-600/5",
-                      iconColor: "text-blue-600"
+                      iconColor: "text-blue-600",
                     },
                     {
                       icon: LinkIcon,
                       title: "2. One Simple Tool",
                       desc: "Use our single API or no-code dashboard to power your entire payment stack without the mess.",
                       bgColor: "bg-indigo-600/5",
-                      iconColor: "text-indigo-600"
+                      iconColor: "text-indigo-600",
                     },
                     {
                       icon: TrendingUp,
                       title: "3. Routing",
                       desc: "The current routing system uses explicit provider selection based on your preference.",
                       bgColor: "bg-slate-600/5",
-                      iconColor: "text-slate-600"
-                    }
+                      iconColor: "text-slate-600",
+                    },
                   ].map((step, i) => (
                     <motion.div
                       key={i}
@@ -308,8 +329,12 @@ function LandingPage() {
                       className="relative flex flex-col items-center text-center group"
                     >
                       <div className="w-20 h-20 rounded-3xl glass-panel flex items-center justify-center mb-8 border border-slate-200 shadow-sm group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300 relative">
-                        <div className={`absolute inset-0 ${step.bgColor} rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity`}></div>
-                        <step.icon className={`w-8 h-8 ${step.iconColor} relative z-10`} />
+                        <div
+                          className={`absolute inset-0 ${step.bgColor} rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity`}
+                        ></div>
+                        <step.icon
+                          className={`w-8 h-8 ${step.iconColor} relative z-10`}
+                        />
                       </div>
                       <h3 className="font-['Outfit'] text-2xl font-bold mb-4 text-black">
                         {step.title}
@@ -325,12 +350,12 @@ function LandingPage() {
                             className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-4 bg-blue-400 rounded-full"
                             animate={{
                               top: ["0%", "100%"],
-                              opacity: [0, 1, 0]
+                              opacity: [0, 1, 0],
                             }}
                             transition={{
                               duration: 1.5,
                               repeat: Infinity,
-                              ease: "linear"
+                              ease: "linear",
                             }}
                           />
                         </div>
@@ -356,7 +381,8 @@ function LandingPage() {
                   Built for every stage of business
                 </h2>
                 <p className="text-slate-600 text-lg max-w-2xl mx-auto">
-                  Whether you're just starting or scaling globally, SynchGate provides the infrastructure you need to succeed.
+                  Whether you're just starting or scaling globally, SynchGate
+                  provides the infrastructure you need to succeed.
                 </p>
               </div>
 
@@ -365,23 +391,23 @@ function LandingPage() {
                   {
                     icon: Zap,
                     title: "Startups & Founders",
-                    desc: "Launch your product faster with a single integration that scales with you from day one."
+                    desc: "Launch your product faster with a single integration that scales with you from day one.",
                   },
                   {
                     icon: ShoppingBag,
                     title: "E-commerce Brands",
-                    desc: "Expand to new markets instantly by enabling multiple payment gateways with a single API."
+                    desc: "Expand to new markets instantly by enabling multiple payment gateways with a single API.",
                   },
                   {
                     icon: Building2,
                     title: "Scaling Platforms",
-                    desc: "Improve reliability with smart routing and automated failovers."
+                    desc: "Improve reliability with smart routing and automated failovers.",
                   },
                   {
                     icon: Cpu,
                     title: "Fintech Builders",
-                    desc: "Build complex payment experiences and custom flows on top of our robust, developer-first APIs."
-                  }
+                    desc: "Build complex payment experiences and custom flows on top of our robust, developer-first APIs.",
+                  },
                 ].map((item, i) => (
                   <motion.div
                     key={i}
@@ -394,8 +420,12 @@ function LandingPage() {
                     <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100 mb-6 group-hover:bg-blue-600 group-hover:border-blue-600 transition-colors">
                       <item.icon className="w-6 h-6 text-blue-600 group-hover:text-white transition-colors" />
                     </div>
-                    <h3 className="text-slate-900 font-bold text-xl mb-3">{item.title}</h3>
-                    <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+                    <h3 className="text-slate-900 font-bold text-xl mb-3">
+                      {item.title}
+                    </h3>
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      {item.desc}
+                    </p>
                   </motion.div>
                 ))}
               </div>
@@ -418,21 +448,20 @@ function LandingPage() {
                 {[
                   {
                     q: "How long does setup take?",
-                    a: "You can be up and running in minutes. Our simplified dashboard help you setup your account, get your API keys and make your first charge."
+                    a: "You can be up and running in minutes. Our simplified dashboard help you setup your account, get your API keys and make your first charge.",
                   },
                   {
                     q: "Which payment providers do you support?",
-                    a: "We currently support some global providers including Flutterwave, Paystack, and Nomba. We are constantly adding new integrations based on customer demand."
+                    a: "We currently support some global providers including Flutterwave, Paystack, and Nomba. We are constantly adding new integrations based on customer demand.",
                   },
                   {
                     q: "Is SynchGate PCI compliant?",
-                    a: "We do not process payments or handle user cards details. All payments are processed by payment gateways (providers) and they securely handle sensitive payment data."
+                    a: "We do not process payments or handle user cards details. All payments are processed by payment gateways (providers) and they securely handle sensitive payment data.",
                   },
                   {
                     q: "How does smart routing work?",
-                    a: "(this feature is coming soon)"
+                    a: "(this feature is coming soon)",
                   },
-
                 ].map((faq, i) => (
                   <motion.div
                     key={i}
@@ -446,7 +475,9 @@ function LandingPage() {
                       onClick={() => setActiveFaq(activeFaq === i ? null : i)}
                       className="w-full flex items-center justify-between p-6 text-left hover:bg-slate-50 transition-colors"
                     >
-                      <span className="font-bold text-slate-900 text-lg">{faq.q}</span>
+                      <span className="font-bold text-slate-900 text-lg">
+                        {faq.q}
+                      </span>
                       {activeFaq === i ? (
                         <Minus className="w-5 h-5 text-blue-600 shrink-0" />
                       ) : (
@@ -479,8 +510,8 @@ function LandingPage() {
                 Ready to simplify?
               </h2>
               <p className="text-slate-600 text-lg md:text-xl mb-10 max-w-2xl mx-auto relative z-10">
-                Join hundreds of businesses building on SynchGate. Create
-                an account, get your API keys, and make your first charge in
+                Join hundreds of businesses building on SynchGate. Create an
+                account, get your API keys, and make your first charge in
                 minutes.
               </p>
 

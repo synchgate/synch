@@ -16,11 +16,11 @@ function InitiateTransfer() {
       </h1>
 
       <p className="text-lg text-slate-600 leading-relaxed mb-8">
-        Coming soon... This endpoint allows you to initiate an outbound transfer to a specified bank account.
+        Coming soon... This endpoint allows you to initiate an outbound transfer
+        to a specified bank account.
       </p>
 
       <SupportedProviders />
-
 
       {/* Navigation Footer */}
       <div className="grid grid-cols-2 gap-4 items-center py-8 mt-16 border-t border-slate-200">

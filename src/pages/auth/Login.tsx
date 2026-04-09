@@ -6,7 +6,6 @@ import { useAuth } from "../../contexts/AuthContext";
 import { authService, type LoginPayload } from "../../services/auth";
 import { queryClient } from "../../lib/react-query";
 
-
 function Login() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -23,7 +22,7 @@ function Login() {
   const loginMutation = useMutation({
     mutationFn: (data: LoginPayload) => authService.login(data),
     onSuccess: (data) => {
-      queryClient.resetQueries()
+      queryClient.resetQueries();
       // Store token depending on your backend schema, falling back to a dummy identifier
       const token =
         data?.access || data?.token || data?.access_token || "authenticated";

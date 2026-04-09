@@ -29,9 +29,9 @@ function Introduction() {
         </p>
         <p>
           Instead of integrating separately with providers such as Paystack,
-          Flutterwave, or Nomba, developers integrate <strong>once</strong>{" "}
-          with SynchGate. The platform then routes transactions to the
-          appropriate provider.
+          Flutterwave, or Nomba, developers integrate <strong>once</strong> with
+          SynchGate. The platform then routes transactions to the appropriate
+          provider.
         </p>
         <p>
           Our infrastructure is designed to simplify payment integration while
@@ -88,8 +88,7 @@ function Introduction() {
 
       <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner">
         <div>
-          Merchant →{" "}
-          <span className="text-indigo-400">synchgate API</span> →{" "}
+          Merchant → <span className="text-indigo-400">synchgate API</span> →{" "}
           <span className="text-blue-400">Payment Provider</span>
         </div>
       </div>

@@ -73,7 +73,8 @@ function InitiatePayment() {
               <td className="px-6 py-4 font-mono text-amber-300">provider</td>
               <td className="px-6 py-4 text-blue-300">string</td>
               <td className="px-6 py-4">
-                Payment provider to route transaction to (e.g., paystack, flutterwave).
+                Payment provider to route transaction to (e.g., paystack,
+                flutterwave).
               </td>
             </tr>
             <tr>
@@ -89,24 +90,30 @@ function InitiatePayment() {
             <tr>
               <td className="px-6 py-4 font-mono text-amber-300">currency</td>
               <td className="px-6 py-4 text-blue-300">string</td>
-              <td className="px-6 py-4">Transaction currency (e.g., NGN, USD, optional but defaults to NGN)</td>
+              <td className="px-6 py-4">
+                Transaction currency (e.g., NGN, USD, optional but defaults to
+                NGN)
+              </td>
             </tr>
             <tr>
               <td className="px-6 py-4 font-mono text-amber-300">
                 callback_url
               </td>
               <td className="px-6 py-4 text-blue-300">url</td>
-              <td className="px-6 py-4">The URL to redirect the customer after payment (optional)</td>
+              <td className="px-6 py-4">
+                The URL to redirect the customer after payment (optional)
+              </td>
             </tr>
             <tr>
               <td className="px-6 py-4 font-mono text-amber-300">reference</td>
               <td className="px-6 py-4 text-blue-300">string</td>
-              <td className="px-6 py-4">Unique transaction reference (optional)</td>
+              <td className="px-6 py-4">
+                Unique transaction reference (optional)
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
-
 
       <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
         Routing Logic
@@ -117,7 +124,8 @@ function InitiatePayment() {
         <strong>explicit provider selection</strong>.
       </p>
       <p className="text-slate-600 mb-6">
-        The provider is specified directly in the request payload, and the API routes the request to that specific gateway.
+        The provider is specified directly in the request payload, and the API
+        routes the request to that specific gateway.
       </p>
 
       <p className="text-slate-900 font-bold text-lg mb-2 mt-8">
@@ -125,7 +133,9 @@ function InitiatePayment() {
       </p>
       <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-          <CopyButton textToCopy={`curl --location 'https://api.synchgate.com/v1/api/initiate-payment/' \\\n--header 'Client-Secret-Key: sk_live_your_key_here' \\\n--header 'Content-Type: application/json' \\\n--data-raw '{\n    "provider": "flutterwave",\n    "email": "customer@example.com",\n    "amount": 8000,\n    "currency": "NGN"\n}'`} />
+          <CopyButton
+            textToCopy={`curl --location 'https://api.synchgate.com/v1/api/initiate-payment/' \\\n--header 'Client-Secret-Key: sk_live_your_key_here' \\\n--header 'Content-Type: application/json' \\\n--data-raw '{\n    "provider": "flutterwave",\n    "email": "customer@example.com",\n    "amount": 8000,\n    "currency": "NGN"\n}'`}
+          />
         </div>
         <pre>
           {`curl --location 'https://api.synchgate.com/v1/api/initiate-payment/' \\
@@ -185,16 +195,20 @@ function InitiatePayment() {
         Unified Response Format
       </h2>
       <p className="text-slate-600 mb-4">
-        Fintech Platform normalizes responses from all providers into a single, consistent format.
+        Fintech Platform normalizes responses from all providers into a single,
+        consistent format.
       </p>
       <p className="text-slate-600 mb-12">
-        This allows you to write one integration regardless of which underlying payment gateway you use.
+        This allows you to write one integration regardless of which underlying
+        payment gateway you use.
       </p>
 
       <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
         Transaction Tracking
       </h2>
-      <p className="text-slate-600 mb-3">All API transactions are tracked with one of the following states:</p>
+      <p className="text-slate-600 mb-3">
+        All API transactions are tracked with one of the following states:
+      </p>
       <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-amber-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10">
         <pre>
           {`pending   - Payment is waiting for customer action
@@ -208,7 +222,8 @@ abandoned - Customer left the payment page`}
         Error Handling
       </h2>
       <p className="text-slate-600 mb-6">
-        All errors return a standard JSON structure with a descriptive message and error code.
+        All errors return a standard JSON structure with a descriptive message
+        and error code.
       </p>
       <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10">
         <pre>

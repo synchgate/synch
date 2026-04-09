@@ -174,7 +174,8 @@ function DocsPage() {
 
             <div>
               <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                <Shield className="w-4 h-4 text-blue-500" /> Compliance & Privacy
+                <Shield className="w-4 h-4 text-blue-500" /> Compliance &
+                Privacy
               </h4>
               <ul className="space-y-2 border-l border-slate-200 ml-2 pl-4">
                 <li>
