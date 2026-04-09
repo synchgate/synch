@@ -10,6 +10,8 @@ import {
   X,
   XCircle,
   Loader2,
+  Zap,
+  GitBranch,
 } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -24,6 +26,7 @@ function Transactions() {
   const [selectedStatus, setSelectedStatus] = useState("All Statuses");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [selectedRoute, setSelectedRoute] = useState("All Routes");
 
   const { data: transactionsResponse, isLoading } = useQuery({
     queryKey: ["transactions", userEmail],
@@ -78,7 +81,18 @@ function Transactions() {
       }
     }
 
-    return matchesSearch && matchesProvider && matchesStatus && matchesDate;
+    const routeType = (tx.route_type || "basic").toLowerCase();
+    const routeFilter = selectedRoute.toLowerCase();
+    const matchesRoute =
+      selectedRoute === "All Routes" || routeType === routeFilter;
+
+    return (
+      matchesSearch &&
+      matchesProvider &&
+      matchesStatus &&
+      matchesDate &&
+      matchesRoute
+    );
   });
 
   const formatCurrency = (amount: string, currency: string) => {
@@ -184,10 +198,20 @@ function Transactions() {
               <option value="Failed">Failed</option>
               <option value="Pending">Pending</option>
             </select>
+            <select
+              value={selectedRoute}
+              onChange={(e) => setSelectedRoute(e.target.value)}
+              className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+            >
+              <option value="All Routes">All Routes</option>
+              <option value="Basic">Basic</option>
+              <option value="Auto">Auto</option>
+            </select>
             {(startDate ||
               endDate ||
               selectedProvider !== "All Providers" ||
               selectedStatus !== "All Statuses" ||
+              selectedRoute !== "All Routes" ||
               searchTerm) && (
                 <button
                   onClick={() => {
@@ -196,6 +220,7 @@ function Transactions() {
                     setSearchTerm("");
                     setSelectedProvider("All Providers");
                     setSelectedStatus("All Statuses");
+                    setSelectedRoute("All Routes");
                   }}
                   className="px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
                 >
@@ -221,6 +246,7 @@ function Transactions() {
                   <th className="px-6 py-4 font-medium">Provider</th>
                   <th className="px-6 py-4 font-medium">Amount</th>
                   <th className="px-6 py-4 font-medium">Channel</th>
+                  <th className="px-6 py-4 font-medium text-center">Route</th>
                   <th className="px-6 py-4 font-medium">Status</th>
                   {/* <th className="px-6 py-4 font-medium">Reason</th> */}
                   <th className="px-6 py-4 font-medium text-right">Time</th>
@@ -246,6 +272,16 @@ function Transactions() {
                       </td>
                       <td className="px-6 py-4 text-slate-600 capitalize">
                         {tx.channel || "-"}
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                          (tx.route_type || "basic").toLowerCase() === "auto" 
+                            ? "bg-indigo-100 text-indigo-700 border border-indigo-200" 
+                            : "bg-slate-100 text-slate-600 border border-slate-200"
+                        }`}>
+                          {(tx.route_type || "basic").toLowerCase() === "auto" ? <Zap className="w-2.5 h-2.5" /> : <GitBranch className="w-2.5 h-2.5" />}
+                          {tx.route_type || "Basic"}
+                        </span>
                       </td>
                       <td className="px-6 py-4">
                         <StatusBadge status={tx.status} />
@@ -365,6 +401,17 @@ function Transactions() {
                     <p className="font-medium text-slate-900 capitalize">
                       {selectedTx.channel || "-"}
                     </p>
+                  </div>
+                  <div>
+                    <p className="text-slate-500 text-xs mb-1">Routing Mode</p>
+                    <div className="flex items-center gap-1.5 font-medium text-slate-900 capitalize">
+                      {(selectedTx.route_type || "basic").toLowerCase() === "auto" ? (
+                        <Zap className="w-3.5 h-3.5 text-indigo-500" />
+                      ) : (
+                        <GitBranch className="w-3.5 h-3.5 text-slate-500" />
+                      )}
+                      {selectedTx.route_type || "Basic"}
+                    </div>
                   </div>
                   <div>
                     <p className="text-slate-500 text-xs mb-1">

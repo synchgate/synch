@@ -3,10 +3,8 @@ import {
   Check, 
   Zap, 
   LineChart, 
-  Lock, 
   Sparkles,
-  TrendingUp,
-  Globe
+  Star
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -14,56 +12,66 @@ import Footer from "../components/Footer";
 const PricingPage = () => {
   const plans = [
     {
-      id: "analytics",
-      name: "Advanced Analytics",
-      price: "15,000",
-      description: "Perfect for growing merchants who need deep insights into transaction performance.",
+      id: "starter",
+      name: "Starter",
+      price: "20",
+      unit: "per successful transaction",
+      description: "Perfect for getting started with payments.",
       features: [
-        "Advanced Trends & Forecasting",
-        "Payment Gateway Performance Metrics",
-        "Customer Email Lists",
-        "Payment Time Analytics",
-        "Real-time Transaction Monitoring",
-        "Email Support",
+        "Basic payment routing",
+        "Transaction logs",
+        "Standard API access",
+        "Basic dashboard (success vs failed)",
       ],
       isAvailable: true,
-      tag: "Popular",
+      tag: "Free Connection",
       icon: LineChart,
-      color: "blue"
+      color: "emerald",
+      ctaText: "Get Started"
     },
     {
-      id: "professional",
-      name: "Professional Mode",
-      price: "45,000",
-      description: "Scale your business with higher limits and specialized routing tools.",
+      id: "growth",
+      name: "Growth",
+      price: "35,000",
+      unit: "/ month",
+      description: "For businesses that want visibility into their payments.",
       features: [
-        "Dynamic Routing Engine",
-        "Priority Settlement Mode",
-        "Multi-Merchant Management",
-        "Dedicated Account Manager",
-        "24/7 Phone Support",
+        "Everything in Starter, plus:",
+        "Advanced analytics dashboard",
+        "Success rate by gateway, bank & time",
+        "Failure reason breakdown",
+        "Transaction trends & insights",
+        "Auto-retry failed transactions",
+        "Revenue loss insights (see failed payment value)",
+        "Customer payment behavior insights",
       ],
-      isAvailable: false,
-      tag: "Coming Soon",
+      isAvailable: true,
+      tag: "Deep Visibility",
       icon: Zap,
-      color: "indigo"
+      color: "blue",
+      ctaText: "Upgrade to Growth"
     },
     {
-      id: "enterprise",
-      name: "Enterprise Custom",
-      price: "120,000+",
-      description: "Bespoke infrastructure tailored for high-volume financial institutions.",
+      id: "pro",
+      name: "Pro",
+      price: "150,000",
+      unit: "/ month",
+      description: "For businesses that want to increase revenue automatically.",
       features: [
-        "Custom Gateway Integrations",
-        "On-premise Deployment Options",
-        "White-label Dashboard",
-        "Unlimited API Routes",
-        "SLA Guarantee & Legal Concierge",
+        "Everything in Growth, plus:",
+        "Intelligent routing insights",
+        "Dynamic auto-routing (switch gateways automatically)",
+        "“What-if” revenue simulations",
+        "Real-time gateway health monitoring",
+        "Downtime & failure alerts (Slack, Email, Webhook)",
+        "Performance optimization recommendations",
       ],
-      isAvailable: false,
-      tag: "Coming Soon",
-      icon: Globe,
-      color: "slate"
+      isAvailable: true,
+      tag: "Most Popular",
+      isPopular: true,
+      icon: Star,
+      color: "indigo",
+      ctaText: "Start Optimizing Revenue"
     }
   ];
 
@@ -94,7 +102,7 @@ const PricingPage = () => {
               Everything you need to <span className="text-blue-600">scale.</span>
             </h1>
             <p className="text-lg text-slate-600 font-light">
-              Choose the right plan for your business etapa. No hidden fees, just pure orchestration.
+              Choose the right plan for your business needs. No hidden fees, just pure orchestration.
             </p>
           </div>
 
@@ -106,57 +114,63 @@ const PricingPage = () => {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                className={`relative rounded-[2.5rem] border p-10 transition-all duration-500 overflow-hidden ${
-                  plan.isAvailable 
-                    ? "bg-white border-slate-200 shadow-2xl shadow-slate-200/50 hover:border-blue-300 ring-4 ring-transparent hover:ring-blue-50/50" 
-                    : "bg-slate-50/50 border-slate-200 opacity-90 grayscale-[0.3]"
+                className={`relative rounded-[2.5rem] border p-10 transition-all duration-500 overflow-hidden flex flex-col ${
+                  plan.isPopular 
+                    ? "bg-white border-blue-200 shadow-2xl shadow-blue-200/50 ring-4 ring-blue-50" 
+                    : "bg-white border-slate-200 shadow-xl shadow-slate-200/50 hover:border-slate-300"
                 }`}
               >
-                {!plan.isAvailable && (
-                  <div className="absolute top-6 right-6 z-20">
-                    <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-950 text-white rounded-full text-[10px] font-bold uppercase tracking-wider shadow-lg">
-                      <Lock className="w-3 h-3" />
-                      {plan.tag}
-                    </div>
+                {/* Popular Badge */}
+                <div className="absolute top-6 right-6 z-20">
+                  <div className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider shadow-lg ${
+                    plan.isPopular 
+                      ? "bg-indigo-600 text-white shadow-indigo-200" 
+                      : plan.color === 'emerald' 
+                        ? "bg-emerald-500 text-white shadow-emerald-100" 
+                        : "bg-blue-600 text-white shadow-blue-100"
+                  }`}>
+                    {plan.id === 'pro' && <Star className="w-3 h-3 fill-current" />}
+                    {plan.tag}
                   </div>
-                )}
-                
-                {plan.isAvailable && (
-                  <div className="absolute top-6 right-6 z-20">
-                    <div className="flex items-center gap-1.5 px-4 py-1.5 bg-emerald-500 text-white rounded-full text-[11px] font-black uppercase tracking-wider shadow-lg shadow-emerald-200">
-                      <TrendingUp className="w-3 h-3" />
-                      {plan.tag}
-                    </div>
-                  </div>
-                )}
+                </div>
 
+                {/* Plan Icon */}
                 <div className={`w-16 h-16 rounded-[1.25rem] flex items-center justify-center mb-10 shadow-sm ${
+                  plan.color === 'emerald' ? 'bg-emerald-600 text-white shadow-emerald-200' : 
                   plan.color === 'blue' ? 'bg-blue-600 text-white shadow-blue-200' : 
-                  plan.color === 'indigo' ? 'bg-indigo-600 text-white shadow-indigo-200' : 
-                  'bg-slate-900 text-white shadow-slate-200'
+                  'bg-indigo-600 text-white shadow-indigo-200'
                 }`}>
                   <plan.icon className="w-8 h-8" />
                 </div>
 
                 <h3 className="text-3xl font-black text-slate-900 mb-4">{plan.name}</h3>
-                <p className="text-sm text-slate-500 mb-8 min-h-[60px] leading-relaxed font-medium">
+                <p className="text-sm text-slate-500 mb-8 min-h-[50px] leading-relaxed font-medium">
                   {plan.description}
                 </p>
 
-                <div className={`flex items-baseline gap-1 mb-10 transition-all duration-500 ${!plan.isAvailable ? 'blur-[3px] opacity-40 select-none pointer-events-none' : ''}`}>
-                  <span className="text-5xl font-black text-slate-900 tracking-tighter">₦{plan.price}</span>
-                  <span className="text-slate-500 font-bold text-lg">/month</span>
+                <div className={`flex flex-col gap-1 mb-10`}>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-5xl font-black text-slate-900 tracking-tighter">₦{plan.price}</span>
+                    {plan.id !== 'starter' && <span className="text-slate-500 font-bold text-lg">{plan.unit}</span>}
+                  </div>
+                  {plan.id === 'starter' && (
+                    <span className="text-slate-500 font-bold text-sm tracking-wide lowercase">{plan.unit}</span>
+                  )}
                 </div>
 
-                <div className={`space-y-5 mb-12 transition-all duration-500 ${!plan.isAvailable ? 'blur-[3px] opacity-40 select-none pointer-events-none' : ''}`}>
+                <div className="space-y-5 mb-12 flex-1">
                   {plan.features.map((feature, i) => (
                     <div key={i} className="flex items-start gap-4">
                       <div className={`mt-1 w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
-                        plan.isAvailable ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-400'
+                        plan.color === 'emerald' ? 'bg-emerald-100 text-emerald-600' : 
+                        plan.color === 'blue' ? 'bg-blue-100 text-blue-600' : 
+                        'bg-indigo-100 text-indigo-600'
                       }`}>
                         <Check className="w-3 h-4 stroke-[4px]" />
                       </div>
-                      <span className={`text-[15px] leading-tight ${plan.isAvailable ? 'text-slate-700 font-bold' : 'text-slate-400 font-medium'}`}>
+                      <span className={`text-[15px] leading-tight ${
+                        feature.includes("Everything in") ? "font-black text-slate-900 underline decoration-blue-500/30 underline-offset-4" : "text-slate-700 font-bold"
+                      }`}>
                         {feature}
                       </span>
                     </div>
@@ -164,18 +178,20 @@ const PricingPage = () => {
                 </div>
 
                 <motion.div
-                  whileHover={plan.isAvailable ? { scale: 1.02 } : {}}
-                  whileTap={plan.isAvailable ? { scale: 0.98 } : {}}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
                   <a
-                    href={plan.isAvailable ? "/auth/signup" : "#"}
+                    href="/auth/signup"
                     className={`block w-full py-5 rounded-3xl font-black text-center text-[17px] transition-all duration-300 ${
-                      plan.isAvailable 
-                        ? "bg-slate-900 text-white hover:bg-black shadow-xl shadow-slate-200 hover:shadow-2xl" 
-                        : "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
+                      plan.isPopular 
+                        ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl shadow-indigo-200" 
+                        : plan.color === 'emerald'
+                          ? "bg-emerald-600 text-white hover:bg-emerald-700 shadow-xl shadow-emerald-200"
+                          : "bg-blue-600 text-white hover:bg-blue-700 shadow-xl shadow-blue-200"
                     }`}
                   >
-                    {plan.isAvailable ? "Get Started Now" : "Request Early Access"}
+                    {plan.ctaText}
                   </a>
                 </motion.div>
               </motion.div>
