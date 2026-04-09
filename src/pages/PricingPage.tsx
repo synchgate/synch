@@ -4,7 +4,8 @@ import {
   Zap, 
   LineChart, 
   Sparkles,
-  Star
+  Star,
+  Info
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -45,7 +46,7 @@ const PricingPage = () => {
         "Revenue loss insights (see failed payment value)",
         "Customer payment behavior insights",
       ],
-      isAvailable: true,
+      isAvailable: false,
       tag: "Deep Visibility",
       icon: Zap,
       color: "blue",
@@ -66,7 +67,7 @@ const PricingPage = () => {
         "Downtime & failure alerts (Slack, Email, Webhook)",
         "Performance optimization recommendations",
       ],
-      isAvailable: true,
+      isAvailable: false,
       tag: "Most Popular",
       isPopular: true,
       icon: Star,
@@ -156,6 +157,14 @@ const PricingPage = () => {
                   {plan.id === 'starter' && (
                     <span className="text-slate-500 font-bold text-sm tracking-wide lowercase">{plan.unit}</span>
                   )}
+                  {plan.id === 'starter' && (
+                    <div className="mt-6 flex items-start gap-2.5 p-3.5 bg-slate-50 rounded-2xl border border-slate-100">
+                      <Info className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                      <p className="text-[11px] text-slate-500 leading-relaxed font-semibold italic">
+                        Invoices for accumulated transaction bills are sent at the end of every month.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-5 mb-12 flex-1">
@@ -177,23 +186,31 @@ const PricingPage = () => {
                   ))}
                 </div>
 
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <a
-                    href="/auth/signup"
-                    className={`block w-full py-5 rounded-3xl font-black text-center text-[17px] transition-all duration-300 ${
-                      plan.isPopular 
-                        ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl shadow-indigo-200" 
-                        : plan.color === 'emerald'
+                {plan.isAvailable ? (
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <a
+                      href="/auth/signup"
+                      className={`block w-full py-5 rounded-3xl font-black text-center text-[17px] transition-all duration-300 ${
+                        plan.isPopular
+                          ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl shadow-indigo-200"
+                          : plan.color === "emerald"
                           ? "bg-emerald-600 text-white hover:bg-emerald-700 shadow-xl shadow-emerald-200"
                           : "bg-blue-600 text-white hover:bg-blue-700 shadow-xl shadow-blue-200"
-                    }`}
+                      }`}
+                    >
+                      {plan.ctaText}
+                    </a>
+                  </motion.div>
+                ) : (
+                  <div
+                    className="block w-full py-5 rounded-3xl font-black text-center text-[17px] bg-slate-100 text-slate-400 cursor-not-allowed select-none pointer-events-none"
                   >
                     {plan.ctaText}
-                  </a>
-                </motion.div>
+                  </div>
+                )}
               </motion.div>
             ))}
           </div>
