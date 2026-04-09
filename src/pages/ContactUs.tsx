@@ -1,12 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import contactHero from "../assets/contact_us_hero.png";
-import logo from "../assets/logo.png";
-import { Link } from "react-router-dom";
-import { ArrowRight, Code2, Menu, X } from "lucide-react";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 export default function ContactUs() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [form, setForm] = useState({
     businessEmail: "",
     firstName: "",
@@ -15,14 +12,6 @@ export default function ContactUs() {
     product: "",
     details: "",
   });
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -54,129 +43,7 @@ export default function ContactUs() {
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] rounded-lg"></div>
       </div>
 
-      {/* Navbar */}
-      <header
-        className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled
-          ? "glass-panel border-b border-slate-200 py-4"
-          : "bg-transparent py-6"
-          }`}
-      >
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer">
-            <Link to="/">
-              <img src={logo} alt="SynchGate Logo" className="w-[150px] " />
-            </Link>
-          </div>
-
-          <nav className="hidden md:flex items-center gap-8">
-            <Link
-              to="/contact-us"
-              className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"
-            >
-              Contact Us
-            </Link>
-            <Link
-              to="/#how-it-works"
-              className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"
-            >
-              How it works
-            </Link>
-            <Link
-              to="/docs"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors inline-flex items-center gap-1 cursor-pointer"
-            >
-              <Code2 className="w-4 h-4" /> Docs
-            </Link>
-          </nav>
-
-          <div className="flex items-center gap-4">
-            <Link
-              to="/auth/login"
-              className="hidden sm:block text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"
-            >
-              Log in
-            </Link>
-            <Link
-              to="/auth/signup"
-              className="relative hidden md:inline-flex group h-9 items-center justify-center rounded-md bg-black px-4 text-sm font-medium text-white shadow transition-colors hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 cursor-pointer"
-            >
-              <span className="relative z-10 hidden sm:flex items-center gap-1">
-                Get started{" "}
-                <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-              </span>
-              <span className="relative z-10 flex sm:hidden items-center gap-1">
-                Get started
-              </span>
-            </Link>
-            <button 
-              className="md:hidden p-1 opacity-70 hover:opacity-100 transition-opacity"
-              onClick={() => setIsMobileMenuOpen(true)}
-            >
-              <Menu className="w-6 h-6" />
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-100 bg-white flex flex-col pt-6 pb-8 px-6 overflow-y-auto">
-          <div className="flex justify-between items-center mb-12">
-            <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
-              <img src={logo} alt="SynchGate Logo" className="w-[150px]" />
-            </Link>
-            <button 
-              onClick={() => setIsMobileMenuOpen(false)} 
-              className="p-2 rounded-full hover:bg-slate-100 text-slate-900 transition-colors"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
-          
-          <nav className="flex flex-col gap-6 items-center flex-1 justify-center">
-            <Link 
-              to="/contact-us" 
-              onClick={() => setIsMobileMenuOpen(false)} 
-              className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors"
-            >
-              Contact Us
-            </Link>
-            <Link 
-              to="/#how-it-works" 
-              onClick={() => setIsMobileMenuOpen(false)} 
-              className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors"
-            >
-              How it works
-            </Link>
-            <Link 
-              to="/docs" 
-              onClick={() => setIsMobileMenuOpen(false)} 
-              className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors inline-flex items-center gap-2"
-            >
-              <Code2 className="w-6 h-6" /> Docs
-            </Link>
-            
-            <hr className="w-full max-w-[250px] border-slate-200 my-4" />
-            
-            <Link 
-              to="/auth/login" 
-              onClick={() => setIsMobileMenuOpen(false)} 
-              className="text-xl font-medium text-slate-600 hover:text-blue-600 transition-colors"
-            >
-              Log in
-            </Link>
-            <Link 
-              to="/auth/signup" 
-              onClick={() => setIsMobileMenuOpen(false)} 
-              className="w-full max-w-[250px] text-center bg-black text-white py-4 rounded-lg font-medium hover:bg-slate-800 transition-colors mt-2 text-lg"
-            >
-              Get started
-            </Link>
-          </nav>
-        </div>
-      )}
+      <Navbar />
 
       <main className="relative z-10 pt-32 pb-20 min-h-screen flex items-center">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-6 lg:gap-10 items-stretch">
@@ -278,12 +145,6 @@ export default function ContactUs() {
                     rows={6} 
                     className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white resize-none text-[15px]"
                   ></textarea>
-                  <div className="flex justify-end pr-1 mt-[-6px]">
-                      <svg width="6" height="6" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M6 1V6H1L6 1Z" fill="#CBD5E1"/>
-                        <path d="M6 3.5V6H3.5L6 3.5Z" fill="#94A3B8"/>
-                      </svg>
-                  </div>
                 </div>
 
                 <div className="pt-4">
@@ -294,13 +155,13 @@ export default function ContactUs() {
                     Send Message
                   </button>
                 </div>
-
               </form>
             </div>
           </div>
-
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }

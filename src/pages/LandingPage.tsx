@@ -1,8 +1,6 @@
 import { motion } from "framer-motion";
 import {
-  ArrowRight,
   ChevronRight,
-  Code2,
   Cpu,
   Plus,
   Minus,
@@ -13,22 +11,20 @@ import {
   Zap,
   Building2,
   ShoppingBag,
-  Fingerprint,
   ShieldCheck,
   Globe,
   Layers,
-  Menu,
-  X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import logo from "../assets/logo.png";
 import businessOwners from "../assets/business-owners.png";
 import paystackLogo from "../assets/brands/paystack.png";
 import flutterwaveLogo from "../assets/brands/flutterwave.png";
 import pagaLogo from "../assets/brands/paga.png";
 import nombaLogo from "../assets/brands/nomba.png";
 import paypalLogo from "../assets/brands/paypal.png";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 type Provider = { src: string; alt: string; size: string };
 
@@ -41,17 +37,7 @@ const PROVIDERS: Provider[] = [
 ];
 
 function LandingPage() {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-500/30 overflow-hidden relative">
@@ -62,136 +48,7 @@ function LandingPage() {
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] rounded-lg"></div>
       </div>
 
-      {/* Navbar */}
-      <header
-        className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled
-          ? "glass-panel border-b border-slate-200 py-4"
-          : "bg-transparent py-6"
-          }`}
-      >
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer">
-            <img src={logo} alt="SynchGate Logo" className="w-[150px] " />
-            {/* <span className="font-['Outfit'] font-bold text-xl tracking-tight text-black">
-              SynchGate
-            </span> */}
-          </div>
-
-          <nav className="hidden md:flex items-center gap-8">
-            <Link
-              to="/contact-us"
-              className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"
-            >
-              Contact Us
-            </Link>
-            <Link
-              to="/pricing"
-              className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"
-            >
-              Pricing
-            </Link>
-            <a
-              href="#how-it-works"
-              className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"
-            >
-              How it works
-            </a>
-            <Link
-              to="/docs"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors inline-flex items-center gap-1 cursor-pointer"
-            >
-              <Code2 className="w-4 h-4" /> Docs
-            </Link>
-          </nav>
-
-          <div className="flex items-center gap-4">
-            <Link
-              to="/auth/login"
-              className="hidden sm:block text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"
-            >
-              Log in
-            </Link>
-            <Link
-              to="/auth/signup"
-              className="relative hidden md:inline-flex group h-9 items-center justify-center rounded-md bg-black px-4 text-sm font-medium text-white shadow transition-colors hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 cursor-pointer"
-            >
-              <span className="relative z-10 hidden sm:flex items-center gap-1">
-                Get started{" "}
-                <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-              </span>
-              <span className="relative z-10 flex sm:hidden items-center gap-1">
-                Get started
-              </span>
-            </Link>
-            <button
-              className="md:hidden p-1 opacity-70 hover:opacity-100 transition-opacity"
-              onClick={() => setIsMobileMenuOpen(true)}
-            >
-              <Menu className="w-6 h-6" />
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-100 bg-white flex flex-col pt-6 pb-8 px-6 overflow-y-auto">
-          <div className="flex justify-between items-center mb-12">
-            <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
-              <img src={logo} alt="SynchGate Logo" className="w-[150px]" />
-            </Link>
-            <button
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="p-2 rounded-full hover:bg-slate-100 text-slate-900 transition-colors"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
-
-          <nav className="flex flex-col gap-6 items-center flex-1 justify-center">
-            <Link
-              to="/contact-us"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors"
-            >
-              Contact Us
-            </Link>
-            <a
-              href="#how-it-works"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors"
-            >
-              How it works
-            </a>
-            <Link
-              to="/docs"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors inline-flex items-center gap-2"
-            >
-              <Code2 className="w-6 h-6" /> Docs
-            </Link>
-
-            <hr className="w-full max-w-[250px] border-slate-200 my-4" />
-
-            <Link
-              to="/auth/login"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="text-xl font-medium text-slate-600 hover:text-blue-600 transition-colors"
-            >
-              Log in
-            </Link>
-            <Link
-              to="/auth/signup"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="w-full max-w-[250px] text-center bg-black text-white py-4 rounded-lg font-medium hover:bg-slate-800 transition-colors mt-2 text-lg"
-            >
-              Get started
-            </Link>
-          </nav>
-        </div>
-      )}
+      <Navbar />
 
       <main className="relative z-10 pt-32 pb-20">
         <div className="max-w-7xl mx-auto px-6">
@@ -647,95 +504,7 @@ function LandingPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200 bg-slate-50 relative z-10 pt-16 pb-8">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
-            <div className="col-span-2">
-              <div className="flex items-center gap-2 mb-4">
-                <img src={logo} alt="SynchGate Logo" className="w-[130px]" />
-              </div>
-              <p className="text-slate-600 text-sm max-w-xs mb-6">
-                The unifying infrastructure for modern payments. One API
-                connecting every major processor and localized method globally.
-              </p>
-            </div>
-
-            <div>
-              <h4 className="text-slate-900 font-medium mb-4">Developers</h4>
-              <ul className="space-y-3">
-                <li>
-                  <Link
-                    to="/docs"
-                    className="text-slate-600 hover:text-blue-600 transition-colors text-sm cursor-pointer"
-                  >
-                    Documentation
-                  </Link>
-                </li>
-                <li>
-                  <a
-                    href="/docs/initiate-payment"
-                    className="text-slate-600 hover:text-blue-600 transition-colors text-sm cursor-pointer"
-                  >
-                    API Reference
-                  </a>
-                </li>
-                <li>
-                  <a
-                    className="text-slate-600 hover:text-blue-600 transition-colors text-sm cursor-pointer"
-                  >
-                    System Status
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-slate-900 font-medium mb-4">Platform</h4>
-              <ul className="space-y-3">
-                <li>
-                  <Link
-                    to="/pricing"
-                    className="text-slate-600 hover:text-blue-600 transition-colors text-sm cursor-pointer"
-                  >
-                    Pricing
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/auth/login"
-                    className="text-slate-600 hover:text-blue-600 transition-colors text-sm cursor-pointer"
-                  >
-                    Log in to Dashboard
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/auth/signup"
-                    className="text-slate-600 hover:text-blue-600 transition-colors text-sm cursor-pointer"
-                  >
-                    Create Account
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-slate-200">
-            <p className="text-slate-500 text-sm mb-4 md:mb-0">
-              © 2026 SynchGate Inc. All rights reserved.
-            </p>
-            <div className="flex gap-4">
-              <a
-                href="#"
-                className="p-2 rounded-full hover:bg-slate-200 transition-colors text-slate-400 hover:text-slate-600 cursor-pointer"
-              >
-                <Fingerprint className="w-5 h-5" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
