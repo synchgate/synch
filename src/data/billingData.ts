@@ -45,7 +45,7 @@ export const subscriptionPlans: SubscriptionPlan[] = [
     price: 25000,
     interval: 'month',
     features: ['50,000 Transactions', 'Priority Support', 'Advanced Analytics', 'Custom Webhooks'],
-    isCurrent: true,
+    isCurrent: false,
   },
   {
     id: 'enterprise',

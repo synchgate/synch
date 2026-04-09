@@ -84,6 +84,12 @@ function LandingPage() {
             >
               Contact Us
             </Link>
+            <Link
+              to="/pricing"
+              className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"
+            >
+              Pricing
+            </Link>
             <a
               href="#how-it-works"
               className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"
@@ -688,11 +694,12 @@ function LandingPage() {
               <h4 className="text-slate-900 font-medium mb-4">Platform</h4>
               <ul className="space-y-3">
                 <li>
-                  <a
+                  <Link
+                    to="/pricing"
                     className="text-slate-600 hover:text-blue-600 transition-colors text-sm cursor-pointer"
                   >
                     Pricing
-                  </a>
+                  </Link>
                 </li>
                 <li>
                   <Link
