@@ -8,8 +8,8 @@ const PricingPage = () => {
     {
       id: "starter",
       name: "Starter",
-      price: "20",
-      unit: "per successful transaction",
+      price: "Free",
+      unit: "Only pay Per successful transaction",
       description: "Perfect for getting started with payments.",
       features: [
         "Basic payment routing",
@@ -111,22 +111,20 @@ const PricingPage = () => {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                className={`relative rounded-[2.5rem] border p-10 transition-all duration-500 overflow-hidden flex flex-col ${
-                  plan.isPopular
-                    ? "bg-white border-blue-200 shadow-2xl shadow-blue-200/50 ring-4 ring-blue-50"
-                    : "bg-white border-slate-200 shadow-xl shadow-slate-200/50 hover:border-slate-300"
-                }`}
+                className={`relative rounded-[2.5rem] border p-10 transition-all duration-500 overflow-hidden flex flex-col ${plan.isPopular
+                  ? "bg-white border-blue-200 shadow-2xl shadow-blue-200/50 ring-4 ring-blue-50"
+                  : "bg-white border-slate-200 shadow-xl shadow-slate-200/50 hover:border-slate-300"
+                  }`}
               >
                 {/* Popular Badge */}
                 <div className="absolute top-6 right-6 z-20">
                   <div
-                    className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider shadow-lg ${
-                      plan.isPopular
-                        ? "bg-indigo-600 text-white shadow-indigo-200"
-                        : plan.color === "emerald"
-                          ? "bg-emerald-500 text-white shadow-emerald-100"
-                          : "bg-blue-600 text-white shadow-blue-100"
-                    }`}
+                    className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider shadow-lg ${plan.isPopular
+                      ? "bg-indigo-600 text-white shadow-indigo-200"
+                      : plan.color === "emerald"
+                        ? "bg-emerald-500 text-white shadow-emerald-100"
+                        : "bg-blue-600 text-white shadow-blue-100"
+                      }`}
                   >
                     {plan.id === "pro" && (
                       <Star className="w-3 h-3 fill-current" />
@@ -137,13 +135,12 @@ const PricingPage = () => {
 
                 {/* Plan Icon */}
                 <div
-                  className={`w-16 h-16 rounded-[1.25rem] flex items-center justify-center mb-10 shadow-sm ${
-                    plan.color === "emerald"
-                      ? "bg-emerald-600 text-white shadow-emerald-200"
-                      : plan.color === "blue"
-                        ? "bg-blue-600 text-white shadow-blue-200"
-                        : "bg-indigo-600 text-white shadow-indigo-200"
-                  }`}
+                  className={`w-16 h-16 rounded-[1.25rem] flex items-center justify-center mb-10 shadow-sm ${plan.color === "emerald"
+                    ? "bg-emerald-600 text-white shadow-emerald-200"
+                    : plan.color === "blue"
+                      ? "bg-blue-600 text-white shadow-blue-200"
+                      : "bg-indigo-600 text-white shadow-indigo-200"
+                    }`}
                 >
                   <plan.icon className="w-8 h-8" />
                 </div>
@@ -157,8 +154,8 @@ const PricingPage = () => {
 
                 <div className={`flex flex-col gap-1 mb-10`}>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-5xl font-black text-slate-900 tracking-tighter">
-                      ₦{plan.price}
+                    <span className={`font-black text-slate-900 tracking-tighter ${plan.id === "starter" ? "text-3xl" : "text-5xl"}`}>
+                      {plan.id !== "starter" && "₦"}{plan.price}
                     </span>
                     {plan.id !== "starter" && (
                       <span className="text-slate-500 font-bold text-lg">
@@ -186,22 +183,20 @@ const PricingPage = () => {
                   {plan.features.map((feature) => (
                     <div key={feature} className="flex items-start gap-4">
                       <div
-                        className={`mt-1 w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
-                          plan.color === "emerald"
-                            ? "bg-emerald-100 text-emerald-600"
-                            : plan.color === "blue"
-                              ? "bg-blue-100 text-blue-600"
-                              : "bg-indigo-100 text-indigo-600"
-                        }`}
+                        className={`mt-1 w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${plan.color === "emerald"
+                          ? "bg-emerald-100 text-emerald-600"
+                          : plan.color === "blue"
+                            ? "bg-blue-100 text-blue-600"
+                            : "bg-indigo-100 text-indigo-600"
+                          }`}
                       >
                         <Check className="w-3 h-4 stroke-[4px]" />
                       </div>
                       <span
-                        className={`text-[15px] leading-tight ${
-                          feature.includes("Everything in")
-                            ? "font-black text-slate-900 underline decoration-blue-500/30 underline-offset-4"
-                            : "text-slate-700 font-bold"
-                        }`}
+                        className={`text-[15px] leading-tight ${feature.includes("Everything in")
+                          ? "font-black text-slate-900 underline decoration-blue-500/30 underline-offset-4"
+                          : "text-slate-700 font-bold"
+                          }`}
                       >
                         {feature}
                       </span>
@@ -216,13 +211,12 @@ const PricingPage = () => {
                   >
                     <a
                       href="/auth/signup"
-                      className={`block w-full py-5 rounded-3xl font-black text-center text-[17px] transition-all duration-300 ${
-                        plan.isPopular
-                          ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl shadow-indigo-200"
-                          : plan.color === "emerald"
-                            ? "bg-emerald-600 text-white hover:bg-emerald-700 shadow-xl shadow-emerald-200"
-                            : "bg-blue-600 text-white hover:bg-blue-700 shadow-xl shadow-blue-200"
-                      }`}
+                      className={`block w-full py-5 rounded-3xl font-black text-center text-[17px] transition-all duration-300 ${plan.isPopular
+                        ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl shadow-indigo-200"
+                        : plan.color === "emerald"
+                          ? "bg-emerald-600 text-white hover:bg-emerald-700 shadow-xl shadow-emerald-200"
+                          : "bg-blue-600 text-white hover:bg-blue-700 shadow-xl shadow-blue-200"
+                        }`}
                     >
                       {plan.ctaText}
                     </a>
