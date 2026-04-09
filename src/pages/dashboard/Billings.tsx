@@ -7,7 +7,7 @@ import {
   // TrendingUp,
   // Zap,
 } from "lucide-react";
-import { useState } from "react";
+// import { useState } from "react";
 import {
   // Bar,
   // BarChart,
@@ -16,63 +16,63 @@ import {
   // ResponsiveContainer,
   // Tooltip,
   // XAxis,
-  YAxis,
+  // YAxis,
 } from "recharts";
 import {
   // apiCalls,
   // invoices,
   // monthlyUsage,
-  subscriptionPlans,
+  // subscriptionPlans,
 } from "../../data/billingData";
 
-const CustomTooltip = ({ active, payload, label, chartMode }: any) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    return (
-      <div className="bg-white p-4 rounded-xl shadow-xl border border-slate-100 animate-in fade-in zoom-in-95 duration-200 min-w-[160px]">
-        <p className="text-sm font-bold text-slate-900 mb-2">{label}</p>
-        <div className="space-y-1.5">
-          {chartMode === "revenue" ? (
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-xs font-medium text-slate-500">
-                Revenue
-              </span>
-              <span className="text-sm font-bold text-blue-600">
-                ₦{data.cost?.toLocaleString()}
-              </span>
-            </div>
-          ) : (
-            <>
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-xs font-medium text-slate-500">
-                  Successful
-                </span>
-                <span className="text-sm font-bold text-emerald-600">
-                  {data.successful?.toLocaleString()}
-                </span>
-              </div>
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-xs font-medium text-slate-500">
-                  Failed
-                </span>
-                <span className="text-sm font-bold text-rose-600">
-                  {data.failed?.toLocaleString()}
-                </span>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    );
-  }
-  return null;
-};
+// const CustomTooltip = ({ active, payload, label, chartMode }: any) => {
+//   if (active && payload && payload.length) {
+//     const data = payload[0].payload;
+//     return (
+//       <div className="bg-white p-4 rounded-xl shadow-xl border border-slate-100 animate-in fade-in zoom-in-95 duration-200 min-w-[160px]">
+//         <p className="text-sm font-bold text-slate-900 mb-2">{label}</p>
+//         <div className="space-y-1.5">
+//           {chartMode === "revenue" ? (
+//             <div className="flex items-center justify-between gap-4">
+//               <span className="text-xs font-medium text-slate-500">
+//                 Revenue
+//               </span>
+//               <span className="text-sm font-bold text-blue-600">
+//                 ₦{data.cost?.toLocaleString()}
+//               </span>
+//             </div>
+//           ) : (
+//             <>
+//               <div className="flex items-center justify-between gap-4">
+//                 <span className="text-xs font-medium text-slate-500">
+//                   Successful
+//                 </span>
+//                 <span className="text-sm font-bold text-emerald-600">
+//                   {data.successful?.toLocaleString()}
+//                 </span>
+//               </div>
+//               <div className="flex items-center justify-between gap-4">
+//                 <span className="text-xs font-medium text-slate-500">
+//                   Failed
+//                 </span>
+//                 <span className="text-sm font-bold text-rose-600">
+//                   {data.failed?.toLocaleString()}
+//                 </span>
+//               </div>
+//             </>
+//           )}
+//         </div>
+//       </div>
+//     );
+//   }
+//   return null;
+// };
 
 const Billings = () => {
-  const currentPlan = subscriptionPlans.find((p) => p.isCurrent) || null;
-  const [activeChartTab, setActiveChartTab] = useState<"volume" | "revenue">(
-    "volume",
-  );
+  // const currentPlan = subscriptionPlans.find((p) => p.isCurrent) || null;
+  // const [activeChartTab, setActiveChartTab] = useState<"volume" | "revenue">(
+  //   "volume",
+  // );
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[500px] text-center p-8 bg-slate-50/30 rounded-[2.5rem] border-2 border-dashed border-slate-200 animate-in fade-in zoom-in-95 duration-700">
