@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
-import { 
-  Check, 
-  Zap, 
-  LineChart, 
-  Lock, 
+import {
+  Check,
+  Zap,
+  LineChart,
+  Lock,
   Sparkles,
   TrendingUp,
   Globe
@@ -117,7 +117,7 @@ const PricingPage = () => {
               Everything you need to <span className="text-blue-600">scale.</span>
             </h1>
             <p className="text-lg text-slate-600 font-light">
-              Choose the right plan for your business etapa. No hidden fees, just pure orchestration.
+              Choose the right plan for your business. No hidden fees, just pure orchestration.
             </p>
           </div>
 
@@ -129,11 +129,10 @@ const PricingPage = () => {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                className={`relative rounded-[2.5rem] border p-10 transition-all duration-500 overflow-hidden ${
-                  plan.isAvailable 
-                    ? "bg-white border-slate-200 shadow-2xl shadow-slate-200/50 hover:border-blue-300 ring-4 ring-transparent hover:ring-blue-50/50" 
+                className={`relative rounded-[2.5rem] border p-10 transition-all duration-500 overflow-hidden ${plan.isAvailable
+                    ? "bg-white border-slate-200 shadow-2xl shadow-slate-200/50 hover:border-blue-300 ring-4 ring-transparent hover:ring-blue-50/50"
                     : "bg-slate-50/50 border-slate-200 opacity-90 grayscale-[0.3]"
-                }`}
+                  }`}
               >
                 {!plan.isAvailable && (
                   <div className="absolute top-6 right-6 z-20">
@@ -143,7 +142,7 @@ const PricingPage = () => {
                     </div>
                   </div>
                 )}
-                
+
                 {plan.isAvailable && (
                   <div className="absolute top-6 right-6 z-20">
                     <div className="flex items-center gap-1.5 px-4 py-1.5 bg-emerald-500 text-white rounded-full text-[11px] font-black uppercase tracking-wider shadow-lg shadow-emerald-200">
@@ -153,11 +152,10 @@ const PricingPage = () => {
                   </div>
                 )}
 
-                <div className={`w-16 h-16 rounded-[1.25rem] flex items-center justify-center mb-10 shadow-sm ${
-                  plan.color === 'blue' ? 'bg-blue-600 text-white shadow-blue-200' : 
-                  plan.color === 'indigo' ? 'bg-indigo-600 text-white shadow-indigo-200' : 
-                  'bg-slate-900 text-white shadow-slate-200'
-                }`}>
+                <div className={`w-16 h-16 rounded-[1.25rem] flex items-center justify-center mb-10 shadow-sm ${plan.color === 'blue' ? 'bg-blue-600 text-white shadow-blue-200' :
+                    plan.color === 'indigo' ? 'bg-indigo-600 text-white shadow-indigo-200' :
+                      'bg-slate-900 text-white shadow-slate-200'
+                  }`}>
                   <plan.icon className="w-8 h-8" />
                 </div>
 
@@ -166,17 +164,16 @@ const PricingPage = () => {
                   {plan.description}
                 </p>
 
-                <div className="flex items-baseline gap-1 mb-10">
+                <div className={`flex items-baseline gap-1 mb-10 transition-all duration-500 ${!plan.isAvailable ? 'blur-[8px] opacity-40 select-none pointer-events-none' : ''}`}>
                   <span className="text-5xl font-black text-slate-900 tracking-tighter">₦{plan.price}</span>
                   <span className="text-slate-500 font-bold text-lg">/month</span>
                 </div>
 
-                <div className="space-y-5 mb-12">
+                <div className={`space-y-5 mb-12 transition-all duration-500 ${!plan.isAvailable ? 'blur-[3px] opacity-40 select-none pointer-events-none' : ''}`}>
                   {plan.features.map((feature, i) => (
                     <div key={i} className="flex items-start gap-4">
-                      <div className={`mt-1 w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
-                        plan.isAvailable ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-400'
-                      }`}>
+                      <div className={`mt-1 w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${plan.isAvailable ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-400'
+                        }`}>
                         <Check className="w-3 h-4 stroke-[4px]" />
                       </div>
                       <span className={`text-[15px] leading-tight ${plan.isAvailable ? 'text-slate-700 font-bold' : 'text-slate-400 font-medium'}`}>
@@ -188,11 +185,10 @@ const PricingPage = () => {
 
                 <Link
                   to={plan.isAvailable ? "/auth/signup" : "#"}
-                  className={`block w-full py-5 rounded-3xl font-black text-center text-[17px] transition-all duration-300 ${
-                    plan.isAvailable 
-                      ? "bg-slate-900 text-white hover:bg-black shadow-xl shadow-slate-200 hover:shadow-2xl active:scale-[0.98]" 
+                  className={`block w-full py-5 rounded-3xl font-black text-center text-[17px] transition-all duration-300 ${plan.isAvailable
+                      ? "bg-slate-900 text-white hover:bg-black shadow-xl shadow-slate-200 hover:shadow-2xl active:scale-[0.98]"
                       : "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
-                  }`}
+                    }`}
                 >
                   {plan.isAvailable ? "Get Started Now" : "Request Early Access"}
                 </Link>
@@ -216,24 +212,24 @@ const PricingPage = () => {
             <div>
               <h4 className="font-bold text-slate-900 mb-6">Developers</h4>
               <ul className="space-y-4 text-sm text-slate-500">
-                 <li><Link to="/docs" className="hover:text-blue-600 transition-colors">Documentation</Link></li>
-                 <li><a href="#" className="hover:text-blue-600 transition-colors">API Status</a></li>
-                 <li><a href="#" className="hover:text-blue-600 transition-colors">Changelog</a></li>
+                <li><Link to="/docs" className="hover:text-blue-600 transition-colors">Documentation</Link></li>
+                <li><a href="#" className="hover:text-blue-600 transition-colors">API Status</a></li>
+                <li><a href="#" className="hover:text-blue-600 transition-colors">Changelog</a></li>
               </ul>
             </div>
             <div>
               <h4 className="font-bold text-slate-900 mb-6">Company</h4>
               <ul className="space-y-4 text-sm text-slate-500">
-                 <li><Link to="/pricing" className="hover:text-blue-600 transition-colors">Pricing</Link></li>
-                 <li><Link to="/contact-us" className="hover:text-blue-600 transition-colors">Contact</Link></li>
-                 <li><Link to="/terms-of-use" className="hover:text-blue-600 transition-colors">Terms</Link></li>
+                <li><Link to="/pricing" className="hover:text-blue-600 transition-colors">Pricing</Link></li>
+                <li><Link to="/contact-us" className="hover:text-blue-600 transition-colors">Contact</Link></li>
+                <li><Link to="/terms-of-use" className="hover:text-blue-600 transition-colors">Terms</Link></li>
               </ul>
             </div>
           </div>
           <div className="pt-10 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-6">
             <p className="text-slate-400 text-xs font-medium">© 2026 SynchGate Inc. All rights reserved.</p>
             <div className="flex gap-6">
-               <a href="#" className="text-slate-400 hover:text-slate-600 transition-colors"><Globe className="w-5 h-5" /></a>
+              <a href="#" className="text-slate-400 hover:text-slate-600 transition-colors"><Globe className="w-5 h-5" /></a>
             </div>
           </div>
         </div>

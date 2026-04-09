@@ -1,60 +1,3 @@
-import { motion } from "framer-motion";
-import { Sparkles, Clock, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
-
-// The full Billings dashboard implementation is temporarily commented out below.
-// To restore the full dashboard, replace the return statement with the commented-out code.
-
-const Billings = () => {
-  return (
-    <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-6">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="relative"
-      >
-        <div className="absolute -inset-4 bg-blue-100/50 rounded-full blur-2xl opacity-50 animate-pulse"></div>
-        <div className="relative w-24 h-24 bg-white rounded-3xl shadow-xl shadow-blue-100 flex items-center justify-center text-blue-600 mb-8 mx-auto border border-blue-50">
-          <Clock className="w-10 h-10" />
-        </div>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-      >
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold uppercase tracking-wider mb-6 border border-blue-100">
-          <Sparkles className="w-3 h-3" />
-          Feature update in progress
-        </div>
-        <h1 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">Billings Dashboard</h1>
-        <p className="text-xl font-medium text-slate-500 max-w-sm mx-auto leading-relaxed">
-          We're currently refining your billing experience. This page will be available <span className="text-blue-600 font-bold underline underline-offset-4 decoration-blue-200">Coming Soon.</span>
-        </p>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="mt-12"
-      >
-        <Link
-          to="/dashboard"
-          className="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors bg-slate-100 px-6 py-3 rounded-xl border border-slate-200 group"
-        >
-          <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-          Back to Overview
-        </Link>
-      </motion.div>
-    </div>
-  );
-};
-
-/*
-FULL DASHBOARD CODE (COMMENTED OUT):
-
 import {
   CreditCard,
   Download,
@@ -109,6 +52,7 @@ const Billings = () => {
 
   return (
     <div className="max-w-7xl mx-auto space-y-8 pb-12">
+      {/* Header Area */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Billing & Subscription</h1>
@@ -119,20 +63,22 @@ const Billings = () => {
             <Download className="w-4 h-4" />
             Export Data
           </button>
-            <Link 
-              to="/pricing"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm shadow-blue-100 focus:outline-hidden focus:ring-2 focus:ring-blue-400"
-            >
-              <Zap className="w-4 h-4" />
-              Upgrade Plan
-            </Link>
+          <Link
+            to="/pricing"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm shadow-blue-100 focus:outline-hidden focus:ring-2 focus:ring-blue-400"
+          >
+            <Zap className="w-4 h-4" />
+            Upgrade Plan
+          </Link>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column: Plan & Usage */}
         <div className="lg:col-span-2 space-y-8">
+          {/* Subscription Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -144,18 +90,18 @@ const Billings = () => {
                 <div className="absolute top-0 right-0 p-8 opacity-5">
                   <CreditCard className="w-32 h-32 text-slate-900" />
                 </div>
-                
+
                 <div className="relative">
                   <div className="flex items-center gap-2 text-blue-600 mb-4 font-semibold text-sm uppercase tracking-wider">
                     <CheckCircle2 className="w-4 h-4" />
                     Active Subscription
                   </div>
-                  
+
                   <div className="flex items-baseline gap-2 mb-2">
                     <h2 className="text-4xl font-bold text-slate-900">₦{currentPlan.price.toLocaleString()}</h2>
                     <span className="text-slate-500 font-medium">/ {currentPlan.interval}</span>
                   </div>
-                  
+
                   <p className="text-slate-600 mb-6 max-w-md leading-relaxed">
                     You are currently on the <span className="font-bold text-slate-900">{currentPlan.name}</span> plan. Your next billing date is <span className="text-slate-900 font-medium">April 15, 2024</span>.
                   </p>
@@ -174,7 +120,7 @@ const Billings = () => {
                   </div>
 
                   <div className="flex gap-4 pt-6 border-t border-slate-100">
-                    <Link 
+                    <Link
                       to="/pricing"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -200,7 +146,7 @@ const Billings = () => {
                     You're currently using the default pay-as-you-go model. Subscribe to unlock analytics and other premium features.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 w-full">
-                    <Link 
+                    <Link
                       to="/pricing"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -217,6 +163,7 @@ const Billings = () => {
             )}
           </motion.div>
 
+          {/* Usage Chart */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -284,6 +231,7 @@ const Billings = () => {
             </div>
           </motion.div>
 
+          {/* Transactions Table */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -338,7 +286,9 @@ const Billings = () => {
           </motion.div>
         </div>
 
+        {/* Right Column: Invoices & History */}
         <div className="space-y-8">
+          {/* Invoices */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -374,6 +324,7 @@ const Billings = () => {
             </button>
           </motion.div>
 
+          {/* Billing History / Events */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -407,6 +358,7 @@ const Billings = () => {
             </div>
           </motion.div>
 
+          {/* Support Widget */}
           <div className="bg-blue-50 rounded-2xl p-6 border border-blue-100">
             <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-600 mb-4">
               <AlertCircle className="w-6 h-6" />
@@ -415,7 +367,7 @@ const Billings = () => {
             <p className="text-sm text-slate-600 mb-4">
               Schedule a call with our accounts team for custom enterprise pricing or to resolve invoice issues.
             </p>
-            <Link 
+            <Link
               to="/dashboard/support-ticket"
               className="w-full py-2.5 bg-white text-blue-600 text-sm font-bold rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors flex items-center justify-center"
             >
@@ -427,6 +379,5 @@ const Billings = () => {
     </div>
   );
 };
-*/
 
 export default Billings;
