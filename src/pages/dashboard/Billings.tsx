@@ -19,6 +19,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   subscriptionPlans,
@@ -28,18 +29,36 @@ import {
   billingHistory,
 } from "../../data/billingData";
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label, chartMode }: any) => {
   if (active && payload && payload.length) {
+    const data = payload[0].payload;
     return (
-      <div className="bg-white p-4 rounded-xl shadow-xl border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-white p-4 rounded-xl shadow-xl border border-slate-100 animate-in fade-in zoom-in-95 duration-200 min-w-[160px]">
         <p className="text-sm font-bold text-slate-900 mb-2">{label}</p>
-        <div className="space-y-1">
-          <p className="text-xs font-medium text-emerald-600 flex items-center justify-between gap-4">
-            Successful Tx: <span className="font-bold">{payload[0].payload.successful.toLocaleString()}</span>
-          </p>
-          <p className="text-xs font-medium text-rose-600 flex items-center justify-between gap-4">
-            Failed Tx: <span className="font-bold">{payload[0].payload.failed.toLocaleString()}</span>
-          </p>
+        <div className="space-y-1.5">
+          {chartMode === 'revenue' ? (
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-xs font-medium text-slate-500">Revenue</span>
+              <span className="text-sm font-bold text-blue-600">
+                ₦{data.cost?.toLocaleString()}
+              </span>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-xs font-medium text-slate-500">Successful</span>
+                <span className="text-sm font-bold text-emerald-600">
+                  {data.successful?.toLocaleString()}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-xs font-medium text-slate-500">Failed</span>
+                <span className="text-sm font-bold text-rose-600">
+                  {data.failed?.toLocaleString()}
+                </span>
+              </div>
+            </>
+          )}
         </div>
       </div>
     );
@@ -49,6 +68,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 const Billings = () => {
   const currentPlan = subscriptionPlans.find((p) => p.isCurrent) || null;
+  const [activeChartTab, setActiveChartTab] = useState<'volume' | 'revenue'>('volume');
 
   return (
     <div className="max-w-7xl mx-auto space-y-8 pb-12">
@@ -152,7 +172,7 @@ const Billings = () => {
                       rel="noopener noreferrer"
                       className="flex-1 px-6 py-2.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all shadow-md shadow-blue-100 hover:shadow-lg focus:outline-hidden focus:ring-2 focus:ring-blue-400 flex items-center justify-center"
                     >
-                      View Available Plans
+                      View Plans
                     </Link>
                     <button className="flex-1 px-6 py-2.5 bg-white text-slate-700 font-bold rounded-xl border border-slate-200 hover:bg-slate-50 transition-all focus:outline-hidden focus:ring-2 focus:ring-slate-200">
                       Learn More
@@ -176,8 +196,26 @@ const Billings = () => {
                 <p className="text-sm text-slate-500">Real-time accumulation of successful and failed transactions.</p>
               </div>
               <div className="flex items-center gap-2 bg-slate-50 p-1 rounded-lg border border-slate-100">
-                <button className="px-3 py-1 text-xs font-medium bg-white text-slate-900 rounded shadow-sm border border-slate-200">Volume</button>
-                <button className="px-3 py-1 text-xs font-medium text-slate-600 hover:text-slate-900 transition-colors">Revenue</button>
+                <button 
+                  onClick={() => setActiveChartTab('volume')}
+                  className={`px-3 py-1 text-xs font-medium rounded transition-all ${
+                    activeChartTab === 'volume' 
+                      ? "bg-white text-slate-900 shadow-sm border border-slate-200" 
+                      : "text-slate-500 hover:text-slate-900"
+                  }`}
+                >
+                  Volume
+                </button>
+                <button 
+                  onClick={() => setActiveChartTab('revenue')}
+                  className={`px-3 py-1 text-xs font-medium rounded transition-all ${
+                    activeChartTab === 'revenue' 
+                      ? "bg-white text-slate-900 shadow-sm border border-slate-200" 
+                      : "text-slate-500 hover:text-slate-900"
+                  }`}
+                >
+                  Revenue
+                </button>
               </div>
             </div>
 
@@ -199,11 +237,11 @@ const Billings = () => {
                     dx={-10}
                   />
                   <Tooltip
-                    content={<CustomTooltip />}
+                    content={<CustomTooltip chartMode={activeChartTab} />}
                     cursor={{ fill: '#F8FAFC' }}
                   />
                   <Bar
-                    dataKey="successful"
+                    dataKey={activeChartTab === 'volume' ? 'successful' : 'cost'}
                     radius={[6, 6, 6, 6]}
                     barSize={40}
                   >

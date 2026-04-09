@@ -152,7 +152,7 @@ function Transactions() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
+          <div className="relative w-full sm:w-64 shrink-0">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
@@ -249,7 +249,7 @@ function Transactions() {
                   <th className="px-6 py-4 font-medium text-center">Route</th>
                   <th className="px-6 py-4 font-medium">Status</th>
                   {/* <th className="px-6 py-4 font-medium">Reason</th> */}
-                  <th className="px-6 py-4 font-medium text-right">Time</th>
+                  <th className="px-6 py-4 font-medium text-left">Date & Time</th>
                   <th className="px-6 py-4 font-medium"></th>
                 </tr>
               </thead>
@@ -274,11 +274,10 @@ function Transactions() {
                         {tx.channel || "-"}
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                          (tx.route_type || "basic").toLowerCase() === "auto" 
-                            ? "bg-indigo-100 text-indigo-700 border border-indigo-200" 
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${(tx.route_type || "basic").toLowerCase() === "auto"
+                            ? "bg-indigo-100 text-indigo-700 border border-indigo-200"
                             : "bg-slate-100 text-slate-600 border border-slate-200"
-                        }`}>
+                          }`}>
                           {(tx.route_type || "basic").toLowerCase() === "auto" ? <Zap className="w-2.5 h-2.5" /> : <GitBranch className="w-2.5 h-2.5" />}
                           {tx.route_type || "Basic"}
                         </span>
@@ -289,7 +288,7 @@ function Transactions() {
                       {/* <td className="px-6 py-4 text-slate-500 text-xs">
                         {tx.message || "-"}
                       </td> */}
-                      <td className="px-6 py-4 text-slate-500 text-right whitespace-nowrap">
+                      <td className="px-6 py-4 text-slate-500 text-left whitespace-nowrap">
                         {formatDate(tx.created_at)}
                       </td>
                       <td className="px-6 py-4 text-right">
