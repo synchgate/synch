@@ -214,6 +214,7 @@ function Transactions() {
               selectedRoute !== "All Routes" ||
               searchTerm) && (
               <button
+                type="button"
                 onClick={() => {
                   setStartDate("");
                   setEndDate("");
@@ -303,6 +304,7 @@ function Transactions() {
                       </td>
                       <td className="px-6 py-4 text-right">
                         <button
+                          type="button"
                           onClick={() => setSelectedTx(tx)}
                           className="text-xs font-medium text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:underline"
                         >
@@ -332,12 +334,16 @@ function Transactions() {
           </span>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               className="p-1 rounded bg-white border border-slate-200 text-slate-400 hover:text-slate-600 shadow-sm cursor-pointer disabled:opacity-50"
               disabled
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <button className="p-1 rounded bg-white border border-slate-200 text-slate-600 hover:text-slate-900 shadow-sm cursor-pointer">
+            <button
+              type="button"
+              className="p-1 rounded bg-white border border-slate-200 text-slate-600 hover:text-slate-900 shadow-sm cursor-pointer"
+            >
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
@@ -348,9 +354,11 @@ function Transactions() {
       {selectedTx && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"
+          <button
+            type="button"
+            className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity w-full h-full border-none p-0 m-0"
             onClick={() => setSelectedTx(null)}
+            aria-label="Close modal"
           />
 
           {/* Modal */}
@@ -366,6 +374,7 @@ function Transactions() {
                 </p>
               </div>
               <button
+                type="button"
                 onClick={() => setSelectedTx(null)}
                 className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
               >
@@ -500,6 +509,7 @@ function Transactions() {
                     Provider Response (Raw)
                   </h3>
                   <button
+                    type="button"
                     onClick={() =>
                       navigator.clipboard.writeText(
                         JSON.stringify(

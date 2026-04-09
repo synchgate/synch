@@ -66,10 +66,14 @@ export default function ContactUs() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="flex flex-col gap-2">
-                    <label className="text-[13px] font-semibold text-slate-800 tracking-wide">
+                    <label
+                      htmlFor="businessEmail"
+                      className="text-[13px] font-semibold text-slate-800 tracking-wide"
+                    >
                       Business Email *
                     </label>
                     <input
+                      id="businessEmail"
                       type="email"
                       name="businessEmail"
                       value={form.businessEmail}
@@ -79,10 +83,14 @@ export default function ContactUs() {
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <label className="text-[13px] font-semibold text-slate-800 tracking-wide">
+                    <label
+                      htmlFor="firstName"
+                      className="text-[13px] font-semibold text-slate-800 tracking-wide"
+                    >
                       First Name *
                     </label>
                     <input
+                      id="firstName"
                       type="text"
                       name="firstName"
                       value={form.firstName}
@@ -92,10 +100,14 @@ export default function ContactUs() {
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <label className="text-[13px] font-semibold text-slate-800 tracking-wide">
+                    <label
+                      htmlFor="lastName"
+                      className="text-[13px] font-semibold text-slate-800 tracking-wide"
+                    >
                       Last Name *
                     </label>
                     <input
+                      id="lastName"
                       type="text"
                       name="lastName"
                       value={form.lastName}
@@ -105,10 +117,14 @@ export default function ContactUs() {
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <label className="text-[13px] font-semibold text-slate-800 tracking-wide">
+                    <label
+                      htmlFor="company"
+                      className="text-[13px] font-semibold text-slate-800 tracking-wide"
+                    >
                       Company *
                     </label>
                     <input
+                      id="company"
                       type="text"
                       name="company"
                       value={form.company}
@@ -120,11 +136,15 @@ export default function ContactUs() {
                 </div>
 
                 <div className="flex flex-col gap-2 pt-2">
-                  <label className="text-[13px] font-semibold text-slate-800 tracking-wide">
+                  <label
+                    htmlFor="product"
+                    className="text-[13px] font-semibold text-slate-800 tracking-wide"
+                  >
                     Product You're Interested In *
                   </label>
                   <div className="relative">
                     <select
+                      id="product"
                       name="product"
                       value={form.product}
                       onChange={handleChange}
@@ -145,7 +165,10 @@ export default function ContactUs() {
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
+                        role="img"
+                        aria-labelledby="select-icon-title"
                       >
+                        <title id="select-icon-title">Dropdown icon</title>
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -158,10 +181,14 @@ export default function ContactUs() {
                 </div>
 
                 <div className="flex flex-col gap-2 pt-2">
-                  <label className="text-[13px] font-semibold text-slate-800 tracking-wide">
+                  <label
+                    htmlFor="details"
+                    className="text-[13px] font-semibold text-slate-800 tracking-wide"
+                  >
                     Give us details on your interest in SynchGate. *
                   </label>
                   <textarea
+                    id="details"
                     name="details"
                     value={form.details}
                     onChange={handleChange}

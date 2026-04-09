@@ -159,8 +159,8 @@ const Pricing = () => {
             </div>
 
             <div className="space-y-4 mb-10">
-              {plan.features.map((feature, i) => (
-                <div key={i} className="flex items-start gap-3">
+              {plan.features.map((feature) => (
+                <div key={feature} className="flex items-start gap-3">
                   <div
                     className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
                       plan.isAvailable
@@ -180,6 +180,7 @@ const Pricing = () => {
             </div>
 
             <button
+              type="button"
               disabled={!plan.isAvailable}
               className={`w-full py-4 rounded-2xl font-bold text-lg transition-all duration-300 shadow-lg ${
                 plan.isAvailable
@@ -259,11 +260,17 @@ const Pricing = () => {
             </div>
           </div>
           <div className="flex gap-4 border-t border-slate-100 pt-6 mt-auto">
-            <button className="text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors">
+            <button
+              type="button"
+              className="text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors"
+            >
               Update Method
             </button>
             <div className="w-px h-4 bg-slate-200 my-auto"></div>
-            <button className="text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors">
+            <button
+              type="button"
+              className="text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors"
+            >
               Manage Subscriptions
             </button>
           </div>

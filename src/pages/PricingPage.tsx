@@ -183,8 +183,8 @@ const PricingPage = () => {
                 </div>
 
                 <div className="space-y-5 mb-12 flex-1">
-                  {plan.features.map((feature, i) => (
-                    <div key={i} className="flex items-start gap-4">
+                  {plan.features.map((feature) => (
+                    <div key={feature} className="flex items-start gap-4">
                       <div
                         className={`mt-1 w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
                           plan.color === "emerald"

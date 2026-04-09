@@ -77,7 +77,10 @@ function ResetPassword() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-slate-700 mb-2"
+          >
             New Password
           </label>
           <div className="relative">
@@ -85,6 +88,7 @@ function ResetPassword() {
               <Lock className="h-5 w-5 text-slate-400" />
             </div>
             <input
+              id="password"
               type={showPassword ? "text" : "password"}
               required
               value={password}
@@ -110,7 +114,10 @@ function ResetPassword() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+          <label
+            htmlFor="confirmPassword"
+            className="block text-sm font-medium text-slate-700 mb-2"
+          >
             Confirm Password
           </label>
           <div className="relative">
@@ -118,6 +125,7 @@ function ResetPassword() {
               <Lock className="h-5 w-5 text-slate-400" />
             </div>
             <input
+              id="confirmPassword"
               type={showConfirmPassword ? "text" : "password"}
               required
               value={confirmPassword}

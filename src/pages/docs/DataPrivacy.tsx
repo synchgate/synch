@@ -81,9 +81,9 @@ function DataPrivacy() {
           "Generating transaction analytics",
           "Maintaining system reliability and monitoring",
           "Detecting suspicious or abusive activity",
-        ].map((purpose, i) => (
+        ].map((purpose) => (
           <li
-            key={i}
+            key={purpose}
             className="flex items-center gap-3 text-slate-700 text-lg"
           >
             <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
@@ -126,9 +126,9 @@ function DataPrivacy() {
           "Access to personal data",
           "Correction of inaccuracies",
           "Request for deletion",
-        ].map((right, i) => (
+        ].map((right) => (
           <span
-            key={i}
+            key={right}
             className="px-4 py-2 bg-slate-100 rounded-full text-slate-700 font-medium border border-slate-200"
           >
             {right}

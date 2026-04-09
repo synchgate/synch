@@ -137,6 +137,7 @@ function Settings() {
             return (
               <button
                 key={tab.id}
+                type="button"
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap cursor-pointer
                                     ${
@@ -187,10 +188,14 @@ function Settings() {
 
                       <div className="grid sm:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="firstName"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             First Name
                           </label>
                           <input
+                            id="firstName"
                             type="text"
                             value={firstName}
                             readOnly
@@ -198,10 +203,14 @@ function Settings() {
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="lastName"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             Last Name
                           </label>
                           <input
+                            id="lastName"
                             type="text"
                             value={lastName}
                             readOnly
@@ -209,10 +218,14 @@ function Settings() {
                           />
                         </div>
                         <div className="sm:col-span-2">
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="emailAddress"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             Email Address
                           </label>
                           <input
+                            id="emailAddress"
                             type="email"
                             value={emailAddress}
                             readOnly
@@ -241,10 +254,14 @@ function Settings() {
                     <div className="p-6">
                       <div className="grid sm:grid-cols-2 gap-6">
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="businessName"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             Business Name
                           </label>
                           <input
+                            id="businessName"
                             type="text"
                             value={businessForm.business_name}
                             readOnly
@@ -252,10 +269,14 @@ function Settings() {
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="businessEmail"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             Business Email
                           </label>
                           <input
+                            id="businessEmail"
                             type="email"
                             value={businessForm.business_email}
                             readOnly
@@ -263,10 +284,14 @@ function Settings() {
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="businessPhone"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             Business Phone
                           </label>
                           <input
+                            id="businessPhone"
                             type="tel"
                             value={businessForm.business_phone}
                             readOnly
@@ -274,10 +299,14 @@ function Settings() {
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="businessType"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             Business Type
                           </label>
                           <input
+                            id="businessType"
                             type="text"
                             value={businessForm.business_type}
                             onChange={(e) =>
@@ -291,10 +320,14 @@ function Settings() {
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="website"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             Website
                           </label>
                           <input
+                            id="website"
                             type="url"
                             value={businessForm.website}
                             onChange={(e) =>
@@ -308,10 +341,14 @@ function Settings() {
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="registrationNumber"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             Registration Number
                           </label>
                           <input
+                            id="registrationNumber"
                             type="text"
                             value={businessForm.registration_number}
                             onChange={(e) =>
@@ -325,10 +362,14 @@ function Settings() {
                           />
                         </div>
                         <div className="sm:col-span-2">
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="address"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             Address
                           </label>
                           <input
+                            id="address"
                             type="text"
                             value={businessForm.address}
                             onChange={(e) =>
@@ -342,10 +383,14 @@ function Settings() {
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="country"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             Country
                           </label>
                           <select
+                            id="country"
                             value={businessForm.country}
                             onChange={(e) =>
                               setBusinessForm({
@@ -364,10 +409,14 @@ function Settings() {
                           </select>
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label
+                            htmlFor="stateProvince"
+                            className="block text-sm font-medium text-slate-700 mb-2"
+                          >
                             State/Province
                           </label>
                           <input
+                            id="stateProvince"
                             type="text"
                             value={businessForm.state}
                             onChange={(e) =>
@@ -397,6 +446,7 @@ function Settings() {
                       )}
                       <div className="ml-auto">
                         <button
+                          type="button"
                           onClick={() => updateMerchant(businessForm)}
                           disabled={isUpdatingBusiness}
                           className="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors shadow-sm shadow-blue-500/20 text-sm flex items-center gap-2 cursor-pointer"

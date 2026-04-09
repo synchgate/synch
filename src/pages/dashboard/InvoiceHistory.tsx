@@ -116,7 +116,10 @@ function InvoiceHistory() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="p-2 text-slate-400 hover:text-blue-600 transition-colors">
+                    <button
+                      type="button"
+                      className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
+                    >
                       <Eye className="w-5 h-5" />
                     </button>
                   </td>
@@ -136,6 +139,14 @@ function InvoiceHistory() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSelectedInvoice(null)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  setSelectedInvoice(null);
+                }
+              }}
+              role="button"
+              tabIndex={0}
+              aria-label="Close modal"
               className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
             />
 
@@ -143,7 +154,7 @@ function InvoiceHistory() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-4xl bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-full"
+              className="relative w-full max-w-4xl bg-white rounded-4xl shadow-2xl overflow-hidden flex flex-col max-h-full"
             >
               {/* Modal Header */}
               <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white sticky top-0 z-20">
@@ -160,6 +171,7 @@ function InvoiceHistory() {
                 </div>
                 <div className="flex items-center gap-2">
                   <button
+                    type="button"
                     onClick={handlePrint}
                     className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all border border-slate-200"
                   >
@@ -167,6 +179,7 @@ function InvoiceHistory() {
                     Print / PDF
                   </button>
                   <button
+                    type="button"
                     onClick={() => setSelectedInvoice(null)}
                     className="p-2 text-slate-400 hover:text-slate-600 transition-colors"
                   >
@@ -270,8 +283,8 @@ function InvoiceHistory() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
-                        {selectedInvoice.items.map((item, index) => (
-                          <tr key={index}>
+                        {selectedInvoice.items.map((item) => (
+                          <tr key={item.description}>
                             <td className="py-6 pr-4">
                               <p className="font-bold text-slate-900 text-sm">
                                 {item.description}
@@ -338,12 +351,14 @@ function InvoiceHistory() {
               {/* Modal Footer (Hidden on print) */}
               <div className="px-8 py-6 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3 shrink-0 print:hidden">
                 <button
+                  type="button"
                   onClick={() => setSelectedInvoice(null)}
                   className="px-6 py-2 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors"
                 >
                   Close
                 </button>
                 <button
+                  type="button"
                   onClick={handlePrint}
                   className="px-6 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 transition-all shadow-md shadow-blue-200 flex items-center gap-2"
                 >

@@ -52,6 +52,7 @@ const SupportTicket = () => {
             get back to you within 24 hours.
           </p>
           <button
+            type="button"
             onClick={() => navigate("/dashboard/billings")}
             className="px-8 py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all shadow-lg"
           >
@@ -168,6 +169,7 @@ const SupportTicket = () => {
             {/* Submit Button */}
             <div className="pt-4">
               <button
+                type="submit"
                 disabled={isSubmitting}
                 className="w-full md:w-auto px-10 py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed group"
               >

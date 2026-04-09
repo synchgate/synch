@@ -194,9 +194,9 @@ function Overview() {
             color: "text-emerald-600",
             up: true,
           },
-        ].map((stat, i) => (
+        ].map((stat) => (
           <div
-            key={i}
+            key={stat.label}
             onClick={() => navigate("/dashboard/transactions")}
             className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm flex flex-col justify-between cursor-pointer hover:border-blue-300 hover:shadow-md transition-all group"
           >
@@ -234,6 +234,7 @@ function Overview() {
             {/* Year Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
+                type="button"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 hover:border-slate-300 transition-all cursor-pointer"
               >
@@ -248,6 +249,7 @@ function Overview() {
                   {years.map((year) => (
                     <button
                       key={year}
+                      type="button"
                       onClick={() => {
                         setSelectedYear(year);
                         setIsDropdownOpen(false);
@@ -344,7 +346,7 @@ function Overview() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {provider_performance?.length > 0 ? (
-                  provider_performance.map((provider: any, idx: number) => {
+                  provider_performance.map((provider: any) => {
                     const name =
                       provider.provider ||
                       provider.provider_name ||
@@ -365,9 +367,11 @@ function Overview() {
                       StatusIcon = Clock;
                     }
 
+                    const providerKey = provider.id || name;
+
                     return (
                       <tr
-                        key={idx}
+                        key={providerKey}
                         className="hover:bg-slate-50 transition-colors"
                       >
                         <td className="px-4 py-3 font-medium text-slate-900 capitalize">

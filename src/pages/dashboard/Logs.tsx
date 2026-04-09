@@ -59,9 +59,9 @@ function Logs() {
               { icon: Search, label: "Advanced Search" },
               { icon: Database, label: "Raw Payloads" },
               { icon: ShieldAlert, label: "Error Tracing" },
-            ].map((item, i) => (
+            ].map((item) => (
               <div
-                key={i}
+                key={item.label}
                 className="flex flex-col items-center gap-2 p-3 rounded-xl bg-slate-50 border border-slate-200"
               >
                 <div className="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center">

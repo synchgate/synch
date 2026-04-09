@@ -124,7 +124,10 @@ function Signup() {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label
+              htmlFor="first_name"
+              className="block text-sm font-medium text-slate-700 mb-2"
+            >
               First Name
             </label>
             <div className="relative">
@@ -132,6 +135,7 @@ function Signup() {
                 <User className="h-5 w-5 text-slate-400" />
               </div>
               <input
+                id="first_name"
                 type="text"
                 name="first_name"
                 value={formData.first_name}
@@ -143,7 +147,10 @@ function Signup() {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label
+              htmlFor="last_name"
+              className="block text-sm font-medium text-slate-700 mb-2"
+            >
               Last Name
             </label>
             <div className="relative">
@@ -151,6 +158,7 @@ function Signup() {
                 <User className="h-5 w-5 text-slate-400" />
               </div>
               <input
+                id="last_name"
                 type="text"
                 name="last_name"
                 value={formData.last_name}
@@ -165,7 +173,10 @@ function Signup() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label
+              htmlFor="business_name"
+              className="block text-sm font-medium text-slate-700 mb-2"
+            >
               Business Name
             </label>
             <div className="relative">
@@ -173,6 +184,7 @@ function Signup() {
                 <Briefcase className="h-5 w-5 text-slate-400" />
               </div>
               <input
+                id="business_name"
                 type="text"
                 name="business_name"
                 value={formData.business_name}
@@ -185,7 +197,10 @@ function Signup() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label
+              htmlFor="business_phone"
+              className="block text-sm font-medium text-slate-700 mb-2"
+            >
               Business Phone
             </label>
             <div className="relative">
@@ -193,6 +208,7 @@ function Signup() {
                 <Phone className="h-5 w-5 text-slate-400" />
               </div>
               <input
+                id="business_phone"
                 type="tel"
                 name="business_phone"
                 value={formData.business_phone}
@@ -206,7 +222,10 @@ function Signup() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-slate-700 mb-2"
+          >
             Email Address
           </label>
           <div className="relative">
@@ -214,6 +233,7 @@ function Signup() {
               <Mail className="h-5 w-5 text-slate-400" />
             </div>
             <input
+              id="email"
               type="email"
               name="email"
               value={formData.email}
@@ -226,7 +246,10 @@ function Signup() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-slate-700 mb-2"
+          >
             Password
           </label>
           <div className="relative">
@@ -234,6 +257,7 @@ function Signup() {
               <Lock className="h-5 w-5 text-slate-400" />
             </div>
             <input
+              id="password"
               type={showPassword ? "text" : "password"}
               name="password"
               value={formData.password}

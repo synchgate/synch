@@ -42,9 +42,9 @@ function PCICompliance() {
           "Vulnerability management",
           "Monitoring and logging",
           "Regular security testing",
-        ].map((item, i) => (
+        ].map((item) => (
           <li
-            key={i}
+            key={item}
             className="flex items-center gap-2 text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100"
           >
             <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
@@ -71,8 +71,8 @@ function PCICompliance() {
             "Card data does not pass through merchant servers",
             "Card details are not stored within SynchGate systems",
             "Payment providers handle PCI-sensitive processing",
-          ].map((benefit, i) => (
-            <li key={i} className="flex items-start gap-3 text-slate-700">
+          ].map((benefit) => (
+            <li key={benefit} className="flex items-start gap-3 text-slate-700">
               <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
                 <div className="w-2 h-2 rounded-full bg-emerald-600" />
               </div>
@@ -105,9 +105,9 @@ function PCICompliance() {
           "Restricted internal access to infrastructure",
           "Monitoring and logging of API activity",
           "Rate limiting and abuse protection",
-        ].map((control, i) => (
+        ].map((control) => (
           <li
-            key={i}
+            key={control}
             className="flex items-center gap-3 text-slate-600 py-2 border-b border-slate-100 last:border-0"
           >
             <ArrowRight className="w-4 h-4 text-blue-500" />
@@ -129,9 +129,9 @@ function PCICompliance() {
           "Enhanced security auditing",
           "Infrastructure penetration testing",
           "Expanded compliance programs",
-        ].map((item, i) => (
+        ].map((item) => (
           <div
-            key={i}
+            key={item}
             className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm font-medium text-slate-800"
           >
             {item}

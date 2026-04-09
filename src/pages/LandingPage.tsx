@@ -168,7 +168,7 @@ function LandingPage() {
                     },
                   ].map((feature, i) => (
                     <motion.div
-                      key={i}
+                      key={feature.title}
                       initial={{ opacity: 0, x: 20 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
@@ -210,9 +210,9 @@ function LandingPage() {
                     key={set}
                     className="flex items-center gap-16 md:gap-32 px-8 md:px-16 shrink-0"
                   >
-                    {PROVIDERS.map((logo, idx) => (
+                    {PROVIDERS.map((logo) => (
                       <img
-                        key={idx}
+                        key={logo.alt}
                         src={logo.src}
                         alt={logo.alt}
                         className={`${logo.size} object-contain brightness-0 opacity-40 hover:brightness-100 hover:opacity-100 transition-all duration-300`}
@@ -321,7 +321,7 @@ function LandingPage() {
                     },
                   ].map((step, i) => (
                     <motion.div
-                      key={i}
+                      key={step.title}
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
@@ -410,7 +410,7 @@ function LandingPage() {
                   },
                 ].map((item, i) => (
                   <motion.div
-                    key={i}
+                    key={item.title}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -464,7 +464,7 @@ function LandingPage() {
                   },
                 ].map((faq, i) => (
                   <motion.div
-                    key={i}
+                    key={faq.q}
                     initial={{ opacity: 0, y: 10 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -472,6 +472,7 @@ function LandingPage() {
                     className="border border-slate-200 rounded-2xl overflow-hidden bg-white"
                   >
                     <button
+                      type="button"
                       onClick={() => setActiveFaq(activeFaq === i ? null : i)}
                       className="w-full flex items-center justify-between p-6 text-left hover:bg-slate-50 transition-colors"
                     >

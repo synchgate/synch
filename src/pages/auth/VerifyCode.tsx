@@ -129,19 +129,20 @@ function VerifyCode() {
 
       <form onSubmit={handleSubmit} className="space-y-8">
         <div className="flex justify-center gap-2 sm:gap-4">
-          {code.map((digit, index) => (
+          {[0, 1, 2, 3, 4, 5].map((index) => (
             <input
-              key={index}
+              key={`otp-box-${index}`}
               ref={(el) => {
                 inputRefs.current[index] = el;
               }}
               type="text"
               inputMode="numeric"
               maxLength={1}
-              value={digit}
+              value={code[index]}
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               onPaste={handlePaste}
+              aria-label={`Digit ${index + 1}`}
               className="w-10 h-12 sm:w-12 sm:h-14 text-center text-xl font-semibold border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-slate-50 text-slate-900 transition-colors"
             />
           ))}
@@ -173,7 +174,10 @@ function VerifyCode() {
 
       <div className="mt-8 text-center text-sm text-slate-600">
         Didn't receive the email?{" "}
-        <button className="font-semibold text-blue-600 hover:text-blue-500 cursor-pointer">
+        <button
+          type="button"
+          className="font-semibold text-blue-600 hover:text-blue-500 cursor-pointer"
+        >
           Click to resend
         </button>
       </div>

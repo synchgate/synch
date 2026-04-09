@@ -108,6 +108,14 @@ function Dashboard() {
         <div
           className="fixed inset-0 bg-slate-900/50 z-40 lg:hidden backdrop-blur-sm"
           onClick={() => setIsSidebarOpen(false)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              setIsSidebarOpen(false);
+            }
+          }}
+          role="button"
+          tabIndex={0}
+          aria-label="Close sidebar"
         ></div>
       )}
 
@@ -126,6 +134,7 @@ function Dashboard() {
             </p>
             <div className="flex gap-3 justify-center">
               <button
+                type="button"
                 onClick={() => setShowKycPopup(false)}
                 className="px-4 py-2 bg-slate-100 text-slate-700 font-medium rounded-lg hover:bg-slate-200 transition-colors cursor-pointer text-sm"
               >
@@ -157,12 +166,14 @@ function Dashboard() {
             </p>
             <div className="flex gap-3 justify-center">
               <button
+                type="button"
                 onClick={() => setShowLogoutPopup(false)}
                 className="flex-1 px-4 py-2 bg-slate-100 text-slate-700 font-medium rounded-lg hover:bg-slate-200 transition-colors cursor-pointer text-sm"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={confirmLogout}
                 className="flex-1 px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors shadow-sm cursor-pointer text-sm"
               >
@@ -192,6 +203,7 @@ function Dashboard() {
             </span> */}
           </Link>
           <button
+            type="button"
             className="ml-auto lg:hidden text-slate-500 hover:text-slate-900"
             onClick={() => setIsSidebarOpen(false)}
           >
@@ -284,6 +296,7 @@ function Dashboard() {
               <Settings className="w-5 h-5 text-slate-400" /> Settings
             </Link>
             <button
+              type="button"
               onClick={handleLogout}
               className="w-full flex items-center gap-3 px-3 py-2 text-slate-600 font-medium rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer"
             >
@@ -298,6 +311,7 @@ function Dashboard() {
         {/* Top Header */}
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 lg:px-8 z-10 shrink-0">
           <button
+            type="button"
             className="lg:hidden text-slate-500 hover:text-slate-900 mr-4"
             onClick={() => setIsSidebarOpen(true)}
           >
@@ -315,6 +329,7 @@ function Dashboard() {
                 Test
               </span>
               <button
+                type="button"
                 onClick={handleToggleMode}
                 disabled={isTogglingMode}
                 className={`relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-colors ${isTogglingMode ? "cursor-wait opacity-80" : "cursor-pointer"} focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${
@@ -345,7 +360,10 @@ function Dashboard() {
               </span>
             </div>
 
-            <button className="text-slate-400 hover:text-slate-600 transition-colors relative cursor-pointer">
+            <button
+              type="button"
+              className="text-slate-400 hover:text-slate-600 transition-colors relative cursor-pointer"
+            >
               <Bell className="w-5 h-5" />
               <span className="absolute top-0 right-0 w-2 h-2 bg-blue-600 rounded-full border border-white"></span>
             </button>
