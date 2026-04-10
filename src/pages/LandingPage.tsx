@@ -10,7 +10,6 @@ import {
   Plus,
   ShieldCheck,
   ShoppingBag,
-  Terminal,
   TrendingUp,
   UserPlus,
   Zap,
@@ -25,6 +24,7 @@ import paystackLogo from "../assets/brands/paystack.png";
 import businessOwners from "../assets/business-owners.png";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
+import DemoModal from "../components/DemoModal";
 
 type Provider = { src: string; alt: string; size: string };
 
@@ -46,6 +46,7 @@ const PROVIDERS: Provider[] = [
 
 function LandingPage() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-500/30 overflow-hidden relative">
@@ -102,19 +103,18 @@ function LandingPage() {
               transition={{ duration: 0.5, delay: 0.3 }}
               className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto px-4 sm:px-0"
             >
-              <Link
-                to="/auth/signup"
+              <button
+                onClick={() => setIsDemoModalOpen(true)}
                 className="w-full sm:w-auto h-12 inline-flex items-center justify-center rounded-lg bg-blue-600 px-8 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition-all hover:bg-blue-700 hover:shadow-blue-500/50 cursor-pointer"
               >
-                Start Building Free
-              </Link>
+                See a demo
+              </button>
               <Link
-                to="/docs"
-                rel="noopener noreferrer"
+                to="/auth/signup"
                 className="w-full sm:w-auto h-12 inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-8 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 hover:border-slate-400 cursor-pointer"
               >
-                <Terminal className="w-4 h-4 mr-2" />
-                Read the Docs
+                <UserPlus className="w-4 h-4 mr-2" />
+                Create an account
               </Link>
             </motion.div>
           </section>
@@ -537,6 +537,11 @@ function LandingPage() {
       </main>
 
       <Footer />
+      
+      <DemoModal
+        isOpen={isDemoModalOpen}
+        onClose={() => setIsDemoModalOpen(false)}
+      />
     </div>
   );
 }
