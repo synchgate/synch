@@ -1,17 +1,19 @@
 import { useState } from "react";
+import { contactService } from "../services/contact";
 import contactHero from "../assets/contact_us_hero.png";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
+import { CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 
 export default function ContactUs() {
   const [form, setForm] = useState({
+    fullName: "",
     businessEmail: "",
-    firstName: "",
-    lastName: "",
-    company: "",
-    product: "",
+    phone: "",
     details: "",
   });
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -22,18 +24,34 @@ export default function ContactUs() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Contact form submitted", form);
-    alert("Thank you for reaching out! We'll get back to you soon.");
-    setForm({
-      businessEmail: "",
-      firstName: "",
-      lastName: "",
-      company: "",
-      product: "",
-      details: "",
-    });
+    setStatus("loading");
+    setErrorMessage("");
+
+    try {
+      await contactService.submitContact({
+        name: form.fullName,
+        email: form.businessEmail,
+        phone: form.phone,
+        message: form.details,
+        contact_me: true,
+      });
+      setStatus("success");
+      setForm({
+        fullName: "",
+        businessEmail: "",
+        phone: "",
+        details: "",
+      });
+    } catch (error: any) {
+      console.error("Contact form error:", error);
+      setStatus("error");
+      setErrorMessage(
+        error.response?.data?.message || 
+        "Something went wrong. Please try again later."
+      );
+    }
   };
 
   return (
@@ -63,122 +81,94 @@ export default function ContactUs() {
           {/* Right Column - Form Container */}
           <div className="w-full lg:w-1/2 flex">
             <div className="w-full bg-white rounded-4xl border border-slate-100 p-8 md:p-10 lg:p-12 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05),0_10px_20px_-2px_rgba(0,0,0,0.02)] flex flex-col justify-center">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="flex flex-col gap-2">
-                    <label
-                      htmlFor="businessEmail"
-                      className="text-[13px] font-semibold text-slate-800 tracking-wide"
-                    >
-                      Business Email *
-                    </label>
-                    <input
-                      id="businessEmail"
-                      type="email"
-                      name="businessEmail"
-                      value={form.businessEmail}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-[10px] rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-[15px]"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <label
-                      htmlFor="firstName"
-                      className="text-[13px] font-semibold text-slate-800 tracking-wide"
-                    >
-                      First Name *
-                    </label>
-                    <input
-                      id="firstName"
-                      type="text"
-                      name="firstName"
-                      value={form.firstName}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-[10px] rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-[15px]"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <label
-                      htmlFor="lastName"
-                      className="text-[13px] font-semibold text-slate-800 tracking-wide"
-                    >
-                      Last Name *
-                    </label>
-                    <input
-                      id="lastName"
-                      type="text"
-                      name="lastName"
-                      value={form.lastName}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-[10px] rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-[15px]"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <label
-                      htmlFor="company"
-                      className="text-[13px] font-semibold text-slate-800 tracking-wide"
-                    >
-                      Company *
-                    </label>
-                    <input
-                      id="company"
-                      type="text"
-                      name="company"
-                      value={form.company}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-[10px] rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-[15px]"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-2 pt-2">
-                  <label
-                    htmlFor="product"
-                    className="text-[13px] font-semibold text-slate-800 tracking-wide"
-                  >
-                    Product You're Interested In *
-                  </label>
-                  <div className="relative">
-                    <select
-                      id="product"
-                      name="product"
-                      value={form.product}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-[10px] rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white appearance-none text-[15px] cursor-pointer"
-                    >
-                      <option value="" disabled></option>
-                      <option value="Payments">Payments API</option>
-                      <option value="Payouts">Payouts</option>
-                      <option value="Orchestration">
-                        Payment Orchestration
-                      </option>
-                      <option value="Other">Other</option>
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
-                      <svg
-                        className="w-4 h-4 text-slate-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        role="img"
-                        aria-labelledby="select-icon-title"
-                      >
-                        <title id="select-icon-title">Dropdown icon</title>
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M19 9l-7 7-7-7"
-                        ></path>
-                      </svg>
+              {status === "success" ? (
+                <div className="text-center space-y-6 py-8">
+                  <div className="flex justify-center">
+                    <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600">
+                      <CheckCircle className="w-12 h-12" />
                     </div>
                   </div>
+                  <div className="space-y-2">
+                    <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Message Sent!</h2>
+                    <p className="text-slate-600 max-w-xs mx-auto leading-relaxed">
+                      Thank you for reaching out. Our team will get back to you as soon as possible.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setStatus("idle")}
+                    className="text-blue-600 font-semibold hover:text-blue-700 transition-colors"
+                  >
+                    Send another message
+                  </button>
                 </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {status === "error" && (
+                    <div className="p-4 bg-rose-50 border border-rose-100 rounded-lg flex items-start gap-3 text-rose-600">
+                      <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                      <p className="text-sm font-medium">{errorMessage}</p>
+                    </div>
+                  )}
+                  
+                  <div className="space-y-6">
+                    <div className="flex flex-col gap-2">
+                      <label
+                        htmlFor="fullName"
+                        className="text-[13px] font-semibold text-slate-800 tracking-wide"
+                      >
+                        Full Name *
+                      </label>
+                      <input
+                        id="fullName"
+                        type="text"
+                        name="fullName"
+                        placeholder="John Doe"
+                        value={form.fullName}
+                        onChange={handleChange}
+                        required
+                        className="w-full px-4 py-[10px] rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-[15px]"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="flex flex-col gap-2">
+                        <label
+                          htmlFor="businessEmail"
+                          className="text-[13px] font-semibold text-slate-800 tracking-wide"
+                        >
+                          Business Email *
+                        </label>
+                        <input
+                          id="businessEmail"
+                          type="email"
+                          name="businessEmail"
+                          placeholder="john@company.com"
+                          value={form.businessEmail}
+                          onChange={handleChange}
+                          required
+                          className="w-full px-4 py-[10px] rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-[15px]"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <label
+                          htmlFor="phone"
+                          className="text-[13px] font-semibold text-slate-800 tracking-wide"
+                        >
+                          Phone Number *
+                        </label>
+                        <input
+                          id="phone"
+                          type="tel"
+                          name="phone"
+                          placeholder="+234 800 000 0000"
+                          value={form.phone}
+                          onChange={handleChange}
+                          required
+                          className="w-full px-4 py-[10px] rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-[15px]"
+                        />
+                      </div>
+                    </div>
+                  </div>
 
                 <div className="flex flex-col gap-2 pt-2">
                   <label
@@ -201,14 +191,23 @@ export default function ContactUs() {
                 <div className="pt-4">
                   <button
                     type="submit"
-                    className="w-full bg-[#007edc] hover:bg-[#006bbd] text-white font-medium py-[10px] px-6 rounded-lg transition-colors shadow-sm text-[15px]"
+                    disabled={status === "loading"}
+                    className="w-full bg-[#007edc] hover:bg-[#006bbd] text-white font-medium py-[10px] px-6 rounded-lg transition-all shadow-sm text-[15px] flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed active:scale-[0.98]"
                   >
-                    Send Message
+                    {status === "loading" ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      "Send Message"
+                    )}
                   </button>
                 </div>
               </form>
-            </div>
+            )}
           </div>
+        </div>
         </div>
       </main>
 
