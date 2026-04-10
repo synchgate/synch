@@ -17,6 +17,7 @@ export interface DemoPayload {
   message: string;
 }
 
+<<<<<<< HEAD
 export interface SupportPayload {
   support_type: string;
   subject: string;
@@ -27,6 +28,8 @@ export interface SupportPayload {
   message: string;
 }
 
+=======
+>>>>>>> aef0af7 (added see a demo)
 export const contactService = {
   submitContact: async (data: ContactPayload) => {
     const response = await api.post("/communications/contact/", data);
@@ -36,8 +39,11 @@ export const contactService = {
     const response = await api.post("/communications/demo-sessions/", data);
     return response.data;
   },
+<<<<<<< HEAD
   submitSupportTicket: async (data: SupportPayload) => {
     const response = await api.post("/communications/support/", data);
     return response.data;
   },
+=======
+>>>>>>> aef0af7 (added see a demo)
 };
