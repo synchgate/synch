@@ -10,20 +10,53 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { contactService } from "../../services/contact";
 
 const SupportTicket = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    company_name: "",
+    support_type: "",
+    subject: "",
+    preferred_date: "",
+    message: "",
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { id, value } = e.target;
+    setForm((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
+    setError("");
+
+    try {
+      const payload = {
+        ...form,
+        preferred_date: new Date(form.preferred_date).toISOString(),
+      };
+      await contactService.submitSupportTicket(payload);
       setIsSubmitting(false);
       setSubmitted(true);
-    }, 1500);
+    } catch (err: any) {
+      console.error("Support ticket error:", err);
+      setIsSubmitting(false);
+      setError(
+        err.response?.data?.message ||
+          "Failed to create support ticket. Please try again."
+      );
+    }
   };
 
   const supportTypes = [
@@ -91,7 +124,33 @@ const SupportTicket = () => {
           className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden"
         >
           <form onSubmit={handleSubmit} className="p-8 md:p-10 space-y-8">
+            {error && (
+              <div className="p-4 bg-rose-50 border border-rose-100 rounded-xl flex items-start gap-3 text-rose-600">
+                <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                <p className="text-sm font-medium">{error}</p>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Full Name Field */}
+              <div className="space-y-2">
+                <label
+                  htmlFor="name"
+                  className="text-sm font-bold text-slate-700"
+                >
+                  Full Name
+                </label>
+                <input
+                  required
+                  type="text"
+                  id="name"
+                  placeholder="Jane Doe"
+                  value={form.name}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
+                />
+              </div>
+
               {/* Email Field */}
               <div className="space-y-2">
                 <label
@@ -105,6 +164,27 @@ const SupportTicket = () => {
                   type="email"
                   id="email"
                   placeholder="name@company.com"
+                  value={form.email}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
+                />
+              </div>
+
+              {/* Company Name Field */}
+              <div className="space-y-2">
+                <label
+                  htmlFor="company_name"
+                  className="text-sm font-bold text-slate-700"
+                >
+                  Company Name
+                </label>
+                <input
+                  required
+                  type="text"
+                  id="company_name"
+                  placeholder="TechCorp"
+                  value={form.company_name}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
                 />
               </div>
@@ -112,14 +192,16 @@ const SupportTicket = () => {
               {/* Support Type Field */}
               <div className="space-y-2">
                 <label
-                  htmlFor="type"
+                  htmlFor="support_type"
                   className="text-sm font-bold text-slate-700"
                 >
                   Support Category
                 </label>
                 <select
                   required
-                  id="type"
+                  id="support_type"
+                  value={form.support_type}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236b7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-size-[1.25rem_1.25rem] bg-position-[right_0.75rem_center] bg-no-repeat"
                 >
                   <option value="">Select a category</option>
@@ -132,21 +214,43 @@ const SupportTicket = () => {
               </div>
             </div>
 
-            {/* Subject Field */}
-            <div className="space-y-2">
-              <label
-                htmlFor="subject"
-                className="text-sm font-bold text-slate-700"
-              >
-                Subject
-              </label>
-              <input
-                required
-                type="text"
-                id="subject"
-                placeholder="Briefly describe what you need help with"
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Subject Field */}
+              <div className="space-y-2">
+                <label
+                  htmlFor="subject"
+                  className="text-sm font-bold text-slate-700"
+                >
+                  Subject
+                </label>
+                <input
+                  required
+                  type="text"
+                  id="subject"
+                  placeholder="Briefly describe the issue"
+                  value={form.subject}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
+                />
+              </div>
+
+              {/* Preferred Date Field */}
+              <div className="space-y-2">
+                <label
+                  htmlFor="preferred_date"
+                  className="text-sm font-bold text-slate-700"
+                >
+                  Preferred Date & Time
+                </label>
+                <input
+                  required
+                  type="datetime-local"
+                  id="preferred_date"
+                  value={form.preferred_date}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400 dark:color-scheme-light"
+                />
+              </div>
             </div>
 
             {/* Message Field */}
@@ -162,6 +266,8 @@ const SupportTicket = () => {
                 id="message"
                 rows={5}
                 placeholder="Provide as much detail as possible..."
+                value={form.message}
+                onChange={handleChange}
                 className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400 resize-none"
               ></textarea>
             </div>
