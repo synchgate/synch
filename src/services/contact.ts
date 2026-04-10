@@ -17,6 +17,16 @@ export interface DemoPayload {
   message: string;
 }
 
+export interface SupportPayload {
+  support_type: string;
+  subject: string;
+  name: string;
+  email: string;
+  company_name: string;
+  preferred_date: string;
+  message: string;
+}
+
 export const contactService = {
   submitContact: async (data: ContactPayload) => {
     const response = await api.post("/communications/contact/", data);
@@ -24,6 +34,10 @@ export const contactService = {
   },
   submitDemoRequest: async (data: DemoPayload) => {
     const response = await api.post("/communications/demo-sessions/", data);
+    return response.data;
+  },
+  submitSupportTicket: async (data: SupportPayload) => {
+    const response = await api.post("/communications/support/", data);
     return response.data;
   },
 };
