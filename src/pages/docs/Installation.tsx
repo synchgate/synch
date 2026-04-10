@@ -52,11 +52,11 @@ function Installation() {
       <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-8 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
           <CopyButton
-            textToCopy={`curl --location 'http://payinfraterminal.onrender.com/v1/api/initiate-payment/' \\\n--header 'Client-Secret-Key: pit_sk_live_U2C8HtHdlHPRvHcjRBYBYn9DyZPJEf2o_xZqQkUFIf0' \\\n--header 'Content-Type: application/json' `}
+            textToCopy={`curl --location 'https://api.synchgate.com/v1/api/initiate-payment/' \\\n--header 'Client-Secret-Key: pit_sk_live_U2C8HtHdlHPRvHcjRBYBYn9DyZPJEf2o_xZqQkUFIf0' \\\n--header 'Content-Type: application/json' `}
           />
         </div>
         <pre>
-          {`curl --location 'http://payinfraterminal.onrender.com/v1/api/initiate-payment/' \\
+          {`curl --location 'https://api.synchgate.com/v1/api/initiate-payment/' \\
 --header 'Client-Secret-Key: pit_sk_live_U2C8HtHdlHPRvHcjRBYBYn9DyZPJEf2o_xZqQkUFIf0' \\
 --header 'Content-Type: application/json' `}
         </pre>
