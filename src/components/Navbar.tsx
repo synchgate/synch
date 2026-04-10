@@ -2,10 +2,12 @@ import { ArrowRight, Code2, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/logo.png";
+import DemoModal from "./DemoModal";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -69,15 +71,15 @@ const Navbar = () => {
             >
               Log in
             </Link>
-            <Link
-              to="/auth/signup"
+            <button
+              onClick={() => setIsDemoModalOpen(true)}
               className="relative hidden md:inline-flex group h-9 items-center justify-center rounded-md bg-black px-4 text-sm font-medium text-white shadow transition-colors hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 cursor-pointer"
             >
               <span className="relative z-10 flex items-center gap-1">
-                Get started{" "}
+                See a demo{" "}
                 <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
               </span>
-            </Link>
+            </button>
             <button
               className="md:hidden p-1 opacity-70 hover:opacity-100 transition-opacity"
               onClick={() => setIsMobileMenuOpen(true)}
@@ -134,16 +136,23 @@ const Navbar = () => {
             >
               Log in
             </Link>
-            <Link
-              to="/auth/signup"
-              onClick={() => setIsMobileMenuOpen(false)}
+            <button
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                setIsDemoModalOpen(true);
+              }}
               className="w-full max-w-[250px] text-center bg-black text-white py-4 rounded-lg font-medium hover:bg-slate-800 transition-colors mt-2 text-lg"
             >
-              Get started
-            </Link>
+              See a demo
+            </button>
           </nav>
         </div>
       )}
+
+      <DemoModal
+        isOpen={isDemoModalOpen}
+        onClose={() => setIsDemoModalOpen(false)}
+      />
     </>
   );
 };
