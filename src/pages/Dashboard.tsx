@@ -16,6 +16,7 @@ import {
 import { useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import logo from "../assets/logo.png";
+import { ALLOW_FEATURE } from "../config/features";
 import { useAuth } from "../contexts/AuthContext";
 import { api } from "../lib/api";
 
@@ -236,13 +237,15 @@ function Dashboard() {
             >
               <Building2 className="w-5 h-5" /> Providers
             </Link>
-            <Link
-              to="/dashboard/billings"
-              onClick={() => setIsSidebarOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2 ${isActive("/dashboard/billings") ? "bg-slate-100 text-blue-600 font-medium" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"} rounded-lg transition-colors cursor-pointer`}
-            >
-              <CreditCard className="w-5 h-5" /> Billings
-            </Link>
+            {ALLOW_FEATURE && (
+              <Link
+                to="/dashboard/billings"
+                onClick={() => setIsSidebarOpen(false)}
+                className={`flex items-center gap-3 px-3 py-2 ${isActive("/dashboard/billings") ? "bg-slate-100 text-blue-600 font-medium" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"} rounded-lg transition-colors cursor-pointer`}
+              >
+                <CreditCard className="w-5 h-5" /> Billings
+              </Link>
+            )}
             <Link
               to="/dashboard/analytics"
               onClick={() => setIsSidebarOpen(false)}
