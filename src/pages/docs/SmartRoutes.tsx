@@ -1,5 +1,6 @@
 import { ArrowRight, Brain, Cpu, RefreshCw, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
+import { SimpleExample } from "../../components/docs/SimpleExample";
 import { CopyButton } from "../../components/ui/CopyButton";
 
 function SmartRoutes() {
@@ -147,28 +148,89 @@ function SmartRoutes() {
         </table>
       </div>
 
-      {/* Response Section */}
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black text-black">
-        Response
+      <SimpleExample />
+
+      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
+        Example Response
       </h2>
-      <h3 className="font-semibold text-emerald-600 text-sm uppercase tracking-wider mb-3">✅ Success Response</h3>
-      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-8 overflow-x-auto shadow-inner border border-white/10">
+      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10">
         <pre>
           {`{
- "status": "success",
- "provider": "paystack",
- "payment_link": "https://checkout.paystack.com/xyz",
- "reference": "txn_123456789"
+    "status": "success",
+    "message": "Payment initiated successfully",
+    "data": {
+        "cleaned_data": {
+            "payment_url": "https://checkout-v2.dev-flutterwave.com/v3/hosted/pay/b27556da90c41b410111",
+            "amount": "10000.00",
+            "currency": "NGN",
+            "reference": "hdjdjfkfkjdjdj",
+            "status": "success",
+            "provider": "provider name"
+        },
+        "provider_data": {
+            "data": {
+                "status": "success",
+                "message": "Hosted Link",
+                "data": {
+                    "link": "https://checkout-v2.dev-flutterwave.com/v3/hosted/pay/b27556da90c41b410111",
+                    "tx_ref": "hdjdjfkfkjdjdj",
+                    "amount": "10000.00",
+                    "currency": "NGN",
+                    "redirect_url": "https://fintech-platform-weld.vercel.app/"
+                }
+            }
+        }
+    },
+    "meta": {
+        "request_id": "41e97272-03b2-485c-a150-8e7c30737f3c",
+        "timestamp": "2026-03-24T11:44:41.828466Z"
+    }
 }`}
         </pre>
       </div>
 
-      <h3 className="font-semibold text-rose-600 text-sm uppercase tracking-wider mb-3">❌ Error Response</h3>
-      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner border border-white/10">
+      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
+        Unified Response Format
+      </h2>
+      <p className="text-slate-600 mb-4">
+        Fintech Platform normalizes responses from all providers into a single,
+        consistent format.
+      </p>
+      <p className="text-slate-600 mb-12">
+        This allows you to write one integration regardless of which underlying
+        payment gateway you use.
+      </p>
+
+      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
+        Transaction Tracking
+      </h2>
+      <p className="text-slate-600 mb-3">
+        All API transactions are tracked with one of the following states:
+      </p>
+      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-amber-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10">
+        <pre>
+          {`pending   - Payment is waiting for customer action
+success   - Payment was successfully processed
+failed    - Payment was declined or failed
+abandoned - Customer left the payment page`}
+        </pre>
+      </div>
+
+      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
+        Error Handling
+      </h2>
+      <p className="text-slate-600 mb-6">
+        All errors return a standard JSON structure with a descriptive message
+        and error code.
+      </p>
+      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10">
         <pre>
           {`{
- "status": "error",
- "message": "Live environment has no providers with credentials."
+    "status": "error",
+    "message": "Invalid client secret key.",
+    "error": {
+        "code": "authentication_failed"
+    }
 }`}
         </pre>
       </div>
@@ -248,6 +310,7 @@ function SmartRoutes() {
  -d '{
    "email": "test@email.com",
    "amount": 5000,
+   "currency": "NGN",
    "reference": "txn_123456",
    "callback_url": "https://example.com/callback"
  }'`}
