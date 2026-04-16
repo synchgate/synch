@@ -26,7 +26,7 @@ const PricingPage = () => {
     {
       id: "growth",
       name: "Growth",
-      price: "35,000",
+      price: "Coming Soon",
       unit: "/ month",
       description: "For businesses that want visibility into their payments.",
       features: [
@@ -48,7 +48,7 @@ const PricingPage = () => {
     {
       id: "pro",
       name: "Pro",
-      price: "150,000",
+      price: "Coming Soon",
       unit: "/ month",
       description:
         "For businesses that want to increase revenue automatically.",
@@ -154,10 +154,10 @@ const PricingPage = () => {
 
                 <div className={`flex flex-col gap-1 mb-10`}>
                   <div className="flex items-baseline gap-1">
-                    <span className={`font-black text-slate-900 tracking-tighter ${plan.id === "starter" ? "text-3xl" : "text-5xl"}`}>
-                      {plan.id !== "starter" && "₦"}{plan.price}
+                    <span className={`font-black text-slate-900 tracking-tighter ${plan.id === "starter" ? "text-3xl" : plan.price === "Coming Soon" ? "text-2xl" : "text-5xl"}`}>
+                      {(plan.id !== "starter" && plan.price !== "Coming Soon") && "₦"}{plan.price}
                     </span>
-                    {plan.id !== "starter" && (
+                    {(plan.id !== "starter" && plan.price !== "Coming Soon") && (
                       <span className="text-slate-500 font-bold text-lg">
                         {plan.unit}
                       </span>
