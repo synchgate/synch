@@ -65,13 +65,15 @@ function InitiatePayment() {
             <tr>
               <th className="px-6 py-4 font-medium">Field</th>
               <th className="px-6 py-4 font-medium">Type</th>
+              <th className="px-6 py-4 font-medium text-center">Required</th>
               <th className="px-6 py-4 font-medium">Description</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-700 bg-[#1e1e1e] text-slate-300">
             <tr>
               <td className="px-6 py-4 font-mono text-amber-300">provider</td>
-              <td className="px-6 py-4 text-blue-300">string</td>
+              <td className="px-6 py-4 text-blue-300 font-mono">string</td>
+              <td className="px-6 py-4 text-center text-emerald-400">✅</td>
               <td className="px-6 py-4">
                 Payment provider to route transaction to (e.g., paystack,
                 flutterwave).
@@ -79,36 +81,40 @@ function InitiatePayment() {
             </tr>
             <tr>
               <td className="px-6 py-4 font-mono text-amber-300">email</td>
-              <td className="px-6 py-4 text-blue-300">string</td>
+              <td className="px-6 py-4 text-blue-300 font-mono">string</td>
+              <td className="px-6 py-4 text-center text-emerald-400">✅</td>
               <td className="px-6 py-4">Customer email address.</td>
             </tr>
             <tr>
               <td className="px-6 py-4 font-mono text-amber-300">amount</td>
-              <td className="px-6 py-4 text-emerald-300">integer</td>
+              <td className="px-6 py-4 text-emerald-300 font-mono">integer</td>
+              <td className="px-6 py-4 text-center text-emerald-400">✅</td>
               <td className="px-6 py-4">Amount to charge</td>
             </tr>
             <tr>
               <td className="px-6 py-4 font-mono text-amber-300">currency</td>
-              <td className="px-6 py-4 text-blue-300">string</td>
+              <td className="px-6 py-4 text-blue-300 font-mono">string</td>
+              <td className="px-6 py-4 text-center text-rose-400">❌</td>
               <td className="px-6 py-4">
-                Transaction currency (e.g., NGN, USD, optional but defaults to
-                NGN)
+                Transaction currency (e.g., NGN, USD, defaults to NGN)
               </td>
             </tr>
             <tr>
               <td className="px-6 py-4 font-mono text-amber-300">
                 callback_url
               </td>
-              <td className="px-6 py-4 text-blue-300">url</td>
+              <td className="px-6 py-4 text-blue-300 font-mono">url</td>
+              <td className="px-6 py-4 text-center text-rose-400">❌</td>
               <td className="px-6 py-4">
-                The URL to redirect the customer after payment (optional)
+                The URL to redirect the customer after payment
               </td>
             </tr>
             <tr>
               <td className="px-6 py-4 font-mono text-amber-300">reference</td>
-              <td className="px-6 py-4 text-blue-300">string</td>
+              <td className="px-6 py-4 text-blue-300 font-mono">string</td>
+              <td className="px-6 py-4 text-center text-emerald-400">✅</td>
               <td className="px-6 py-4">
-                Unique transaction reference (optional)
+                Unique transaction reference
               </td>
             </tr>
           </tbody>

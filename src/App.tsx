@@ -39,6 +39,7 @@ import Installation from "./pages/docs/Installation";
 import Introduction from "./pages/docs/Introduction";
 import PCICompliance from "./pages/docs/PCICompliance";
 import ResolveAccount from "./pages/docs/ResolveAccount";
+import SmartRoutes from "./pages/docs/SmartRoutes";
 import TransactionVerification from "./pages/docs/TransactionVerification";
 import LandingPage from "./pages/LandingPage";
 import PricingPage from "./pages/PricingPage";
@@ -125,6 +126,7 @@ function App() {
               <Route path="installation" element={<Installation />} />
               <Route path="authentication" element={<Authentication />} />
               <Route path="initiate-payment" element={<InitiatePayment />} />
+              <Route path="smart-routes" element={<SmartRoutes />} />
               <Route
                 path="transaction-verification"
                 element={<TransactionVerification />}
