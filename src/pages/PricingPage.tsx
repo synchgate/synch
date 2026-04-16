@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Check, Info, LineChart, Sparkles, Star, Zap } from "lucide-react";
+import { Check, Info, LineChart, Sparkles, Zap } from "lucide-react";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 
@@ -45,29 +45,6 @@ const PricingPage = () => {
       color: "blue",
       ctaText: "Upgrade to Growth",
     },
-    {
-      id: "pro",
-      name: "Pro",
-      price: "Coming Soon",
-      unit: "/ month",
-      description:
-        "For businesses that want to increase revenue automatically.",
-      features: [
-        "Everything in Growth, plus:",
-        "Intelligent routing insights",
-        "Dynamic auto-routing (switch gateways automatically)",
-        "“What-if” revenue simulations",
-        "Real-time gateway health monitoring",
-        "Downtime & failure alerts (Slack, Email, Webhook)",
-        "Performance optimization recommendations",
-      ],
-      isAvailable: false,
-      tag: "Most Popular",
-      isPopular: true,
-      icon: Star,
-      color: "indigo",
-      ctaText: "Start Optimizing Revenue",
-    },
   ];
 
   return (
@@ -104,31 +81,23 @@ const PricingPage = () => {
           </div>
 
           {/* Pricing Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-24 max-w-4xl mx-auto">
             {plans.map((plan, index) => (
               <motion.div
                 key={plan.id}
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                className={`relative rounded-[2.5rem] border p-10 transition-all duration-500 overflow-hidden flex flex-col ${plan.isPopular
-                  ? "bg-white border-blue-200 shadow-2xl shadow-blue-200/50 ring-4 ring-blue-50"
-                  : "bg-white border-slate-200 shadow-xl shadow-slate-200/50 hover:border-slate-300"
-                  }`}
+                className={`relative rounded-[2.5rem] border p-10 transition-all duration-500 overflow-hidden flex flex-col bg-white border-slate-200 shadow-xl shadow-slate-200/50 hover:border-slate-300`}
               >
                 {/* Popular Badge */}
                 <div className="absolute top-6 right-6 z-20">
                   <div
-                    className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider shadow-lg ${plan.isPopular
-                      ? "bg-indigo-600 text-white shadow-indigo-200"
-                      : plan.color === "emerald"
+                    className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider shadow-lg ${plan.color === "emerald"
                         ? "bg-emerald-500 text-white shadow-emerald-100"
                         : "bg-blue-600 text-white shadow-blue-100"
                       }`}
                   >
-                    {plan.id === "pro" && (
-                      <Star className="w-3 h-3 fill-current" />
-                    )}
                     {plan.tag}
                   </div>
                 </div>
@@ -211,9 +180,7 @@ const PricingPage = () => {
                   >
                     <a
                       href="/auth/signup"
-                      className={`block w-full py-5 rounded-3xl font-black text-center text-[17px] transition-all duration-300 ${plan.isPopular
-                        ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl shadow-indigo-200"
-                        : plan.color === "emerald"
+                      className={`block w-full py-5 rounded-3xl font-black text-center text-[17px] transition-all duration-300 ${plan.color === "emerald"
                           ? "bg-emerald-600 text-white hover:bg-emerald-700 shadow-xl shadow-emerald-200"
                           : "bg-blue-600 text-white hover:bg-blue-700 shadow-xl shadow-blue-200"
                         }`}
