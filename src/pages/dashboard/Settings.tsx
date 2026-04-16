@@ -581,7 +581,7 @@ function Settings() {
                       </div>
                       <div>
                         <h3 className="text-sm font-bold text-slate-900">
-                          Smart Routes
+                          Smart Route
                         </h3>
                         <p className="text-xs text-slate-500 mt-0.5">
                           Manage automated routing preferences for each
@@ -645,8 +645,8 @@ function Settings() {
                       <p className="text-[10px] text-blue-600 flex items-center gap-2">
                         <Zap className="w-3 h-3" />
                         {providers.length > 1
-                          ? "Smart Routes is enabled by default because multiple providers are detected."
-                          : "Smart Routes is disabled because only one provider is configured."}
+                          ? "Smart Route is enabled by default because multiple providers are detected."
+                          : "Smart Route is disabled because only one provider is configured."}
                       </p>
                     </div>
                   </div>
