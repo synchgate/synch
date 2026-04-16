@@ -128,7 +128,7 @@ function SmartRoutes() {
             <tr>
               <td className="px-6 py-4 text-amber-300">currency</td>
               <td className="px-6 py-4 text-blue-300">string</td>
-              <td className="px-6 py-4 text-center text-rose-400">❌</td>
+              <td className="px-6 py-4 text-center text-rose-400">✅</td>
               <td className="px-6 py-4 font-sans italic text-slate-400">Currency code (default: NGN)</td>
             </tr>
             <tr>
