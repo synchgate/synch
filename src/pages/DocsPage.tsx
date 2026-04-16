@@ -127,7 +127,7 @@ function DocsPage() {
                     to="/docs/smart-routes"
                     className={`block text-sm font-medium ${isActive("/docs/smart-routes") ? "text-blue-600 cursor-default" : "text-slate-600 hover:text-blue-600 cursor-pointer"} transition-colors`}
                   >
-                    Smart Routes
+                    Smart Route
                   </Link>
                 </li>
                 <li>
