@@ -8,6 +8,7 @@ import {
   Routes,
   useLocation,
 } from "react-router-dom";
+import { ALLOW_FEATURE } from "./config/features";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { queryClient } from "./lib/react-query";
 import AuthLayout from "./pages/auth/AuthLayout";
@@ -106,8 +107,12 @@ function App() {
               <Route path="logs" element={<Logs />} />
               <Route path="settings" element={<Settings />} />
               <Route path="api-keys" element={<MyApiKey />} />
-              <Route path="billings" element={<Billings />} />
-              <Route path="billings/history" element={<InvoiceHistory />} />
+              {ALLOW_FEATURE && (
+                <>
+                  <Route path="billings" element={<Billings />} />
+                  <Route path="billings/history" element={<InvoiceHistory />} />
+                </>
+              )}
               <Route path="support-ticket" element={<SupportTicket />} />
             </Route>
 
