@@ -41,6 +41,7 @@ import ResolveAccount from "./pages/docs/ResolveAccount";
 import TransactionVerification from "./pages/docs/TransactionVerification";
 import LandingPage from "./pages/LandingPage";
 import PricingPage from "./pages/PricingPage";
+import DemoPage from "./pages/DemoPage";
 import TermsOfUse from "./pages/TermsOfUse";
 
 const ScrollToTop = () => {
@@ -81,6 +82,7 @@ function App() {
               }
             />
             <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/demo" element={<DemoPage />} />
             <Route
               path="/contact-us"
               element={

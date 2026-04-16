@@ -24,7 +24,6 @@ import paystackLogo from "../assets/brands/paystack.png";
 import businessOwners from "../assets/business-owners.png";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
-import DemoModal from "../components/DemoModal";
 
 type Provider = { src: string; alt: string; size: string };
 
@@ -46,7 +45,6 @@ const PROVIDERS: Provider[] = [
 
 function LandingPage() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
-  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-500/30 overflow-hidden relative">
@@ -103,12 +101,12 @@ function LandingPage() {
               transition={{ duration: 0.5, delay: 0.3 }}
               className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto px-4 sm:px-0"
             >
-              <button
-                onClick={() => setIsDemoModalOpen(true)}
-                className="w-full sm:w-auto h-12 inline-flex items-center justify-center rounded-lg bg-blue-600 px-8 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition-all hover:bg-blue-700 hover:shadow-blue-500/50 cursor-pointer"
+              <Link
+                to="/demo"
+                className="w-full sm:w-auto h-12 inline-flex items-center justify-center rounded-lg bg-blue-600 px-8 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition-all hover:bg-blue-700 hover:shadow-blue-500/50 cursor-pointer text-center"
               >
-                See a demo
-              </button>
+                Book a demo
+              </Link>
               <Link
                 to="/auth/signup"
                 className="w-full sm:w-auto h-12 inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-8 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 hover:border-slate-400 cursor-pointer"
@@ -537,11 +535,6 @@ function LandingPage() {
       </main>
 
       <Footer />
-      
-      <DemoModal
-        isOpen={isDemoModalOpen}
-        onClose={() => setIsDemoModalOpen(false)}
-      />
     </div>
   );
 }
