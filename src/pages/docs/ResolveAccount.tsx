@@ -37,7 +37,7 @@ function ResolveAccount() {
         Endpoint
       </h2>
       <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10 relative group flex items-center justify-between">
-        <span>POST /resolve-account/</span>
+        <span>POST /bank/resolve-account/</span>
         <div className="opacity-0 group-hover:opacity-100 transition-opacity">
           <CopyButton textToCopy="POST /resolve-account/" />
         </div>

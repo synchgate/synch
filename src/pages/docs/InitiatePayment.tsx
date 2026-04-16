@@ -49,7 +49,7 @@ function InitiatePayment() {
       <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-8 overflow-x-auto shadow-inner leading-relaxed border border-white/10">
         <pre>
           {`{
-  "provider": "flutterwave",
+  "provider": "provider_name",
   "email": "customer@example.com",
   "amount": 8000,
   "currency": "NGN",
@@ -65,13 +65,15 @@ function InitiatePayment() {
             <tr>
               <th className="px-6 py-4 font-medium">Field</th>
               <th className="px-6 py-4 font-medium">Type</th>
+              <th className="px-6 py-4 font-medium text-center">Required</th>
               <th className="px-6 py-4 font-medium">Description</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-700 bg-[#1e1e1e] text-slate-300">
             <tr>
               <td className="px-6 py-4 font-mono text-amber-300">provider</td>
-              <td className="px-6 py-4 text-blue-300">string</td>
+              <td className="px-6 py-4 text-blue-300 font-mono">string</td>
+              <td className="px-6 py-4 text-center text-emerald-400">✅</td>
               <td className="px-6 py-4">
                 Payment provider to route transaction to (e.g., paystack,
                 flutterwave).
@@ -79,36 +81,40 @@ function InitiatePayment() {
             </tr>
             <tr>
               <td className="px-6 py-4 font-mono text-amber-300">email</td>
-              <td className="px-6 py-4 text-blue-300">string</td>
+              <td className="px-6 py-4 text-blue-300 font-mono">string</td>
+              <td className="px-6 py-4 text-center text-emerald-400">✅</td>
               <td className="px-6 py-4">Customer email address.</td>
             </tr>
             <tr>
               <td className="px-6 py-4 font-mono text-amber-300">amount</td>
-              <td className="px-6 py-4 text-emerald-300">integer</td>
+              <td className="px-6 py-4 text-emerald-300 font-mono">integer</td>
+              <td className="px-6 py-4 text-center text-emerald-400">✅</td>
               <td className="px-6 py-4">Amount to charge</td>
             </tr>
             <tr>
               <td className="px-6 py-4 font-mono text-amber-300">currency</td>
-              <td className="px-6 py-4 text-blue-300">string</td>
+              <td className="px-6 py-4 text-blue-300 font-mono">string</td>
+              <td className="px-6 py-4 text-center text-rose-400">❌</td>
               <td className="px-6 py-4">
-                Transaction currency (e.g., NGN, USD, optional but defaults to
-                NGN)
+                Transaction currency (e.g., NGN, USD, defaults to NGN)
               </td>
             </tr>
             <tr>
               <td className="px-6 py-4 font-mono text-amber-300">
                 callback_url
               </td>
-              <td className="px-6 py-4 text-blue-300">url</td>
+              <td className="px-6 py-4 text-blue-300 font-mono">url</td>
+              <td className="px-6 py-4 text-center text-rose-400">❌</td>
               <td className="px-6 py-4">
-                The URL to redirect the customer after payment (optional)
+                The URL to redirect the customer after payment
               </td>
             </tr>
             <tr>
               <td className="px-6 py-4 font-mono text-amber-300">reference</td>
-              <td className="px-6 py-4 text-blue-300">string</td>
+              <td className="px-6 py-4 text-blue-300 font-mono">string</td>
+              <td className="px-6 py-4 text-center text-emerald-400">✅</td>
               <td className="px-6 py-4">
-                Unique transaction reference (optional)
+                Unique transaction reference
               </td>
             </tr>
           </tbody>
@@ -134,7 +140,7 @@ function InitiatePayment() {
       <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
           <CopyButton
-            textToCopy={`curl --location 'https://api.synchgate.com/v1/api/initiate-payment/' \\\n--header 'Client-Secret-Key: sk_live_your_key_here' \\\n--header 'Content-Type: application/json' \\\n--data-raw '{\n    "provider": "flutterwave",\n    "email": "customer@example.com",\n    "amount": 8000,\n    "currency": "NGN"\n}'`}
+            textToCopy={`curl --location 'https://api.synchgate.com/v1/api/initiate-payment/' \\\n--header 'Client-Secret-Key: sk_live_your_key_here' \\\n--header 'Content-Type: application/json' \\\n--data-raw '{\n    "provider": "provider_name",\n    "email": "customer@example.com",\n    "amount": 8000,\n    "currency": "NGN"\n}'`}
           />
         </div>
         <pre>
@@ -142,10 +148,12 @@ function InitiatePayment() {
 --header 'Client-Secret-Key: sk_live_your_key_here' \\
 --header 'Content-Type: application/json' \\
 --data-raw '{
-    "provider": "flutterwave",
+    "provider": "provider_name",
     "email": "customer@example.com",
     "amount": 8000,
-    "currency": "NGN"
+    "currency": "NGN",
+    "reference": "transaction_reference",
+    "callback_url": "https://synchgate.com/payments/"
 }'`}
         </pre>
       </div>
@@ -167,7 +175,7 @@ function InitiatePayment() {
             "currency": "NGN",
             "reference": "hdjdjfkfkjdjdj",
             "status": "success",
-            "provider": "flutterwave"
+            "provider": "provider_name"
         },
         "provider_data": {
             "data": {

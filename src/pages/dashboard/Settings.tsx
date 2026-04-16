@@ -6,8 +6,10 @@ import {
   CreditCard as CreditCardIcon,
   FileText,
   Settings as SettingsIcon,
+  Settings2,
   Shield,
   User,
+  Zap,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -57,6 +59,37 @@ function Settings() {
   const merchant = Array.isArray(merchantsData)
     ? merchantsData[0]
     : merchantsData;
+
+  // Extract configured providers
+  const apiClients = merchant?.api_clients || [];
+  const providers = Array.from(
+    new Set(
+      apiClients.flatMap((client: any) =>
+        (client.providers || []).map((p: any) => {
+          if (!p || !p.provider) return null;
+          return (
+            p.provider.charAt(0).toUpperCase() +
+            p.provider.slice(1).toLowerCase()
+          );
+        }),
+      ),
+    ),
+  ).filter(Boolean) as string[];
+
+  const [providerToggles, setProviderToggles] = useState<
+    Record<string, boolean>
+  >({});
+
+  useEffect(() => {
+    if (providers.length > 0) {
+      const initialToggles: Record<string, boolean> = {};
+      providers.forEach((p) => {
+        // Toggled on by default if more than one provider, else off
+        initialToggles[p] = providers.length > 1;
+      });
+      setProviderToggles(initialToggles);
+    }
+  }, [providers.length]);
 
   console.log("=== SETTINGS DATA ===", settingsData);
   console.log("=== PROFILE ===", settingsData?.profile);
@@ -129,6 +162,7 @@ function Settings() {
             { id: "business", label: "Business Profile", icon: Building2 },
 
             { id: "kyc", label: "KYC Documents", icon: FileText },
+            { id: "configuration", label: "Configuration", icon: Settings2 },
             { id: "billing", label: "Billing Plans", icon: CreditCardIcon },
             { id: "security", label: "Security", icon: Shield },
             { id: "notifications", label: "Notifications", icon: Bell },
@@ -537,10 +571,93 @@ function Settings() {
                 </div>
               )}
 
+              {/* Configuration Tab Content */}
+              {activeTab === "configuration" && (
+                <div className="space-y-6">
+                  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div className="px-6 py-5 border-b border-slate-200 flex items-center gap-3 bg-slate-50/60 font-black">
+                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center border border-blue-200 shrink-0">
+                        <Zap className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-bold text-slate-900">
+                          Smart Route
+                        </h3>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          Manage automated routing preferences for each
+                          provider.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="divide-y divide-slate-100">
+                      {providers.length === 0 ? (
+                        <div className="p-12 text-center">
+                          <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Settings2 className="w-6 h-6 text-slate-300" />
+                          </div>
+                          <p className="text-sm font-medium text-slate-900 mb-1">
+                            No providers configured
+                          </p>
+                          <p className="text-xs text-slate-500">
+                            Configure providers in the Providers tab to manage
+                            smart routing.
+                          </p>
+                        </div>
+                      ) : (
+                        providers.map((p) => (
+                          <div
+                            key={p}
+                            className="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-slate-900 shrink-0 font-['Outfit'] font-black">
+                                {p[0]}
+                              </div>
+                              <span className="text-sm font-medium text-slate-700">
+                                {p}
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setProviderToggles((prev) => ({
+                                  ...prev,
+                                  [p]: !prev[p],
+                                }))
+                              }
+                              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-blue-600 focus:ring-offset-2
+                                                            ${providerToggles[p] ? "bg-blue-600" : "bg-slate-200"}
+                                                        `}
+                            >
+                              <span
+                                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out
+                                                                ${providerToggles[p] ? "translate-x-5" : "translate-x-0"}
+                                                            `}
+                              />
+                            </button>
+                          </div>
+                        ))
+                      )}
+                    </div>
+
+                    <div className="p-4 bg-blue-50/50 border-t border-slate-100 italic">
+                      <p className="text-[10px] text-blue-600 flex items-center gap-2">
+                        <Zap className="w-3 h-3" />
+                        {providers.length > 1
+                          ? "Smart Route is enabled by default because multiple providers are detected."
+                          : "Smart Route is disabled because only one provider is configured."}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Empty State for other tabs */}
               {activeTab !== "general" &&
                 activeTab !== "business" &&
                 activeTab !== "kyc" &&
+                activeTab !== "configuration" &&
                 activeTab !== "apikeys" && (
                   <div className="h-64 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center text-center p-6 bg-slate-50/50">
                     <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-4">
