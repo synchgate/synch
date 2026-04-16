@@ -37,7 +37,6 @@ function SmartRoutes() {
           <h3 className="font-bold text-slate-900 mb-2">1. Merchant Configuration Validation</h3>
           <ul className="list-disc ml-6 text-slate-600 space-y-1">
             <li>At least 2 providers configured.</li>
-            <li>Providers available in both sandbox and live environments.</li>
           </ul>
         </div>
         <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
