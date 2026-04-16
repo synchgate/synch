@@ -49,7 +49,7 @@ function InitiatePayment() {
       <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-8 overflow-x-auto shadow-inner leading-relaxed border border-white/10">
         <pre>
           {`{
-  "provider": "flutterwave",
+  "provider": "provider name",
   "email": "customer@example.com",
   "amount": 8000,
   "currency": "NGN",
@@ -140,7 +140,7 @@ function InitiatePayment() {
       <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
           <CopyButton
-            textToCopy={`curl --location 'https://api.synchgate.com/v1/api/initiate-payment/' \\\n--header 'Client-Secret-Key: sk_live_your_key_here' \\\n--header 'Content-Type: application/json' \\\n--data-raw '{\n    "provider": "flutterwave",\n    "email": "customer@example.com",\n    "amount": 8000,\n    "currency": "NGN"\n}'`}
+            textToCopy={`curl --location 'https://api.synchgate.com/v1/api/initiate-payment/' \\\n--header 'Client-Secret-Key: sk_live_your_key_here' \\\n--header 'Content-Type: application/json' \\\n--data-raw '{\n    "provider": "provider name",\n    "email": "customer@example.com",\n    "amount": 8000,\n    "currency": "NGN"\n}'`}
           />
         </div>
         <pre>
@@ -148,7 +148,7 @@ function InitiatePayment() {
 --header 'Client-Secret-Key: sk_live_your_key_here' \\
 --header 'Content-Type: application/json' \\
 --data-raw '{
-    "provider": "flutterwave",
+    "provider": "provider name",
     "email": "customer@example.com",
     "amount": 8000,
     "currency": "NGN"
@@ -173,7 +173,7 @@ function InitiatePayment() {
             "currency": "NGN",
             "reference": "hdjdjfkfkjdjdj",
             "status": "success",
-            "provider": "flutterwave"
+            "provider": "provider name"
         },
         "provider_data": {
             "data": {
