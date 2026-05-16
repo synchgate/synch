@@ -79,8 +79,8 @@ function LandingPage() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="font-['Outfit'] text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-8 leading-[1.1] max-w-4xl text-black mx-auto"
             >
-              Your Payments, <br className="hidden md:block" />
-              <span className="text-blue-600">Intelligently Orchestrated.</span>
+              Accept More Payments, <br className="hidden md:block" />
+              <span className="text-blue-600">Grow Revenue.</span>
             </motion.h1>
 
             <motion.p
@@ -89,10 +89,9 @@ function LandingPage() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-sm md:text-base text-slate-600 max-w-2xl mb-12 font-light leading-relaxed"
             >
-              An open payments infrastructure that lets you connect any provider
-              and intelligently manage every transaction flow—from unified APIs
-              and webhooks to seamless routing, payouts, and global payment
-              experiences.
+              A simple payment system that lets your business connect to multiple payment providers 
+              in one place. It helps you manage all transactions easily, improve payment success rates, 
+              and reduce failed payments so you can grow revenue faster.
             </motion.p>
 
             <motion.div
@@ -379,7 +378,7 @@ function LandingPage() {
                   Built for every stage of business
                 </h2>
                 <p className="text-slate-600 text-lg max-w-2xl mx-auto">
-                  Whether you're just starting or scaling globally, SynchGate
+                  Whether you're just starting or scaling globally, we
                   provides the infrastructure you need to succeed.
                 </p>
               </div>
