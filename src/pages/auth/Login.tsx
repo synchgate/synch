@@ -21,8 +21,9 @@ function Login() {
 
   const loginMutation = useMutation({
     mutationFn: (data: LoginPayload) => authService.login(data),
-    onSuccess: (data) => {
+    onSuccess: (response) => {
       queryClient.resetQueries();
+      const data = response?.data;
       // Store token depending on your backend schema, falling back to a dummy identifier
       const token =
         data?.access || data?.token || data?.access_token || "authenticated";
