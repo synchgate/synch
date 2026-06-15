@@ -21,7 +21,6 @@ import ContactUs from "./pages/ContactUs";
 import Dashboard from "./pages/Dashboard";
 import DocsPage from "./pages/DocsPage";
 import Analytics from "./pages/dashboard/Analytics";
-import Billings from "./pages/dashboard/Billings";
 import InvoiceHistory from "./pages/dashboard/InvoiceHistory";
 import Logs from "./pages/dashboard/Logs";
 import MyApiKey from "./pages/dashboard/MyApiKey";
@@ -108,12 +107,6 @@ function App() {
               <Route path="logs" element={<Logs />} />
               <Route path="settings" element={<Settings />} />
               <Route path="api-keys" element={<MyApiKey />} />
-              {ALLOW_FEATURE && (
-                <>
-                  <Route path="billings" element={<Billings />} />
-                  <Route path="billings/history" element={<InvoiceHistory />} />
-                </>
-              )}
               <Route path="support-ticket" element={<SupportTicket />} />
             </Route>
 
