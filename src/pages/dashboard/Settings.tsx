@@ -2,9 +2,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Bell,
   Building2,
+  Calendar,
   CheckCircle,
   CreditCard as CreditCardIcon,
   FileText,
+  Loader2,
   Settings as SettingsIcon,
   Settings2,
   Shield,
@@ -117,6 +119,25 @@ function Settings() {
       });
     }
   }, [settingsResponse]);
+
+  const { data: currentSubscription, isLoading: isLoadingSubscription } = useQuery({
+    queryKey: ["current-subscription"],
+    queryFn: async () => {
+      const res = await api.get("/billing/subscriptions/current");
+      return res.data;
+    },
+    enabled: activeTab === "billing",
+    retry: false,
+  });
+
+  const { data: subscriptionHistory, isLoading: isLoadingHistory } = useQuery({
+    queryKey: ["subscription-history"],
+    queryFn: async () => {
+      const res = await api.get("/billing/subscriptions/history");
+      return res.data;
+    },
+    enabled: activeTab === "billing",
+  });
 
   const { mutateAsync: updateMerchant, isPending: isUpdatingBusiness } =
     useMutation({
@@ -653,12 +674,134 @@ function Settings() {
                 </div>
               )}
 
+              {/* Billing Tab */}
+              {activeTab === "billing" && (
+                <div className="space-y-8">
+                  {/* Current Plan */}
+                  <div>
+                    <h3 className="text-base font-semibold text-slate-900 mb-4">Current Plan</h3>
+                    {isLoadingSubscription ? (
+                      <div className="flex items-center gap-3 p-6 bg-slate-50 rounded-2xl border border-slate-200">
+                        <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                        <span className="text-sm text-slate-500">Loading plan details…</span>
+                      </div>
+                    ) : (
+                      <div className="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${currentSubscription?.plan?.name?.toLowerCase().includes("growth") ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-500"}`}>
+                            <CreditCardIcon className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <p className="text-lg font-bold text-slate-900">
+                              {currentSubscription?.plan?.name ?? "Free Plan"}
+                            </p>
+                            <p className="text-sm text-slate-500">
+                              {currentSubscription
+                                ? `Status: ${currentSubscription.status ?? "Active"}`
+                                : "No active paid subscription"}
+                            </p>
+                            {currentSubscription?.current_period_end && (
+                              <p className="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
+                                <Calendar className="w-3 h-3" />
+                                Renews {new Date(currentSubscription.current_period_end).toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" })}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 shrink-0">
+                          {currentSubscription ? (
+                            <span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-full border border-emerald-100 uppercase tracking-wide">
+                              Active
+                            </span>
+                          ) : (
+                            <span className="px-3 py-1 bg-slate-100 text-slate-500 text-xs font-bold rounded-full uppercase tracking-wide">
+                              Free
+                            </span>
+                          )}
+                          <a
+                            href="/pricing"
+                            className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                          >
+                            {currentSubscription ? "Manage Plan" : "Upgrade"}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Subscription History */}
+                  <div>
+                    <h3 className="text-base font-semibold text-slate-900 mb-4">Subscription History</h3>
+                    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                      {isLoadingHistory ? (
+                        <div className="flex items-center gap-3 p-6">
+                          <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                          <span className="text-sm text-slate-500">Loading history…</span>
+                        </div>
+                      ) : !subscriptionHistory?.length ? (
+                        <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+                          <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+                            <FileText className="w-5 h-5 text-slate-400" />
+                          </div>
+                          <p className="text-sm font-semibold text-slate-700 mb-1">No subscription history</p>
+                          <p className="text-xs text-slate-400">Your past payments and plan changes will appear here.</p>
+                        </div>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm text-left">
+                            <thead className="bg-slate-50 border-b border-slate-200 text-xs uppercase text-slate-500">
+                              <tr>
+                                <th className="px-6 py-4 font-medium">Date</th>
+                                <th className="px-6 py-4 font-medium">Plan</th>
+                                <th className="px-6 py-4 font-medium">Amount</th>
+                                <th className="px-6 py-4 font-medium">Status</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                              {subscriptionHistory.map((entry: any, i: number) => (
+                                <tr key={entry.id ?? i} className="hover:bg-slate-50 transition-colors">
+                                  <td className="px-6 py-4 text-slate-600">
+                                    {entry.created_at
+                                      ? new Date(entry.created_at).toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" })
+                                      : "—"}
+                                  </td>
+                                  <td className="px-6 py-4 font-medium text-slate-900">
+                                    {entry.plan?.name ?? entry.plan_name ?? "—"}
+                                  </td>
+                                  <td className="px-6 py-4 text-slate-700">
+                                    {entry.amount != null
+                                      ? `₦${Number(entry.amount).toLocaleString()}`
+                                      : "—"}
+                                  </td>
+                                  <td className="px-6 py-4">
+                                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wide ${
+                                      (entry.status ?? "").toLowerCase() === "active" || (entry.status ?? "").toLowerCase() === "success"
+                                        ? "bg-emerald-100 text-emerald-700"
+                                        : (entry.status ?? "").toLowerCase() === "cancelled" || (entry.status ?? "").toLowerCase() === "failed"
+                                          ? "bg-red-100 text-red-700"
+                                          : "bg-slate-100 text-slate-600"
+                                    }`}>
+                                      {entry.status ?? "—"}
+                                    </span>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Empty State for other tabs */}
               {activeTab !== "general" &&
                 activeTab !== "business" &&
                 activeTab !== "kyc" &&
                 activeTab !== "configuration" &&
-                activeTab !== "apikeys" && (
+                activeTab !== "apikeys" &&
+                activeTab !== "billing" && (
                   <div className="h-64 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center text-center p-6 bg-slate-50/50">
                     <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-4">
                       <SettingsIcon className="w-6 h-6 text-slate-400" />

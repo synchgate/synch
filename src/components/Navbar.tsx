@@ -19,8 +19,8 @@ const Navbar = () => {
   const isHomePage = location.pathname === "/";
 
   const navLinks = [
+    { name: "Pricing", path: "/pricing" },
     { name: "Contact Us", path: "/contact-us" },
-    // { name: "Pricing", path: "/pricing" },
     ...(isHomePage
       ? [{ name: "How it works", path: "/#how-it-works", isAnchor: true }]
       : []),
