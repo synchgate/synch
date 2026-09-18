@@ -86,10 +86,10 @@ const SupportTicket = () => {
           </p>
           <button
             type="button"
-            onClick={() => navigate("/dashboard/billings")}
+            onClick={() => navigate("/dashboard")}
             className="px-8 py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all shadow-lg"
           >
-            Back to Billing
+            Back to dashboard
           </button>
         </motion.div>
       </div>
@@ -100,11 +100,11 @@ const SupportTicket = () => {
     <div className="max-w-3xl mx-auto pb-12">
       {/* Breadcrumb */}
       <Link
-        to="/dashboard/billings"
+        to="/dashboard"
         className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors mb-8 group"
       >
         <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-        Back to Billing
+        Back to dashboard
       </Link>
 
       <div className="space-y-8">

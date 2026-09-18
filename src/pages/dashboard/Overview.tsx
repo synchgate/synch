@@ -1,18 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import {
-  Activity,
+  ArrowDownLeft,
+  ArrowRight,
   ArrowUpRight,
+  Check,
   CheckCircle2,
   ChevronDown,
+  Circle,
   Clock,
-  Loader2,
+  LineChart as LineChartIcon,
   Server,
-  TrendingDown,
-  TrendingUp,
+  X,
   XCircle,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   CartesianGrid,
   Line,
@@ -22,402 +24,521 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import {
+  Card,
+  EmptyState,
+  EnvironmentBadge,
+  LoadingBlock,
+  PageHeader,
+  StatCard,
+  StatusBadge,
+  TypeBadge,
+} from "../../components/dashboard/ui";
+import { CodeTabs } from "../../components/docs/CodeBlock";
+import { requestSnippets } from "../../components/docs/snippets";
 import { useAuth } from "../../contexts/AuthContext";
 import { api } from "../../lib/api";
+import {
+  formatAmount,
+  formatNaira,
+  formatNumber,
+  timeAgo,
+  unwrap,
+  useEnvironment,
+} from "../../lib/dashboard";
 
-const chartData = [
-  { month: "Jan", success_rate: 94 },
-  { month: "Feb", success_rate: 96 },
-  { month: "Mar", success_rate: 95 },
-  { month: "Apr", success_rate: 92 },
-  { month: "May", success_rate: 97 },
-  { month: "Jun", success_rate: 98 },
-  { month: "Jul", success_rate: 96 },
-];
+const DISMISS_KEY = "synchgate:onboarding-dismissed";
+
+const testRequest = requestSnippets({
+  method: "POST",
+  path: "/initiate-payment/",
+  body: {
+    provider: "paystack",
+    email: "customer@example.com",
+    amount: 5000,
+    reference: "my-first-test-001",
+    callback_url: "https://yourdomain.com/payments/callback",
+  },
+});
+
+function useTransactionTotal(environment: "live" | "sandbox") {
+  const { userEmail } = useAuth();
+  return useQuery({
+    queryKey: ["transaction-total", userEmail, environment],
+    queryFn: async () => {
+      const response = await api.get("/transactions/", {
+        params: { environment, page_size: 1 },
+      });
+      return (response.data?.pagination?.total ?? 0) as number;
+    },
+    enabled: !!userEmail,
+    staleTime: 30_000,
+  });
+}
 
 function Overview() {
-  const navigate = useNavigate();
-  const { userEmail } = useAuth();
-  const [selectedYear, setSelectedYear] = useState("2026");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const { userEmail, userName, kycStatus, merchantMode } = useAuth();
+  const environment = useEnvironment();
+  const thisYear = new Date().getFullYear();
+  const years = [thisYear, thisYear - 1, thisYear - 2];
 
-  // Close dropdown when clicking outside
+  const [year, setYear] = useState(thisYear);
+  const [yearOpen, setYearOpen] = useState(false);
+  const yearRef = useRef<HTMLDivElement>(null);
+  const [dismissed, setDismissed] = useState(
+    () => localStorage.getItem(DISMISS_KEY) === "1",
+  );
+
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsDropdownOpen(false);
+    const close = (event: MouseEvent) => {
+      if (yearRef.current && !yearRef.current.contains(event.target as Node)) {
+        setYearOpen(false);
       }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    };
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
   }, []);
 
-  const years = ["2023", "2024", "2025", "2026"];
-
-  const {
-    data: overviewResponse,
-    isLoading,
-    error,
-    isError,
-  } = useQuery({
-    queryKey: ["overview", userEmail],
-    queryFn: async () => {
-      const token = localStorage.getItem("authToken");
-      const response = await api.get(`/analytics/overview/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return response.data;
-    },
+  const { data: overview, isLoading } = useQuery({
+    queryKey: ["overview", userEmail, environment],
+    queryFn: async () =>
+      unwrap<any>(
+        await api.get("/analytics/overview/", { params: { environment } }),
+      ),
     enabled: !!userEmail,
   });
 
-  const { data: graphResponse, isFetching: isGraphFetching } = useQuery({
-    queryKey: ["overview-graph", userEmail, selectedYear],
-    queryFn: async () => {
-      const token = localStorage.getItem("authToken");
-      const response = await api.get(
-        `/analytics/overview/graph/?year=${selectedYear}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      return response.data;
-    },
+  const { data: graph, isFetching: graphLoading } = useQuery({
+    queryKey: ["overview-graph", userEmail, environment, year],
+    queryFn: async () =>
+      unwrap<any[]>(
+        await api.get("/analytics/overview/graph/", {
+          params: { year, environment },
+        }),
+      ),
     enabled: !!userEmail,
   });
 
-  console.log("Raw API Response (overviewResponse):", overviewResponse);
-  console.log("Graph API Response (graphResponse):", graphResponse);
+  const { data: recent, isLoading: recentLoading } = useQuery({
+    queryKey: ["recent-transactions", userEmail, environment],
+    queryFn: async () =>
+      (
+        await api.get("/transactions/", {
+          params: { environment, page_size: 5 },
+        })
+      ).data?.data as any[],
+    enabled: !!userEmail,
+  });
 
-  const overviewData = overviewResponse?.data ||
-    overviewResponse || {
-      transactions: {
-        total_transactions: 0,
-        successful_transactions: 0,
-        failed_transactions: 0,
-        success_rate: "0%",
-        total_value: 0,
-      },
-      provider_performance: [],
-      provider_success_graph: [],
-    };
+  const { data: account } = useQuery({
+    queryKey: ["settings", userEmail],
+    queryFn: async () => (await api.get("/accounts/user/details/")).data,
+    enabled: !!userEmail,
+  });
 
-  const { transactions, provider_performance } = overviewData;
+  const sandboxTotal = useTransactionTotal("sandbox");
+  const liveTotal = useTransactionTotal("live");
 
-  // Use graphResponse for the chart data
-  const graphDataFromApi =
-    graphResponse?.data || graphResponse?.provider_success_graph || [];
+  const collections = overview?.transactions;
+  const payouts = overview?.payouts;
+  const providers: any[] = overview?.provider_performance ?? [];
+  const completed =
+    (collections?.successful_transactions ?? 0) +
+    (collections?.failed_transactions ?? 0);
 
-  const displayedChartData = graphDataFromApi.length
-    ? graphDataFromApi.map((d: any) => ({
-        month: d.month || "Unknown",
-        success_rate:
-          typeof d.success_rate === "string"
-            ? parseFloat(d.success_rate.replace("%", ""))
-            : d.success_rate || 0,
-      }))
-    : chartData;
+  // ---- onboarding checklist, worked out from real account state
+  const raw = account?.data || account || {};
+  const merchantData = Array.isArray(raw.merchants)
+    ? raw.merchants[0]
+    : raw.merchants;
+  const clients: any[] = merchantData?.api_clients ?? [];
+  const providerCount = clients
+    .filter((client) => {
+      const env = String(client.environment ?? "").toLowerCase();
+      return environment === "live"
+        ? env === "live"
+        : env === "sandbox" || env === "test";
+    })
+    .reduce((count, client) => count + (client.providers?.length ?? 0), 0);
 
-  console.log("Raw API Response (overviewResponse):", overviewResponse);
-  console.log("Extracted overviewData:", overviewData);
-  console.log("Extracted provider_performance:", provider_performance);
-  if (isError) {
-    console.error("API Error fetching overview:", error);
-  }
+  const steps = [
+    {
+      key: "provider",
+      title: "Connect a payment provider",
+      text: `Add your Paystack, Flutterwave or Nomba ${environment === "live" ? "live" : "test"} credentials.`,
+      done: providerCount > 0,
+      to: "/dashboard/providers",
+      cta: "Connect provider",
+    },
+    {
+      key: "test",
+      title: "Send your first test request",
+      text: "Call the API with your sandbox key and watch it appear here.",
+      done: (sandboxTotal.data ?? 0) > 0,
+      to: "/docs/installation",
+      cta: "Read the quickstart",
+    },
+    {
+      key: "kyc",
+      title: "Verify your business",
+      text: "Complete KYC so you can switch to live mode.",
+      done: kycStatus === "verified",
+      to: "/dashboard/settings",
+      state: { tab: "kyc" },
+      cta: "Start verification",
+    },
+    {
+      key: "live",
+      title: "Go live",
+      text: "Turn on live mode with the Test / Live switch at the top of the page.",
+      done: merchantMode === "live",
+    },
+    {
+      key: "first-live",
+      title: "Process your first live transaction",
+      text: "Use your live key to collect a payment or send a payout.",
+      done: (liveTotal.data ?? 0) > 0,
+      to: "/docs/initiate-payment",
+      cta: "See the API",
+    },
+  ];
+  const doneCount = steps.filter((step) => step.done).length;
+  const showChecklist = !dismissed && doneCount < steps.length && !isLoading;
+  const nextStep = steps.find((step) => !step.done);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-12 h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-      </div>
-    );
-  }
+  const chartData = (graph ?? []).map((month: any) => ({
+    month: String(month.month ?? "").slice(0, 3),
+    // a month with nothing completed has no rate, so leave a gap rather than plotting 0%
+    success_rate: month.completed_transactions > 0 ? month.success_rate : null,
+  }));
+  const chartHasData = chartData.some(
+    (point: any) => point.success_rate !== null,
+  );
+
+  const firstName = (userName || "").split(" ")[0];
+
+  if (isLoading) return <LoadingBlock label="Loading your overview…" />;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
-      {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-        <div>
-          <h1 className="font-['Outfit'] text-2xl sm:text-3xl font-bold text-black mb-1">
-            Overview Snapshot
-          </h1>
-          <p className="text-slate-600 text-sm sm:text-base">
-            Quick health snapshot of your payment operations.
-          </p>
-        </div>
+    <div className="max-w-6xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
+      <PageHeader
+        title={firstName ? `Welcome back, ${firstName}` : "Overview"}
+        description="A snapshot of your payments and payouts."
+        actions={<EnvironmentBadge environment={environment} />}
+      />
+
+      {showChecklist && (
+        <Card
+          title={`Get started (${doneCount} of ${steps.length} done)`}
+          description="A few steps to your first live transaction."
+          action={
+            <button
+              type="button"
+              onClick={() => {
+                localStorage.setItem(DISMISS_KEY, "1");
+                setDismissed(true);
+              }}
+              aria-label="Dismiss checklist"
+              className="text-slate-400 hover:text-slate-600 cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          }
+        >
+          <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden mb-5">
+            <div
+              className="h-full rounded-full bg-blue-600 transition-all"
+              style={{ width: `${(doneCount / steps.length) * 100}%` }}
+            />
+          </div>
+          <ol className="space-y-4">
+            {steps.map((step) => (
+              <li key={step.key} className="flex items-start gap-3">
+                {step.done ? (
+                  <span className="mt-0.5 w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0">
+                    <Check className="w-3 h-3" strokeWidth={3} />
+                  </span>
+                ) : (
+                  <Circle className="mt-0.5 w-5 h-5 text-slate-300 shrink-0" />
+                )}
+                <div className="flex-1 min-w-0">
+                  <p
+                    className={`text-sm font-medium ${step.done ? "text-slate-400 line-through" : "text-slate-900"}`}
+                  >
+                    {step.title}
+                  </p>
+                  {!step.done && (
+                    <p className="text-xs text-slate-500 mt-0.5">{step.text}</p>
+                  )}
+                </div>
+                {!step.done && step.to && step === nextStep && (
+                  <Link
+                    to={step.to}
+                    state={step.state}
+                    className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700"
+                  >
+                    {step.cta} <ArrowRight className="w-3 h-3" />
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ol>
+        </Card>
+      )}
+
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          label="Payments received"
+          value={formatNaira(collections?.total_value)}
+          hint={`${formatNumber(collections?.successful_transactions)} successful payments`}
+          icon={<ArrowDownLeft className="w-4 h-4 text-emerald-600" />}
+        />
+        <StatCard
+          label="Success rate"
+          value={completed > 0 ? collections?.success_rate : "—"}
+          hint={
+            completed > 0
+              ? `${formatNumber(collections?.failed_transactions)} failed of ${formatNumber(completed)} completed`
+              : "Shown once a payment completes"
+          }
+          icon={<CheckCircle2 className="w-4 h-4 text-blue-600" />}
+        />
+        <StatCard
+          label="Payments"
+          value={formatNumber(collections?.total_transactions)}
+          hint={`${formatNumber(collections?.in_progress_transactions)} in progress`}
+          icon={<Clock className="w-4 h-4 text-amber-500" />}
+        />
+        <StatCard
+          label="Payouts sent"
+          value={formatNaira(payouts?.total_value)}
+          hint={`${formatNumber(payouts?.total_transactions)} payouts, ${formatNumber(payouts?.in_progress_transactions)} in progress`}
+          icon={<ArrowUpRight className="w-4 h-4 text-violet-600" />}
+        />
       </div>
 
-      {/* Metric Cards (Top Row) */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        {[
-          {
-            label: "Total Transactions",
-            value: transactions.total_transactions?.toLocaleString() || "0",
-            trend: "+0%",
-            color: "text-emerald-600",
-            up: true,
-          },
-          {
-            label: "Successful tx",
-            value:
-              transactions.successful_transactions?.toLocaleString() || "0",
-            trend: "+0%",
-            color: "text-emerald-600",
-            up: true,
-          },
-          {
-            label: "Failed tx",
-            value: transactions.failed_transactions?.toLocaleString() || "0",
-            trend: "-0%",
-            color: "text-emerald-600",
-            up: false,
-          },
-          {
-            label: "Success Rate",
-            value: transactions.success_rate || "0%",
-            trend: "+0%",
-            color: "text-blue-600",
-            up: true,
-          },
-          {
-            label: "Total Value",
-            value: `₦${transactions.total_value?.toLocaleString() || "0"}`,
-            trend: "+0%",
-            color: "text-emerald-600",
-            up: true,
-          },
-        ].map((stat) => (
-          <div
-            key={stat.label}
-            onClick={() => navigate("/dashboard/transactions")}
-            className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm flex flex-col justify-between cursor-pointer hover:border-blue-300 hover:shadow-md transition-all group"
-          >
-            <span className="text-xs font-medium text-slate-500 mb-3 block">
-              {stat.label}
-            </span>
-            <div className="flex items-end justify-between">
-              <span className="font-['Outfit'] text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
-                {stat.value}
-              </span>
-              <div
-                className={`flex items-center gap-0.5 text-xs font-semibold px-2 py-1 rounded-full ${stat.color} bg-slate-50`}
-              >
-                {stat.up ? (
-                  <TrendingUp className="w-3 h-3" />
-                ) : (
-                  <TrendingDown className="w-3 h-3" />
-                )}
-                {stat.trend}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      {environment === "sandbox" && (sandboxTotal.data ?? 1) === 0 && (
+        <Card
+          title="Make your first test request"
+          description="Use your sandbox key, then check the Transactions tab. No real money moves in test mode."
+        >
+          <CodeTabs snippets={testRequest} className="mb-0" />
+        </Card>
+      )}
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Success Rate Chart */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-6 flex flex-col h-[400px]">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="font-semibold text-slate-900 flex items-center gap-2">
-              <Activity className="w-5 h-5 text-blue-500" /> Success Rate Trend
-              (Yearly)
-            </h3>
-
-            {/* Year Dropdown */}
-            <div className="relative" ref={dropdownRef}>
+        <Card
+          className="lg:col-span-2"
+          title="Success rate by month"
+          description="Payments only, measured over completed payments"
+          action={
+            <div className="relative" ref={yearRef}>
               <button
                 type="button"
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 hover:border-slate-300 transition-all cursor-pointer"
+                onClick={() => setYearOpen(!yearOpen)}
+                className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 cursor-pointer"
               >
-                {selectedYear}
+                {year}
                 <ChevronDown
-                  className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`}
+                  className={`w-4 h-4 text-slate-500 transition-transform ${yearOpen ? "rotate-180" : ""}`}
                 />
               </button>
-
-              {isDropdownOpen && (
-                <div className="absolute right-0 mt-1 w-24 bg-white border border-slate-200 rounded-lg shadow-lg z-50 py-1 animate-in fade-in zoom-in-95 duration-100">
-                  {years.map((year) => (
+              {yearOpen && (
+                <div className="absolute right-0 mt-1 w-24 bg-white border border-slate-200 rounded-lg shadow-lg z-20 py-1">
+                  {years.map((option) => (
                     <button
-                      key={year}
+                      key={option}
                       type="button"
                       onClick={() => {
-                        setSelectedYear(year);
-                        setIsDropdownOpen(false);
+                        setYear(option);
+                        setYearOpen(false);
                       }}
-                      className={`w-full text-left px-4 py-2 text-sm hover:bg-blue-50 hover:text-blue-600 transition-colors ${selectedYear === year ? "text-blue-600 font-semibold bg-blue-50/50" : "text-slate-600"}`}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-blue-50 cursor-pointer ${
+                        option === year
+                          ? "text-blue-600 font-semibold"
+                          : "text-slate-600"
+                      }`}
                     >
-                      {year}
+                      {option}
                     </button>
                   ))}
                 </div>
               )}
             </div>
-          </div>
-          <div className="flex-1 w-full relative">
-            {/* Chart Loader Overlay */}
-            {isGraphFetching && (
-              <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-[1px] flex items-center justify-center rounded-xl animate-in fade-in duration-200">
-                <div className="flex flex-col items-center gap-2">
-                  <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
-                  <span className="text-xs font-medium text-slate-500">
-                    Updating data...
-                  </span>
-                </div>
-              </div>
-            )}
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={displayedChartData}
-                margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  vertical={false}
-                  stroke="#e2e8f0"
-                />
-                <XAxis
-                  dataKey="month"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "#64748b", fontSize: 12 }}
-                  dy={10}
-                  tickFormatter={(val) => val.substring(0, 3)}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "#64748b", fontSize: 12 }}
-                  domain={[80, 100]}
-                  dx={-10}
-                  tickFormatter={(val) => `${val}%`}
-                />
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: "8px",
-                    border: "1px solid #e2e8f0",
-                    boxShadow:
-                      "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
-                  }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="success_rate"
-                  stroke="#2563eb"
-                  strokeWidth={3}
-                  dot={false}
-                  activeDot={{
-                    r: 6,
-                    fill: "#2563eb",
-                    stroke: "#fff",
-                    strokeWidth: 2,
-                  }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+          }
+        >
+          {chartHasData ? (
+            <div
+              className={`h-72 transition-opacity ${graphLoading ? "opacity-50" : ""}`}
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={chartData}
+                  margin={{ top: 5, right: 16, bottom: 5, left: 0 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="#e2e8f0"
+                  />
+                  <XAxis
+                    dataKey="month"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#64748b", fontSize: 12 }}
+                    dy={8}
+                  />
+                  <YAxis
+                    domain={[0, 100]}
+                    ticks={[0, 25, 50, 75, 100]}
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#64748b", fontSize: 12 }}
+                    tickFormatter={(value) => `${value}%`}
+                    width={44}
+                  />
+                  <Tooltip
+                    formatter={(value) => [`${value}%`, "Success rate"]}
+                    contentStyle={{
+                      borderRadius: 8,
+                      border: "1px solid #e2e8f0",
+                      fontSize: 12,
+                    }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="success_rate"
+                    stroke="#2563eb"
+                    strokeWidth={3}
+                    dot={{ r: 3, fill: "#2563eb" }}
+                    activeDot={{ r: 6, stroke: "#fff", strokeWidth: 2 }}
+                    connectNulls={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <EmptyState
+              icon={<LineChartIcon className="w-6 h-6" />}
+              title={`No completed payments in ${year}`}
+            >
+              Your monthly success rate will be charted here once payments
+              complete.
+            </EmptyState>
+          )}
+        </Card>
 
-        {/* Provider Performance Table */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden h-fit flex flex-col">
-          <div className="px-5 sm:px-6 py-4 border-b border-slate-200 flex items-center justify-between shrink-0">
-            <h3 className="font-semibold text-slate-900 flex items-center gap-2">
-              <Server className="w-5 h-5 text-blue-500" /> Provider Performance
-            </h3>
-          </div>
-          <div className="divide-y divide-slate-100 overflow-x-auto">
+        <Card
+          padded={false}
+          title="Provider performance"
+          action={
+            <Link
+              to="/dashboard/analytics"
+              className="text-xs font-medium text-blue-600 hover:text-blue-700"
+            >
+              Details
+            </Link>
+          }
+        >
+          {providers.length === 0 ? (
+            <EmptyState
+              icon={<Server className="w-6 h-6" />}
+              title="No provider data yet"
+            >
+              Provider results show here once payments are processed.
+            </EmptyState>
+          ) : (
             <table className="w-full text-sm text-left">
-              <thead className="bg-slate-50 text-xs uppercase text-slate-500 rounded-t-lg">
+              <thead className="bg-slate-50 text-xs uppercase text-slate-500">
                 <tr>
                   <th className="px-4 py-3 font-medium">Provider</th>
-                  <th className="px-4 py-3 font-medium text-right">Total TX</th>
-                  <th className="px-4 py-3 font-medium text-right">SR %</th>
-                  <th className="px-4 py-3 font-medium text-center">Status</th>
+                  <th className="px-4 py-3 font-medium text-right">Payments</th>
+                  <th className="px-4 py-3 font-medium text-right">Success</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {provider_performance?.length > 0 ? (
-                  provider_performance.map((provider: any) => {
-                    const name =
-                      provider.provider ||
-                      provider.provider_name ||
-                      provider.name ||
-                      "Unknown";
-                    const tx = provider.total_transactions ?? provider.tx ?? 0;
-                    const sr = provider.success_rate || provider.rate || "-";
-                    const status = (provider.status || "good").toLowerCase();
-
-                    let statusTextColor = "text-emerald-600";
-                    let StatusIcon = CheckCircle2;
-
-                    if (status === "poor") {
-                      statusTextColor = "text-red-500";
-                      StatusIcon = XCircle;
-                    } else if (status === "average") {
-                      statusTextColor = "text-amber-500";
-                      StatusIcon = Clock;
-                    }
-
-                    const providerKey = provider.id || name;
-
-                    return (
-                      <tr
-                        key={providerKey}
-                        className="hover:bg-slate-50 transition-colors"
-                      >
-                        <td className="px-4 py-3 font-medium text-slate-900 capitalize">
-                          {name}
-                        </td>
-                        <td className="px-4 py-3 text-right text-slate-600">
-                          {tx.toLocaleString()}
-                        </td>
-                        <td className="px-4 py-3 text-right font-medium text-slate-900">
-                          {sr}
-                        </td>
-                        <td className="px-4 py-3 pb-3 text-center flex justify-center mt-1">
-                          <div
-                            className={`inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider ${statusTextColor}`}
-                          >
-                            <StatusIcon className="w-3.5 h-3.5" />
-                            {status}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td
-                      colSpan={4}
-                      className="px-4 py-8 text-center text-slate-500 text-sm"
-                    >
-                      No provider data available.
+                {providers.map((provider) => (
+                  <tr key={provider.provider}>
+                    <td className="px-4 py-3 font-medium text-slate-900 capitalize">
+                      <span className="inline-flex items-center gap-2">
+                        {provider.status === "poor" ? (
+                          <XCircle className="w-3.5 h-3.5 text-red-500" />
+                        ) : provider.status === "average" ? (
+                          <Clock className="w-3.5 h-3.5 text-amber-500" />
+                        ) : (
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                        )}
+                        {provider.provider || "—"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right text-slate-600">
+                      {formatNumber(provider.total_transactions)}
+                    </td>
+                    <td className="px-4 py-3 text-right font-medium text-slate-900">
+                      {provider.success_rate}
                     </td>
                   </tr>
-                )}
+                ))}
+              </tbody>
+            </table>
+          )}
+        </Card>
+      </div>
+
+      <Card
+        padded={false}
+        title="Recent activity"
+        action={
+          <Link
+            to="/dashboard/transactions"
+            className="text-xs font-medium text-blue-600 hover:text-blue-700 inline-flex items-center gap-1"
+          >
+            View all <ArrowRight className="w-3 h-3" />
+          </Link>
+        }
+      >
+        {recentLoading ? (
+          <LoadingBlock />
+        ) : !recent || recent.length === 0 ? (
+          <EmptyState
+            title={`No ${environment === "live" ? "live" : "test"} transactions yet`}
+          >
+            They appear here as soon as you send a request.
+          </EmptyState>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <tbody className="divide-y divide-slate-100">
+                {recent.map((tx) => (
+                  <tr key={tx.id} className="hover:bg-slate-50">
+                    <td className="px-5 py-3.5">
+                      <TypeBadge type={tx.transaction_type} />
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <span className="block font-medium text-slate-900 max-w-[220px] truncate">
+                        {tx.reference || tx.transaction_id}
+                      </span>
+                      <span className="block text-xs text-slate-500 capitalize">
+                        {tx.provider}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5 text-right font-semibold text-slate-900 whitespace-nowrap">
+                      {tx.transaction_type === "payout" ? "−" : ""}
+                      {formatAmount(tx.amount, tx.currency)}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <StatusBadge status={tx.status} />
+                    </td>
+                    <td className="px-5 py-3.5 text-xs text-slate-500 text-right whitespace-nowrap">
+                      {timeAgo(tx.created_at)}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
-          <div className="bg-slate-50 border-t border-slate-200 p-3 text-center">
-            <Link
-              to="/dashboard/providers"
-              className="text-xs font-medium text-blue-600 hover:text-blue-700 inline-flex items-center transition-colors cursor-pointer group"
-            >
-              View detailed routing metrics
-              <ArrowUpRight className="w-3 h-3 ml-1 text-blue-400 group-hover:text-blue-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </Link>
-          </div>
-        </div>
-      </div>
+        )}
+      </Card>
     </div>
   );
 }
