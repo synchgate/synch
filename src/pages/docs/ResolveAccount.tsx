@@ -1,127 +1,125 @@
-import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Endpoint, ParamTable } from "../../components/docs/ApiReference";
+import { CodeBlock, CodeTabs } from "../../components/docs/CodeBlock";
+import {
+  Callout,
+  DocPage,
+  InlineCode,
+  PageHeader,
+  PageNav,
+  Prose,
+  SectionHeading,
+} from "../../components/docs/DocLayout";
+import { FlowAnimation } from "../../components/docs/FlowAnimation";
+import { resolveFlow } from "../../components/docs/flows";
 import { SupportedProviders } from "../../components/docs/SupportedProviders";
-import { CopyButton } from "../../components/ui/CopyButton";
+import { requestSnippets } from "../../components/docs/snippets";
+
+const snippets = requestSnippets({
+  method: "POST",
+  path: "/bank/resolve/",
+  body: {
+    provider: "paystack",
+    account_number: "0123456789",
+    code: "058",
+  },
+});
+
+const successResponse = `{
+  "status": "success",
+  "message": "Bank Account Details",
+  "data": {
+    "accountName": "ADA OBI",
+    "accountNumber": "0123456789"
+  },
+  "meta": {
+    "request_id": "922bdcd8-b5e1-4bcc-9f8f-45ec0dc174bb",
+    "timestamp": "2026-09-18T02:03:28.369634Z"
+  }
+}`;
 
 function ResolveAccount() {
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 text-slate-900">
-      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-200 bg-blue-50 mb-6 shadow-sm">
-        <span className="text-xs font-medium text-blue-600 uppercase tracking-wider">
-          TRANSFER
-        </span>
-      </div>
-
-      <h1 className="font-['Outfit'] text-4xl md:text-5xl font-bold mb-6 text-black">
-        Resolve Account
-      </h1>
-
-      <p className="text-lg text-slate-600 leading-relaxed mb-8">
-        This endpoint allows you to verify a customer's bank account details
-        before initiating a transfer.
-      </p>
+    <DocPage>
+      <PageHeader eyebrow="TRANSFER" title="Resolve Account">
+        Look up the name on a bank account before you send money to it, so a
+        typo in the account number never sends a payout to the wrong person.
+      </PageHeader>
 
       <SupportedProviders />
 
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
-        Base URL
-      </h2>
-      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10 relative group flex items-center justify-between">
-        <span>https://api.synchgate.com/v1/api</span>
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-          <CopyButton textToCopy="https://api.synchgate.com/v1/api" />
-        </div>
-      </div>
+      <SectionHeading>How it works</SectionHeading>
+      <FlowAnimation {...resolveFlow} />
 
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 border-b border-slate-200 pb-2 text-black">
-        Endpoint
-      </h2>
-      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10 relative group flex items-center justify-between">
-        <span>POST /bank/resolve-account/</span>
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-          <CopyButton textToCopy="POST /resolve-account/" />
-        </div>
-      </div>
-
-      <h3 className="font-semibold text-slate-900 text-lg mb-3">
-        Request Payload
-      </h3>
-      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-8 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
-        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-          <CopyButton
-            textToCopy={`{\n    "provider": "flutterwave",\n    "account_number": "1243190620",\n    "bank_code": "044"\n}`}
-          />
-        </div>
-        <pre>
-          {`{
-    "provider": "flutterwave",
-    "account_number": "1243190620",
-    "bank_code": "044"
-}`}
-        </pre>
-      </div>
-
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
-        Example Response
-      </h2>
-      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
-        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-          <CopyButton
-            textToCopy={`{\n    "status": "success",\n    "message": "Bank Account Details",\n    "data": {\n        "accountName": "John Doe",\n        "accountNumber": "1243190620"\n    },\n    "meta": {\n        "request_id": "922bdcd8-b5e1-4bcc-9f8f-45ec0dc174bb",\n        "timestamp": "2026-04-01T02:03:28.369634Z"\n    }\n}`}
-          />
-        </div>
-        <pre>
-          {`{
-    "status": "success",
-    "message": "Bank Account Details",
-    "data": {
-        "accountName": "John Doe",
-        "accountNumber": "1243190620"
-    },
-    "meta": {
-        "request_id": "922bdcd8-b5e1-4bcc-9f8f-45ec0dc174bb",
-        "timestamp": "2026-04-01T02:03:28.369634Z"
-    }
-}`}
-        </pre>
-      </div>
-
-      {/* Navigation Footer */}
-      <div className="grid grid-cols-2 gap-4 items-center py-8 mt-16 border-t border-slate-200">
+      <SectionHeading>Endpoint</SectionHeading>
+      <Endpoint method="POST" path="/bank/resolve/" />
+      <Prose>
+        Authenticate with your secret key in the{" "}
+        <InlineCode>Client-Secret-Key</InlineCode> header, as described in{" "}
         <Link
-          to="/docs/banks"
-          className="flex items-center gap-2 text-slate-600 hover:text-blue-600 transition-colors group cursor-pointer min-w-0"
+          to="/docs/authentication"
+          className="text-blue-600 hover:underline"
         >
-          <div className="w-10 h-10 shrink-0 rounded-full border border-slate-200 flex items-center justify-center group-hover:bg-blue-50 group-hover:border-blue-200 transition-colors">
-            <ArrowLeft className="w-5 h-5 text-slate-500 group-hover:text-blue-600" />
-          </div>
-          <div className="text-left min-w-0 pr-2">
-            <span className="text-xs text-slate-500 uppercase tracking-wider block">
-              Previous
-            </span>
-            <span className="font-medium text-blue-600 group-hover:text-blue-500 block truncate">
-              Banks
-            </span>
-          </div>
+          Authentication
         </Link>
-        <Link
-          to="/docs/initiate-transfer"
-          className="flex items-center gap-2 text-slate-600 hover:text-blue-600 transition-colors group cursor-pointer min-w-0 justify-end text-right"
-        >
-          <div className="text-right min-w-0 pl-2">
-            <span className="text-xs text-slate-500 uppercase tracking-wider block">
-              Next
-            </span>
-            <span className="font-medium text-blue-600 group-hover:text-blue-500 block truncate">
-              Initiate Transfer
-            </span>
-          </div>
-          <div className="w-10 h-10 shrink-0 rounded-full border border-slate-200 flex items-center justify-center group-hover:bg-blue-50 group-hover:border-blue-200 transition-colors">
-            <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-blue-600" />
-          </div>
-        </Link>
-      </div>
-    </div>
+        . The provider must already be connected in your dashboard.
+      </Prose>
+      <Callout title="Sandbox returns a sample account">
+        With a sandbox key this endpoint does not look the account up. It
+        returns a fixed sample account, so use a live key to resolve real
+        accounts.
+      </Callout>
+
+      <SectionHeading>Request body</SectionHeading>
+      <ParamTable
+        params={[
+          {
+            name: "provider",
+            type: "string",
+            required: true,
+            description:
+              "Provider to resolve the account with, for example paystack, flutterwave or nomba.",
+          },
+          {
+            name: "account_number",
+            type: "string",
+            required: true,
+            description: "The bank account number to look up.",
+          },
+          {
+            name: "code",
+            type: "string",
+            required: true,
+            description: (
+              <>
+                The bank's code, from the{" "}
+                <Link to="/docs/banks" className="text-blue-300 underline">
+                  Banks API
+                </Link>
+                .
+              </>
+            ),
+          },
+        ]}
+      />
+
+      <SectionHeading>Example request</SectionHeading>
+      <CodeTabs snippets={snippets} />
+
+      <SectionHeading>Response</SectionHeading>
+      <CodeBlock code={successResponse} title="200 OK" />
+      <Prose>
+        <InlineCode>data.accountName</InlineCode> is the name registered on the
+        account. Show it to your user, or compare it with the name you expect,
+        and pass it as <InlineCode>account_name</InlineCode> when you initiate
+        the transfer.
+      </Prose>
+
+      <PageNav
+        prev={{ label: "Banks API", to: "/docs/banks" }}
+        next={{ label: "Initiate Transfer", to: "/docs/initiate-transfer" }}
+      />
+    </DocPage>
   );
 }
 

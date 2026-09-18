@@ -32,6 +32,7 @@ import Transactions from "./pages/dashboard/Transactions";
 import Authentication from "./pages/docs/Authentication";
 import BanksApi from "./pages/docs/BanksApi";
 import DataPrivacy from "./pages/docs/DataPrivacy";
+import Errors from "./pages/docs/Errors";
 import InitiatePayment from "./pages/docs/InitiatePayment";
 import InitiateTransfer from "./pages/docs/InitiateTransfer";
 import Installation from "./pages/docs/Installation";
@@ -118,6 +119,7 @@ function App() {
               />
               <Route path="installation" element={<Installation />} />
               <Route path="authentication" element={<Authentication />} />
+              <Route path="errors" element={<Errors />} />
               <Route path="initiate-payment" element={<InitiatePayment />} />
               <Route path="smart-routes" element={<SmartRoutes />} />
               <Route
