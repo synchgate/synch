@@ -16,7 +16,6 @@ import {
 import { useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import logo from "../assets/logo.png";
-import { ALLOW_FEATURE } from "../config/features";
 import { useAuth } from "../contexts/AuthContext";
 import { api } from "../lib/api";
 
