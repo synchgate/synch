@@ -1,10 +1,21 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle, AlertCircle, Loader2, Calendar, Phone, Mail, User, Building2, MessageSquare, ArrowLeft } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowLeft,
+  Building2,
+  Calendar,
+  CheckCircle,
+  Loader2,
+  Mail,
+  MessageSquare,
+  Phone,
+  User,
+} from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { contactService } from "../services/contact";
-import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
+import { contactService } from "../services/contact";
 
 export default function DemoPage() {
   const [form, setForm] = useState({
@@ -15,11 +26,13 @@ export default function DemoPage() {
     preferred_date: "",
     message: "",
   });
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -35,7 +48,7 @@ export default function DemoPage() {
         ...form,
         preferred_date: new Date(form.preferred_date).toISOString(),
       };
-      
+
       await contactService.submitDemoRequest(payload);
       setStatus("success");
       setForm({
@@ -50,8 +63,8 @@ export default function DemoPage() {
       console.error("Demo request error:", error);
       setStatus("error");
       setErrorMessage(
-        error.response?.data?.message || 
-        "Something went wrong while booking your demo. Please try again."
+        error.response?.data?.message ||
+          "Something went wrong while booking your demo. Please try again.",
       );
     }
   };
@@ -59,7 +72,7 @@ export default function DemoPage() {
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-500/30 relative">
       <Navbar />
-      
+
       {/* Background elements */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full bg-blue-50 blur-[120px]"></div>
@@ -68,43 +81,51 @@ export default function DemoPage() {
 
       <main className="relative z-10 pt-32 pb-20 px-6">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-16 items-start">
-          
           {/* Left Column: Context & Hero */}
           <div className="lg:w-1/2 lg:sticky lg:top-40">
-            <Link to="/" className="inline-flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-colors mb-8 group">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-colors mb-8 group"
+            >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
               <span className="text-sm font-medium">Back to Home</span>
             </Link>
-            
+
             <h1 className="font-['Outfit'] text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-black">
               See the future of <span className="text-blue-600">payments.</span>
             </h1>
             <p className="text-lg text-slate-600 mb-12 leading-relaxed max-w-xl font-light">
-              Join a 30-minute deep dive into SynchGate. Discover how our unified API and intelligent routing can save you thousands in processing fees and months of development time.
+              Join a 30-minute walkthrough of SynchGate. See how one API for
+              payments, bank transfers and provider routing can save your team
+              months of integration work.
             </p>
 
             <div className="space-y-8">
               {[
                 {
                   title: "Expert Guidance",
-                  desc: "One-on-one session with our product experts tailored to your business needs."
+                  desc: "One-on-one session with our product experts tailored to your business needs.",
                 },
                 {
                   title: "Technical Walkthrough",
-                  desc: "A deep dive into our API documentation and integration patterns."
+                  desc: "A deep dive into our API documentation and integration patterns.",
                 },
                 {
                   title: "Custom Pricing",
-                  desc: "Get a personalized quote based on your transaction volume and requirements."
-                }
+                  desc: "Get a personalized quote based on your transaction volume and requirements.",
+                },
               ].map((benefit, i) => (
                 <div key={i} className="flex gap-4">
                   <div className="shrink-0 w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center mt-1">
                     <CheckCircle className="w-4 h-4 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-slate-900 font-bold mb-1">{benefit.title}</h3>
-                    <p className="text-slate-600 text-sm leading-relaxed">{benefit.desc}</p>
+                    <h3 className="text-slate-900 font-bold mb-1">
+                      {benefit.title}
+                    </h3>
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      {benefit.desc}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -113,7 +134,7 @@ export default function DemoPage() {
 
           {/* Right Column: The Form */}
           <div className="lg:w-1/2 w-full">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="bg-white rounded-[2.5rem] border border-slate-200 shadow-2xl p-8 md:p-12 relative overflow-hidden"
@@ -127,9 +148,12 @@ export default function DemoPage() {
                       </div>
                     </div>
                     <div className="space-y-3">
-                      <h3 className="text-3xl font-bold text-slate-900 tracking-tight">Booking Confirmed!</h3>
+                      <h3 className="text-3xl font-bold text-slate-900 tracking-tight">
+                        Booking Confirmed!
+                      </h3>
                       <p className="text-slate-600 max-w-sm mx-auto leading-relaxed text-lg">
-                        We've received your request. Check your inbox for a confirmation email and calendar invite.
+                        We've received your request. Check your inbox for a
+                        confirmation email and calendar invite.
                       </p>
                     </div>
                     <div className="pt-8">
@@ -144,8 +168,12 @@ export default function DemoPage() {
                 ) : (
                   <>
                     <div className="mb-10 text-center lg:text-left">
-                      <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Book your demo session</h2>
-                      <p className="text-slate-500 mt-2">Fill in your details and we'll be in touch.</p>
+                      <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
+                        Book your demo session
+                      </h2>
+                      <p className="text-slate-500 mt-2">
+                        Fill in your details and we'll be in touch.
+                      </p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
@@ -173,7 +201,8 @@ export default function DemoPage() {
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-bold text-slate-700 flex items-center gap-2 px-1">
-                            <Mail className="w-4 h-4 text-blue-600" /> Business Email
+                            <Mail className="w-4 h-4 text-blue-600" /> Business
+                            Email
                           </label>
                           <input
                             required
@@ -190,7 +219,8 @@ export default function DemoPage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                           <label className="text-sm font-bold text-slate-700 flex items-center gap-2 px-1">
-                            <Phone className="w-4 h-4 text-blue-600" /> Phone Number
+                            <Phone className="w-4 h-4 text-blue-600" /> Phone
+                            Number
                           </label>
                           <input
                             required
@@ -204,7 +234,8 @@ export default function DemoPage() {
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-bold text-slate-700 flex items-center gap-2 px-1">
-                            <Building2 className="w-4 h-4 text-blue-600" /> Company Name
+                            <Building2 className="w-4 h-4 text-blue-600" />{" "}
+                            Company Name
                           </label>
                           <input
                             required
@@ -220,7 +251,8 @@ export default function DemoPage() {
 
                       <div className="space-y-2">
                         <label className="text-sm font-bold text-slate-700 flex items-center gap-2 px-1">
-                          <Calendar className="w-4 h-4 text-blue-600" /> Preferred Date & Time
+                          <Calendar className="w-4 h-4 text-blue-600" />{" "}
+                          Preferred Date & Time
                         </label>
                         <input
                           required
@@ -234,7 +266,8 @@ export default function DemoPage() {
 
                       <div className="space-y-2">
                         <label className="text-sm font-bold text-slate-700 flex items-center gap-2 px-1">
-                          <MessageSquare className="w-4 h-4 text-blue-600" /> How can we help?
+                          <MessageSquare className="w-4 h-4 text-blue-600" />{" "}
+                          How can we help?
                         </label>
                         <textarea
                           required
@@ -261,9 +294,10 @@ export default function DemoPage() {
                           "Book My Demo Session"
                         )}
                       </button>
-                      
+
                       <p className="text-center text-slate-400 text-xs mt-4">
-                        By submitting this form, you agree to our privacy policy and terms of service.
+                        By submitting this form, you agree to our privacy policy
+                        and terms of service.
                       </p>
                     </form>
                   </>
