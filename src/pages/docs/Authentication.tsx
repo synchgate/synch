@@ -1,101 +1,139 @@
-import { ArrowRight, KeyRound } from "lucide-react";
-import { Link } from "react-router-dom";
+import { KeyRound } from "lucide-react";
+import { ReferenceTable } from "../../components/docs/ApiReference";
+import { CodeBlock, CodeTabs } from "../../components/docs/CodeBlock";
+import {
+  Callout,
+  DocPage,
+  InlineCode,
+  PageHeader,
+  PageNav,
+  Prose,
+  SectionHeading,
+} from "../../components/docs/DocLayout";
+import { requestSnippets } from "../../components/docs/snippets";
+
+const snippets = requestSnippets({
+  method: "GET",
+  path: "/banks/",
+  query: { provider: "paystack" },
+});
+
+const authError = `{
+  "status": "error",
+  "message": "Invalid client secret key.",
+  "error": {
+    "code": "authentication_failed",
+    "details": {
+      "detail": "Invalid client secret key."
+    }
+  },
+  "meta": {
+    "request_id": "d1b75731-198a-487b-ba66-249538b9af36",
+    "timestamp": "2026-09-18T20:26:39.520495Z"
+  }
+}`;
 
 function Authentication() {
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 text-slate-900">
-      <h1 className="font-['Outfit'] text-4xl md:text-5xl font-bold mb-6 text-black">
-        Authentication
-      </h1>
-
-      <p className="text-lg text-slate-600 leading-relaxed mb-8">
-        The SynchGate API uses secret keys to authenticate requests. You can
-        view and manage your API keys in the SynchGate Dashboard.
-      </p>
+    <DocPage>
+      <PageHeader title="Authentication">
+        The SynchGate API authenticates every request with your secret key, sent
+        in the <InlineCode>Client-Secret-Key</InlineCode> header. You can view
+        and regenerate your keys in the SynchGate dashboard.
+      </PageHeader>
 
       <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-xl mb-10 flex gap-4 text-yellow-800 shadow-sm">
         <KeyRound className="w-6 h-6 shrink-0 mt-0.5" />
         <div>
           <h4 className="font-semibold mb-1">Keep your keys safe</h4>
           <p className="text-sm">
-            Your secret keys carry many privileges, so be sure to keep them
-            confidential! Do not share your secret keys in publicly accessible
-            areas such as GitHub, client-side code, and so forth.
+            Your secret key can move money. Keep it on your server, load it from
+            an environment variable, and never put it in client-side code, a
+            mobile app or a public repository. If a key is exposed, regenerate
+            it from the dashboard straight away.
           </p>
         </div>
       </div>
 
-      <h2 className="font-['Outfit'] text-2xl font-bold mb-4 border-b border-slate-200 pb-2 text-black">
-        Authenticating requests
-      </h2>
-      <p className="text-slate-600 mb-6">
-        Depending on the framework or SDK you are using, you will supply your
-        API key during initialization. All API requests must be made over HTTPS.
-        Calls made over plain HTTP will fail. API requests without
-        authentication will also fail.
-      </p>
+      <SectionHeading>Authenticating requests</SectionHeading>
+      <Prose>
+        Add your secret key to the header of every request. All requests must be
+        made over HTTPS. Requests without a valid key are rejected.
+      </Prose>
+      <CodeBlock code="Client-Secret-Key: synch_sk_live_your_key_here" />
+      <CodeTabs snippets={snippets} />
 
-      <div className="relative rounded-2xl overflow-hidden mb-12 border border-slate-200 shadow-lg">
-        <div className="flex items-center gap-2 bg-slate-50 px-4 py-3 border-b border-slate-200">
-          <div className="w-3 h-3 rounded-full bg-red-400"></div>
-          <div className="w-3 h-3 rounded-full bg-amber-400"></div>
-          <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
-          <div className="text-xs text-slate-500 ml-2 font-mono">init.ts</div>
-        </div>
-        <pre className="text-sm font-mono text-slate-800 bg-white p-6 overflow-x-auto shadow-inner">
-          <code>
-            <span className="text-pink-600">import</span> &#123; SynchGate
-            &#125; <span className="text-pink-600">from</span>{" "}
-            <span className="text-blue-600">'@synchgate/node'</span>;<br />
-            <br />
-            <span className="text-slate-400">
-              // Initialize with your secret key
-            </span>
-            <br />
-            <span className="text-blue-700">const</span> SynchGate ={" "}
-            <span className="text-pink-600">new</span>{" "}
-            <span className="text-amber-600">SynchGate</span>(
-            <span className="text-blue-600">'pf_test_xxyz123abc'</span>);
-            <br />
-          </code>
-        </pre>
-      </div>
+      <SectionHeading>Sandbox and live keys</SectionHeading>
+      <Prose>
+        Your account has one key per environment. The prefix tells you which
+        environment a key belongs to, and the environment decides where the
+        request is recorded.
+      </Prose>
+      <ReferenceTable
+        headers={["Key prefix", "Environment", "Behaviour"]}
+        rows={[
+          {
+            key: "sandbox",
+            cells: [
+              "synch_sk_sandbox_",
+              "Sandbox",
+              "For building and testing. Requests use the test credentials you configured for the provider and are recorded separately from live data.",
+            ],
+          },
+          {
+            key: "live",
+            cells: [
+              "synch_sk_live_",
+              "Live",
+              "Real transactions. Only works once your account is in live mode and has an active subscription.",
+            ],
+          },
+        ]}
+      />
 
-      <div className="grid grid-cols-2 gap-4 items-center py-8 mt-16 border-t border-slate-200">
-        <Link
-          to="/docs/installation"
-          className="flex items-center gap-2 text-slate-600 hover:text-blue-600 transition-colors group cursor-pointer min-w-0"
-        >
-          <div className="w-10 h-10 shrink-0 rounded-full border border-slate-200 flex items-center justify-center group-hover:bg-blue-50 group-hover:border-blue-200 transition-colors">
-            <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-blue-600 rotate-180" />
-          </div>
-          <div className="text-left min-w-0 pr-2">
-            <span className="text-xs text-slate-500 uppercase tracking-wider block">
-              Previous
-            </span>
-            <span className="font-medium text-blue-600 group-hover:text-blue-500 block truncate">
-              Installation
-            </span>
-          </div>
-        </Link>
-        <a
-          href="#"
-          className="flex items-center justify-end gap-2 text-slate-600 hover:text-blue-600 transition-colors group cursor-pointer min-w-0"
-        >
-          <div className="text-right min-w-0 pl-2">
-            <span className="text-xs text-slate-500 uppercase tracking-wider block">
-              Next
-            </span>
-            <span className="font-medium text-blue-600 group-hover:text-blue-500 block truncate">
-              Create a Charge
-            </span>
-          </div>
-          <div className="w-10 h-10 shrink-0 rounded-full border border-slate-200 flex items-center justify-center group-hover:bg-blue-50 group-hover:border-blue-200 transition-colors">
-            <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-blue-600" />
-          </div>
-        </a>
-      </div>
-    </div>
+      <SectionHeading>Authentication errors</SectionHeading>
+      <Prose>
+        A missing or invalid key returns HTTP <InlineCode>403</InlineCode> with
+        the code <InlineCode>authentication_failed</InlineCode>.
+      </Prose>
+      <CodeBlock code={authError} title="403 Forbidden" />
+      <ReferenceTable
+        headers={["Message", "Cause"]}
+        rows={[
+          {
+            key: "missing",
+            cells: [
+              "Missing API credentials.",
+              "The Client-Secret-Key header was not sent.",
+            ],
+          },
+          {
+            key: "invalid",
+            cells: [
+              "Invalid client secret key.",
+              "The key does not exist, was regenerated, or its client is not active.",
+            ],
+          },
+          {
+            key: "live-mode",
+            cells: [
+              "You currently provided live keys but your account is not in live mode.",
+              "A live key was used before your account was switched to live mode.",
+            ],
+          },
+        ]}
+      />
+
+      <Callout title="Rotating a key">
+        Regenerating a key invalidates the old one immediately. Update your
+        deployment first, or requests will fail until you do.
+      </Callout>
+
+      <PageNav
+        prev={{ label: "Installation", to: "/docs/installation" }}
+        next={{ label: "Response and Errors", to: "/docs/errors" }}
+      />
+    </DocPage>
   );
 }
 

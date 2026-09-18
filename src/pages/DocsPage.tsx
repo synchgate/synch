@@ -4,7 +4,6 @@ import {
   BookOpen,
   Menu,
   Shield,
-  Webhook,
   X,
 } from "lucide-react";
 import { useState } from "react";
@@ -106,6 +105,22 @@ function DocsPage() {
                     Installation
                   </Link>
                 </li>
+                <li>
+                  <Link
+                    to="/docs/authentication"
+                    className={`block text-sm font-medium ${isActive("/docs/authentication") ? "text-blue-600 cursor-default" : "text-slate-600 hover:text-blue-600 cursor-pointer"} transition-colors`}
+                  >
+                    Authentication
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/docs/errors"
+                    className={`block text-sm font-medium ${isActive("/docs/errors") ? "text-blue-600 cursor-default" : "text-slate-600 hover:text-blue-600 cursor-pointer"} transition-colors`}
+                  >
+                    Response and Errors
+                  </Link>
+                </li>
               </ul>
             </div>
 
@@ -169,23 +184,6 @@ function DocsPage() {
                   >
                     Initiate Transfer
                   </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                <Webhook className="w-4 h-4 text-blue-500" /> Webhooks
-              </h4>
-              <ul className="space-y-2 border-l border-slate-200 ml-2 pl-4">
-                <li>
-                  <button
-                    type="button"
-                    className="block text-sm text-slate-600 hover:text-blue-600 transition-colors cursor-pointer text-left w-full"
-                    onClick={(e) => e.preventDefault()}
-                  >
-                    Overview
-                  </button>
                 </li>
               </ul>
             </div>

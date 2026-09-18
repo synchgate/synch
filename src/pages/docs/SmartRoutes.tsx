@@ -1,358 +1,263 @@
-import { ArrowRight, Brain, Cpu, RefreshCw, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
-import { SimpleExample } from "../../components/docs/SimpleExample";
-import { CopyButton } from "../../components/ui/CopyButton";
+import {
+  Endpoint,
+  ParamTable,
+  ReferenceTable,
+} from "../../components/docs/ApiReference";
+import { CodeBlock, CodeTabs } from "../../components/docs/CodeBlock";
+import {
+  Callout,
+  DocPage,
+  InlineCode,
+  PageHeader,
+  PageNav,
+  Prose,
+  SectionHeading,
+  SubHeading,
+} from "../../components/docs/DocLayout";
+import { SupportedProviders } from "../../components/docs/SupportedProviders";
+import { requestSnippets } from "../../components/docs/snippets";
+
+const snippets = requestSnippets({
+  method: "POST",
+  path: "/initiate-payment/smart-route/",
+  body: {
+    email: "customer@example.com",
+    amount: 8000,
+    currency: "NGN",
+    reference: "order-2026-000124",
+    callback_url: "https://yourdomain.com/payments/callback",
+  },
+});
+
+const successResponse = `{
+  "status": "success",
+  "message": "Payment initiated successfully",
+  "data": {
+    "cleaned_data": {
+      "payment_url": "https://checkout.paystack.com/abc123xyz",
+      "amount": "8000.00",
+      "currency": "NGN",
+      "reference": "order-2026-000124",
+      "status": "success",
+      "provider": "paystack"
+    },
+    "provider_data": {
+      "data": {
+        "status": true,
+        "message": "Authorization URL created"
+      }
+    },
+    "routing": {
+      "provider": "paystack",
+      "payment_channel": null,
+      "route_type": "smart_score",
+      "rule_name": null
+    }
+  },
+  "meta": {
+    "request_id": "41e97272-03b2-485c-a150-8e7c30737f3c",
+    "timestamp": "2026-09-18T11:44:41.828466Z"
+  }
+}`;
 
 function SmartRoutes() {
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 text-slate-900">
-      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-200 bg-blue-50 mb-6 shadow-sm">
-        <span className="text-xs font-medium text-blue-600 uppercase tracking-wider">
-          COLLECT PAYMENTS
-        </span>
-      </div>
+    <DocPage>
+      <PageHeader eyebrow="COLLECT PAYMENTS" title="Smart Route">
+        Create a payment without choosing the provider. SynchGate picks one for
+        you, using the routing rules you set up or, if you have none, the
+        providers' recent performance.
+      </PageHeader>
 
-      <h1 className="font-['Outfit'] text-4xl md:text-5xl font-bold mb-6 text-black">
-        Smart Route Payment API
-      </h1>
+      <SupportedProviders />
 
-      <p className="text-lg text-slate-600 leading-relaxed mb-8">
-        Initiate a payment using SynchGate’s Smart Routing Engine, which automatically selects the best available payment provider based on real-time performance metrics such as success rate and transaction volume.
-      </p>
-
-      {/* Overview Section */}
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black flex items-center gap-3">
-        <Brain className="w-8 h-8 text-blue-600" /> Overview
-      </h2>
-      <p className="text-slate-600 mb-6 leading-relaxed">
-        The Smart Route API abstracts multiple payment providers behind a single endpoint. Instead of manually selecting a provider, the system dynamically determines the optimal provider for each transaction.
-        This follows the general concept of payment initiation APIs, which are designed to submit payment instructions for processing and transfer funds between accounts.
-      </p>
-
-      {/* How It Works Section */}
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black flex items-center gap-3">
-        <Cpu className="w-8 h-8 text-blue-600" /> How It Works
-      </h2>
-      <div className="space-y-4 mb-8">
-        <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
-          <h3 className="font-bold text-slate-900 mb-2">1. Merchant Configuration Validation</h3>
-          <ul className="list-disc ml-6 text-slate-600 space-y-1">
-            <li>At least 2 providers configured.</li>
-          </ul>
-        </div>
-        <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
-          <h3 className="font-bold text-slate-900 mb-2">2. Smart Engine Analysis</h3>
-          <ul className="list-disc ml-6 text-slate-600 space-y-1">
-            <li>Analyzes historical transaction data.</li>
-            <li>Computes provider success rates.</li>
-            <li>Considers transaction volume.</li>
-            <li>Applies a scoring algorithm.</li>
-          </ul>
-        </div>
-        <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-600">
-          <p>3. The <b>best provider</b> is selected automatically and payment is initiated.</p>
-        </div>
-      </div>
-
-      {/* Authentication Section */}
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
-        Authentication
-      </h2>
-      <p className="text-slate-600 mb-4">
-        Use your Client Secret Key associated with the environment:
-      </p>
-      <div className="grid sm:grid-cols-2 gap-4 mb-6">
-        <div className="p-4 bg-slate-900 rounded-xl border border-white/10">
-          <p className="text-xs text-slate-400 uppercase font-bold mb-1">Live Environment</p>
-          <code className="text-blue-300 text-sm">synch_sk_live_...</code>
-        </div>
-        <div className="p-4 bg-slate-900 rounded-xl border border-white/10">
-          <p className="text-xs text-slate-400 uppercase font-bold mb-1">Sandbox Environment</p>
-          <code className="text-blue-300 text-sm">synch_sk_test_...</code>
-        </div>
-      </div>
-      <p className="text-slate-600 mb-8">
-        Include in your request header: <code className="bg-slate-100 px-2 py-1 rounded text-blue-600 font-mono text-sm">Authorization: Bearer YOUR_SECRET_KEY</code>
-      </p>
-
-      {/* Request Section */}
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
-        Endpoint
-      </h2>
-      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10 relative group flex items-center justify-between">
-        <span>POST /v1/api/initiate-payment/smart-route/</span>
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-          <CopyButton textToCopy="POST /v1/api/initiate-payment/smart-route/" />
-        </div>
-      </div>
-
-      <h3 className="font-semibold text-slate-900 text-lg mb-3">Request Body</h3>
-      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-8 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
-        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-          <CopyButton textToCopy={`{\n "email": "customer@email.com",\n "amount": 5000,\n "currency": "NGN",\n "reference": "txn_123456789",\n "callback_url": "https://yourdomain.com/callback"\n}`} />
-        </div>
-        <pre>
-          {`{
- "email": "customer@email.com",
- "amount": 5000,
- "currency": "NGN",
- "reference": "txn_123456789",
- "callback_url": "https://yourdomain.com/callback"
-}`}
-        </pre>
-      </div>
-
-      <h3 className="font-semibold text-slate-900 text-lg mb-3">Request Parameters</h3>
-      <div className="mb-8 overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
-        <table className="w-full text-sm text-left">
-          <thead className="bg-[#242424] text-slate-200 text-xs uppercase tracking-wider">
-            <tr>
-              <th className="px-6 py-4 font-medium">Field</th>
-              <th className="px-6 py-4 font-medium">Type</th>
-              <th className="px-6 py-4 font-medium text-center">Required</th>
-              <th className="px-6 py-4 font-medium">Description</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-700 bg-[#1e1e1e] text-slate-300 font-mono">
-            <tr>
-              <td className="px-6 py-4 text-amber-300">email</td>
-              <td className="px-6 py-4 text-blue-300">string</td>
-              <td className="px-6 py-4 text-center text-emerald-400">✅</td>
-              <td className="px-6 py-4 font-sans italic text-slate-400">Customer email address</td>
-            </tr>
-            <tr>
-              <td className="px-6 py-4 text-amber-300">amount</td>
-              <td className="px-6 py-4 text-emerald-300">integer</td>
-              <td className="px-6 py-4 text-center text-emerald-400">✅</td>
-              <td className="px-6 py-4 font-sans italic text-slate-400">Amount in lowest currency unit (e.g. kobo)</td>
-            </tr>
-            <tr>
-              <td className="px-6 py-4 text-amber-300">currency</td>
-              <td className="px-6 py-4 text-blue-300">string</td>
-              <td className="px-6 py-4 text-center text-rose-400">✅</td>
-              <td className="px-6 py-4 font-sans italic text-slate-400">Currency code (default: NGN)</td>
-            </tr>
-            <tr>
-              <td className="px-6 py-4 text-amber-300">reference</td>
-              <td className="px-6 py-4 text-blue-300">string</td>
-              <td className="px-6 py-4 text-center text-emerald-400">✅</td>
-              <td className="px-6 py-4 font-sans italic text-slate-400">Unique transaction reference</td>
-            </tr>
-            <tr>
-              <td className="px-6 py-4 text-amber-300">callback_url</td>
-              <td className="px-6 py-4 text-blue-300">string</td>
-              <td className="px-6 py-4 text-center text-rose-400">❌</td>
-              <td className="px-6 py-4 font-sans italic text-slate-400">URL for payment completion redirect</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <SimpleExample />
-
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
-        Example Response
-      </h2>
-      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10">
-        <pre>
-          {`{
-    "status": "success",
-    "message": "Payment initiated successfully",
-    "data": {
-        "cleaned_data": {
-            "payment_url": "https://checkout-v2.dev-flutterwave.com/v3/hosted/pay/b27556da90c41b410111",
-            "amount": "10000.00",
-            "currency": "NGN",
-            "reference": "hdjdjfkfkjdjdj",
-            "status": "success",
-            "provider": "provider name"
-        },
-        "provider_data": {
-            "data": {
-                "status": "success",
-                "message": "Hosted Link",
-                "data": {
-                    "link": "https://checkout-v2.dev-flutterwave.com/v3/hosted/pay/b27556da90c41b410111",
-                    "tx_ref": "hdjdjfkfkjdjdj",
-                    "amount": "10000.00",
-                    "currency": "NGN",
-                    "redirect_url": "https://fintech-platform-weld.vercel.app/"
-                }
-            }
-        }
-    },
-    "meta": {
-        "request_id": "41e97272-03b2-485c-a150-8e7c30737f3c",
-        "timestamp": "2026-03-24T11:44:41.828466Z"
-    }
-}`}
-        </pre>
-      </div>
-
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
-        Unified Response Format
-      </h2>
-      <p className="text-slate-600 mb-4">
-        Fintech Platform normalizes responses from all providers into a single,
-        consistent format.
-      </p>
-      <p className="text-slate-600 mb-12">
-        This allows you to write one integration regardless of which underlying
-        payment gateway you use.
-      </p>
-
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
-        Transaction Tracking
-      </h2>
-      <p className="text-slate-600 mb-3">
-        All API transactions are tracked with one of the following states:
-      </p>
-      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-amber-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10">
-        <pre>
-          {`pending   - Payment is waiting for customer action
-success   - Payment was successfully processed
-failed    - Payment was declined or failed
-abandoned - Customer left the payment page`}
-        </pre>
-      </div>
-
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
-        Error Handling
-      </h2>
-      <p className="text-slate-600 mb-6">
-        All errors return a standard JSON structure with a descriptive message
-        and error code.
-      </p>
-      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10">
-        <pre>
-          {`{
-    "status": "error",
-    "message": "Invalid client secret key.",
-    "error": {
-        "code": "authentication_failed"
-    }
-}`}
-        </pre>
-      </div>
-
-      {/* Logic Section */}
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black flex items-center gap-3">
-        <Brain className="w-8 h-8 text-blue-600" /> Smart Routing Logic
-      </h2>
-      <div className="grid md:grid-cols-2 gap-6 mb-12">
-        <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <h4 className="font-bold text-slate-900 mb-2 flex items-center gap-2">
-            <Zap className="w-4 h-4 text-amber-500" /> 1. Success Rate
-          </h4>
-          <p className="text-sm text-slate-600">Percentage of successful transactions per provider calculated in real-time.</p>
-        </div>
-        <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <h4 className="font-bold text-slate-900 mb-2 flex items-center gap-2">
-            <Zap className="w-4 h-4 text-blue-500" /> 2. Transaction Volume
-          </h4>
-          <p className="text-sm text-slate-600">Providers with sufficient usage and proven stability are prioritized.</p>
-        </div>
-        <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <h4 className="font-bold text-slate-900 mb-2 flex items-center gap-2">
-            <Zap className="w-4 h-4 text-emerald-500" /> 3. Cold Start Handling
-          </h4>
-          <p className="text-sm text-slate-600">New providers may be temporarily boosted to gather performance data.</p>
-        </div>
-        <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <h4 className="font-bold text-slate-900 mb-2 flex items-center gap-2">
-            <Zap className="w-4 h-4 text-slate-500" /> 4. Environment Isolation
-          </h4>
-          <p className="text-sm text-slate-600">Routing optimizations are performed separately for sandbox and live environments.</p>
-        </div>
-      </div>
-
-      {/* Validation Rules Section */}
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
-        Validation Rules
-      </h2>
-      <p className="text-slate-600 mb-6">Before routing, the system ensures:</p>
-      <div className="space-y-3 mb-12">
-        <div className="flex items-center gap-3 text-slate-700">
-          <div className="w-6 h-6 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shrink-0">✅</div>
-          <span>Both sandbox and live environments are configured</span>
-        </div>
-        <div className="flex items-center gap-3 text-slate-700">
-          <div className="w-6 h-6 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shrink-0">✅</div>
-          <span>Each environment has at least one provider with credentials</span>
-        </div>
-        <div className="flex items-center gap-3 text-slate-700">
-          <div className="w-6 h-6 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shrink-0">✅</div>
-          <span>Current environment has at least 2 active providers</span>
-        </div>
-      </div>
-
-      {/* Fallback Section */}
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black flex items-center gap-3 font-black">
-        <RefreshCw className="w-8 h-8 text-blue-600" /> Fallback Behavior
-      </h2>
-      <div className="p-6 bg-blue-50 border border-blue-100 rounded-2xl text-slate-700 mb-12 italic">
-        <p className="mb-2"><b>If no historical data exists:</b> The system performs a random selection among valid providers.</p>
-        <p><b>If a provider fails (future enhancement):</b> Automatic failover to the next best provider will be introduced.</p>
-      </div>
-
-      {/* Example Section */}
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black font-black">
-        🧪 Example cURL
-      </h2>
-      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner border border-white/10 relative group">
-        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-          <CopyButton textToCopy={`curl -X POST https://api.synchgate.com/v1/api/initiate-payment/smart-route/ \\\n -H "Authorization: Bearer synch_sk_test_xxx" \\\n -H "Content-Type: application/json" \\\n -d '{\n   "email": "test@email.com",\n   "amount": 5000,\n   "reference": "txn_123456",\n   "callback_url": "https://example.com/callback"\n }'`} />
-        </div>
-        <pre>
-          {`curl -X POST https://api.synchgate.com/v1/api/initiate-payment/smart-route/ \\
- -H "Authorization: Bearer synch_sk_test_xxx" \\
- -H "Content-Type: application/json" \\
- -d '{
-   "email": "test@email.com",
-   "amount": 5000,
-   "currency": "NGN",
-   "reference": "txn_123456",
-   "callback_url": "https://example.com/callback"
- }'`}
-        </pre>
-      </div>
-
-      {/* Navigation Footer */}
-      <div className="grid grid-cols-2 gap-4 items-center py-8 mt-16 border-t border-slate-200">
+      <SectionHeading>Endpoint</SectionHeading>
+      <Endpoint method="POST" path="/initiate-payment/smart-route/" />
+      <Prose>
+        Authenticate with your secret key in the{" "}
+        <InlineCode>Client-Secret-Key</InlineCode> header, as described in{" "}
+        <Link
+          to="/docs/authentication"
+          className="text-blue-600 hover:underline"
+        >
+          Authentication
+        </Link>
+        . Everything else works like{" "}
         <Link
           to="/docs/initiate-payment"
-          className="flex items-center gap-2 text-slate-600 hover:text-blue-600 transition-colors group cursor-pointer min-w-0"
+          className="text-blue-600 hover:underline"
         >
-          <div className="w-10 h-10 shrink-0 rounded-full border border-slate-200 flex items-center justify-center group-hover:bg-blue-50 group-hover:border-blue-200 transition-colors">
-            <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-blue-600 rotate-180" />
-          </div>
-          <div className="text-left min-w-0 pr-2">
-            <span className="text-xs text-slate-500 uppercase tracking-wider block">
-              Previous
-            </span>
-            <span className="font-medium text-blue-600 group-hover:text-blue-500 block truncate">
-              Initiate Payment
-            </span>
-          </div>
+          Initiate Payment
         </Link>
-        <Link
-          to="/docs/transaction-verification"
-          className="flex items-center gap-2 text-slate-600 hover:text-blue-600 transition-colors group cursor-pointer min-w-0 justify-end text-right"
-        >
-          <div className="text-right min-w-0 pl-2">
-            <span className="text-xs text-slate-500 uppercase tracking-wider block">
-              Next
-            </span>
-            <span className="font-medium text-blue-600 group-hover:text-blue-500 block truncate">
-              Transaction Verification
-            </span>
-          </div>
-          <div className="w-10 h-10 shrink-0 rounded-full border border-slate-200 flex items-center justify-center group-hover:bg-blue-50 group-hover:border-blue-200 transition-colors">
-            <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-blue-600" />
-          </div>
-        </Link>
-      </div>
-    </div>
+        , except that there is no <InlineCode>provider</InlineCode> field.
+      </Prose>
+
+      <SectionHeading>How the provider is chosen</SectionHeading>
+      <SubHeading>1. Your routing policy</SubHeading>
+      <p className="text-slate-600 mb-4">
+        If you have an active Smart Route policy, its rules are checked in
+        priority order and the first rule whose conditions all match decides the
+        provider. A rule can test:
+      </p>
+      <ReferenceTable
+        headers={["Condition", "Matches when"]}
+        rows={[
+          {
+            key: "amount",
+            cells: [
+              "Amount range",
+              "The payment amount is within the minimum and maximum you set.",
+            ],
+          },
+          {
+            key: "currency",
+            cells: ["Currency", "The payment currency is one of those listed."],
+          },
+          {
+            key: "country",
+            cells: [
+              "Country",
+              "Your merchant profile's country is one of those listed.",
+            ],
+          },
+          {
+            key: "time",
+            cells: [
+              "Time of day (UTC)",
+              "The request arrives inside the time window you set.",
+            ],
+          },
+        ]}
+      />
+      <SubHeading>2. Performance scoring</SubHeading>
+      <p className="text-slate-600 mb-8">
+        With no active policy, or when no rule matches, SynchGate scores each of
+        your providers on its success rate and transaction volume over the last
+        hour, and uses the best. Providers with very little recent activity get
+        a small boost so they can build up a track record. Sandbox and live are
+        scored separately.
+      </p>
+
+      <SectionHeading>Before you begin</SectionHeading>
+      <ul className="space-y-2 mb-8 text-slate-600 list-disc list-inside ml-2">
+        <li>
+          Both your sandbox and live environments need at least one active
+          provider with credentials.
+        </li>
+        <li>
+          Performance scoring needs at least two active providers in the
+          environment you are calling.
+        </li>
+      </ul>
+      <Callout title="No automatic failover yet">
+        SynchGate does not retry on another provider if the chosen one returns
+        an error. The request fails and you can send it again.
+      </Callout>
+
+      <SectionHeading>Request body</SectionHeading>
+      <ParamTable
+        params={[
+          {
+            name: "email",
+            type: "string",
+            required: true,
+            description: "Customer's email address. Up to 100 characters.",
+          },
+          {
+            name: "amount",
+            type: "integer",
+            required: true,
+            description:
+              "Amount in major units (naira, not kobo). Send a whole number: any decimal part is dropped. Must be greater than zero.",
+          },
+          {
+            name: "currency",
+            type: "string",
+            description: "Currency code. Defaults to NGN.",
+          },
+          {
+            name: "reference",
+            type: "string",
+            required: true,
+            description:
+              "Your unique reference for this payment, up to 50 characters.",
+          },
+          {
+            name: "callback_url",
+            type: "string",
+            description:
+              "URL the customer is sent back to after paying. Up to 100 characters.",
+          },
+        ]}
+      />
+
+      <SectionHeading>Example request</SectionHeading>
+      <CodeTabs snippets={snippets} />
+
+      <SectionHeading>Response</SectionHeading>
+      <Prose>
+        The response is the same as Initiate Payment, plus a{" "}
+        <InlineCode>routing</InlineCode> object that tells you what was chosen.
+      </Prose>
+      <CodeBlock code={successResponse} title="200 OK" />
+
+      <SubHeading>The routing object</SubHeading>
+      <ReferenceTable
+        headers={["Field", "Description"]}
+        rows={[
+          {
+            key: "provider",
+            cells: ["provider", "Provider that was chosen."],
+          },
+          {
+            key: "route_type",
+            cells: [
+              "route_type",
+              <>
+                <InlineCode>smart_policy</InlineCode> when one of your rules
+                matched, or <InlineCode>smart_score</InlineCode> when the
+                provider was chosen by performance.
+              </>,
+            ],
+          },
+          {
+            key: "rule_name",
+            cells: [
+              "rule_name",
+              "Name of the rule that matched, or null when scoring was used.",
+            ],
+          },
+          {
+            key: "payment_channel",
+            cells: [
+              "payment_channel",
+              "The channel set on the matching rule (for example card or bank_transfer), or null. It is returned for your information and does not restrict the provider's checkout.",
+            ],
+          },
+        ]}
+      />
+
+      <SectionHeading>Errors</SectionHeading>
+      <Prose>
+        Smart Route failures return HTTP <InlineCode>400</InlineCode> with the
+        reason in <InlineCode>message</InlineCode>, for example{" "}
+        <InlineCode>sandbox environment has no active providers.</InlineCode>{" "}
+        Authentication failures return <InlineCode>403</InlineCode>. See{" "}
+        <Link to="/docs/errors" className="text-blue-600 hover:underline">
+          Response and Errors
+        </Link>{" "}
+        for the full format.
+      </Prose>
+
+      <PageNav
+        prev={{ label: "Initiate Payment", to: "/docs/initiate-payment" }}
+        next={{
+          label: "Transaction Verification",
+          to: "/docs/transaction-verification",
+        }}
+      />
+    </DocPage>
   );
 }
 

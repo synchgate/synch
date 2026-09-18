@@ -1,137 +1,139 @@
-import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import {
+  Endpoint,
+  ParamTable,
+  ReferenceTable,
+} from "../../components/docs/ApiReference";
+import { CodeBlock, CodeTabs } from "../../components/docs/CodeBlock";
+import {
+  Callout,
+  DocPage,
+  InlineCode,
+  PageHeader,
+  PageNav,
+  Prose,
+  SectionHeading,
+} from "../../components/docs/DocLayout";
 import { SupportedProviders } from "../../components/docs/SupportedProviders";
-import { CopyButton } from "../../components/ui/CopyButton";
+import { requestSnippets } from "../../components/docs/snippets";
+
+const snippets = requestSnippets({
+  method: "GET",
+  path: "/banks/",
+  query: { provider: "paystack" },
+});
+
+const successResponse = `{
+  "status": "success",
+  "message": "List of NGN banks",
+  "data": [
+    {
+      "name": "Access Bank",
+      "code": "044"
+    },
+    {
+      "name": "GTBank",
+      "code": "058"
+    },
+    {
+      "name": "Zenith Bank",
+      "code": "057"
+    }
+  ],
+  "meta": {
+    "request_id": "f7d3ad77-f327-4314-9c64-00501d9ebaec",
+    "timestamp": "2026-09-18T12:44:01.060968Z"
+  }
+}`;
 
 function BanksApi() {
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 text-slate-900">
-      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-200 bg-blue-50 mb-6 shadow-sm">
-        <span className="text-xs font-medium text-blue-600 uppercase tracking-wider">
-          TRANSFER
-        </span>
-      </div>
-
-      <h1 className="font-['Outfit'] text-4xl md:text-5xl font-bold mb-6 text-black">
-        Banks API
-      </h1>
-
-      <p className="text-lg text-slate-600 leading-relaxed mb-8">
-        Retrieve a list of supported banks for transfers using a specific
-        provider.
-      </p>
+    <DocPage>
+      <PageHeader eyebrow="TRANSFER" title="Banks API">
+        Retrieve the banks a provider supports for transfers, with the codes you
+        need to send money to them.
+      </PageHeader>
 
       <SupportedProviders />
 
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
-        Base URL
-      </h2>
-      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10 relative group flex items-center justify-between">
-        <span>https://api.synchgate.com/v1/api</span>
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-          <CopyButton textToCopy="https://api.synchgate.com/v1/api" />
-        </div>
-      </div>
-
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 border-b border-slate-200 pb-2 text-black">
-        Endpoint
-      </h2>
-      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10 relative group flex items-center justify-between">
-        <span>POST /banks/</span>
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-          <CopyButton textToCopy="POST /banks/" />
-        </div>
-      </div>
-
-      <h3 className="font-semibold text-slate-900 text-lg mb-3">
-        Request Payload
-      </h3>
-      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-8 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
-        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-          <CopyButton textToCopy={`{\n    "provider": "flutterwave"\n}`} />
-        </div>
-        <pre>
-          {`{
-    "provider": "flutterwave"
-}`}
-        </pre>
-      </div>
-
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
-        Example Response
-      </h2>
-      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
-        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-          <CopyButton
-            textToCopy={`{\n    "status": "success",\n    "message": "List of NGN banks",\n    "data": [\n        {\n            "name": "Enterprise Bank",\n            "code": "000019"\n        },\n        {\n            "name": "Titan Trust Bank",\n            "code": "000025"\n        },\n        {\n            "name": "Taj Bank Limited",\n            "code": "000026"\n        },\n        {\n            "name": "Globus Bank",\n            "code": "000027"\n        }\n    ],\n    "meta": {\n        "request_id": "f7d3ad77-f327-4314-9c64-00501d9ebaec",\n        "timestamp": "2026-04-01T12:44:01.060968Z"\n    }\n}`}
-          />
-        </div>
-        <pre>
-          {`{
-    "status": "success",
-    "message": "List of NGN banks",
-    "data": [
-        {
-            "name": "Enterprise Bank",
-            "code": "000019"
-        },
-        {
-            "name": "Titan Trust Bank",
-            "code": "000025"
-        },
-        {
-            "name": "Taj Bank Limited",
-            "code": "000026"
-        },
-        {
-            "name": "Globus Bank",
-            "code": "000027"
-        }
-    ],
-    "meta": {
-        "request_id": "f7d3ad77-f327-4314-9c64-00501d9ebaec",
-        "timestamp": "2026-04-01T12:44:01.060968Z"
-    }
-}`}
-        </pre>
-      </div>
-
-      {/* Navigation Footer */}
-      <div className="grid grid-cols-2 gap-4 items-center py-8 mt-16 border-t border-slate-200">
+      <SectionHeading>Endpoint</SectionHeading>
+      <Endpoint method="GET" path="/banks/" />
+      <Prose>
+        Authenticate with your secret key in the{" "}
+        <InlineCode>Client-Secret-Key</InlineCode> header, as described in{" "}
         <Link
-          to="/docs/transaction-verification"
-          className="flex items-center gap-2 text-slate-600 hover:text-blue-600 transition-colors group cursor-pointer min-w-0"
+          to="/docs/authentication"
+          className="text-blue-600 hover:underline"
         >
-          <div className="w-10 h-10 shrink-0 rounded-full border border-slate-200 flex items-center justify-center group-hover:bg-blue-50 group-hover:border-blue-200 transition-colors">
-            <ArrowLeft className="w-5 h-5 text-slate-500 group-hover:text-blue-600" />
-          </div>
-          <div className="text-left min-w-0 pr-2">
-            <span className="text-xs text-slate-500 uppercase tracking-wider block">
-              Previous
-            </span>
-            <span className="font-medium text-blue-600 group-hover:text-blue-500 block truncate">
-              Transaction Verification
-            </span>
-          </div>
+          Authentication
         </Link>
-        <Link
-          to="/docs/resolve-account"
-          className="flex items-center gap-2 text-slate-600 hover:text-blue-600 transition-colors group cursor-pointer min-w-0 justify-end text-right"
-        >
-          <div className="text-right min-w-0 pl-2">
-            <span className="text-xs text-slate-500 uppercase tracking-wider block">
-              Next
-            </span>
-            <span className="font-medium text-blue-600 group-hover:text-blue-500 block truncate">
-              Resolve Account
-            </span>
-          </div>
-          <div className="w-10 h-10 shrink-0 rounded-full border border-slate-200 flex items-center justify-center group-hover:bg-blue-50 group-hover:border-blue-200 transition-colors">
-            <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-blue-600" />
-          </div>
-        </Link>
-      </div>
-    </div>
+        . The provider must already be connected in your dashboard.
+      </Prose>
+
+      <SectionHeading>Query parameters</SectionHeading>
+      <ParamTable
+        params={[
+          {
+            name: "provider",
+            type: "string",
+            required: true,
+            description:
+              "Provider whose banks you want, for example paystack, flutterwave or nomba.",
+          },
+        ]}
+      />
+
+      <SectionHeading>Example request</SectionHeading>
+      <CodeTabs snippets={snippets} />
+
+      <SectionHeading>Response</SectionHeading>
+      <CodeBlock code={successResponse} title="200 OK" />
+      <ReferenceTable
+        headers={["Field", "Description"]}
+        rows={[
+          {
+            key: "name",
+            cells: ["name", "The bank's name."],
+          },
+          {
+            key: "code",
+            cells: [
+              "code",
+              <>
+                The bank's code. Pass it as <InlineCode>code</InlineCode> to{" "}
+                <Link
+                  to="/docs/resolve-account"
+                  className="text-blue-300 underline"
+                >
+                  Resolve Account
+                </Link>{" "}
+                and as <InlineCode>bank_code</InlineCode> to{" "}
+                <Link
+                  to="/docs/initiate-transfer"
+                  className="text-blue-300 underline"
+                >
+                  Initiate Transfer
+                </Link>
+                .
+              </>,
+            ],
+          },
+        ]}
+      />
+
+      <Callout title="Codes belong to a provider">
+        Bank codes are not the same across providers, so always use the list
+        from the provider you will transfer with.
+      </Callout>
+
+      <PageNav
+        prev={{
+          label: "Transaction Verification",
+          to: "/docs/transaction-verification",
+        }}
+        next={{ label: "Resolve Account", to: "/docs/resolve-account" }}
+      />
+    </DocPage>
   );
 }
 
