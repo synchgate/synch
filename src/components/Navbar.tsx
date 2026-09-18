@@ -19,8 +19,9 @@ const Navbar = () => {
   const isHomePage = location.pathname === "/";
 
   const navLinks = [
+    { name: "Pricing", path: "/pricing" },
     { name: "Contact Us", path: "/contact-us" },
-    // { name: "Pricing", path: "/pricing" },
+    { name: "Book a demo", path: "/demo" },
     ...(isHomePage
       ? [{ name: "How it works", path: "/#how-it-works", isAnchor: true }]
       : []),
@@ -29,10 +30,11 @@ const Navbar = () => {
   return (
     <>
       <header
-        className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled
+        className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+          isScrolled
             ? "bg-white/80 backdrop-blur-md border-b border-slate-200 py-4"
             : "bg-transparent py-6"
-          }`}
+        }`}
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 cursor-pointer">
@@ -44,10 +46,11 @@ const Navbar = () => {
               <Link
                 key={link.name}
                 to={link.path}
-                className={`text-sm font-medium transition-colors cursor-pointer ${location.pathname === link.path
+                className={`text-sm font-medium transition-colors cursor-pointer ${
+                  location.pathname === link.path
                     ? "text-blue-600 font-bold"
                     : "text-slate-600 hover:text-blue-600"
-                  }`}
+                }`}
               >
                 {link.name}
               </Link>
@@ -70,15 +73,17 @@ const Navbar = () => {
               Log in
             </Link>
             <Link
-              to="/demo"
+              to="/auth/signup"
               className="relative hidden md:inline-flex group h-9 items-center justify-center rounded-md bg-black px-4 text-sm font-medium text-white shadow transition-colors hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 cursor-pointer"
             >
               <span className="relative z-10 flex items-center gap-1">
-                Book a demo{" "}
+                Start free{" "}
                 <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
               </span>
             </Link>
             <button
+              type="button"
+              aria-label="Open menu"
               className="md:hidden p-1 opacity-70 hover:opacity-100 transition-opacity"
               onClick={() => setIsMobileMenuOpen(true)}
             >
@@ -96,6 +101,8 @@ const Navbar = () => {
               <img src={logo} alt="SynchGate Logo" className="w-[150px]" />
             </Link>
             <button
+              type="button"
+              aria-label="Close menu"
               onClick={() => setIsMobileMenuOpen(false)}
               className="p-2 rounded-full hover:bg-slate-100 text-slate-900 transition-colors"
             >
@@ -109,10 +116,11 @@ const Navbar = () => {
                 key={link.name}
                 to={link.path}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className={`text-2xl font-bold transition-colors ${location.pathname === link.path
+                className={`text-2xl font-bold transition-colors ${
+                  location.pathname === link.path
                     ? "text-blue-600"
                     : "text-slate-900 hover:text-blue-600"
-                  }`}
+                }`}
               >
                 {link.name}
               </Link>
@@ -135,11 +143,11 @@ const Navbar = () => {
               Log in
             </Link>
             <Link
-              to="/demo"
+              to="/auth/signup"
               onClick={() => setIsMobileMenuOpen(false)}
               className="w-full max-w-[250px] text-center bg-black text-white py-4 rounded-lg font-medium hover:bg-slate-800 transition-colors mt-2 text-lg"
             >
-              Book a demo
+              Start free
             </Link>
           </nav>
         </div>

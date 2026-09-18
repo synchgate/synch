@@ -10,13 +10,62 @@ import {
   Loader2,
   Search,
   Server,
+  TrendingUp,
   X,
   XCircle,
   Zap,
 } from "lucide-react";
 import { useState } from "react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import { monthlyUsage } from "../../data/billingData";
 import { useAuth } from "../../contexts/AuthContext";
 import { api } from "../../lib/api";
+
+const CustomTooltip = ({ active, payload, label, chartMode }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-white p-4 rounded-xl shadow-xl border border-slate-100 min-w-40">
+        <p className="text-sm font-bold text-slate-900 mb-2">{label}</p>
+        <div className="space-y-1.5">
+          {chartMode === "revenue" ? (
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-xs font-medium text-slate-500">Revenue</span>
+              <span className="text-sm font-bold text-blue-600">
+                ₦{data.cost?.toLocaleString()}
+              </span>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-xs font-medium text-slate-500">Successful</span>
+                <span className="text-sm font-bold text-emerald-600">
+                  {data.successful?.toLocaleString()}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-xs font-medium text-slate-500">Failed</span>
+                <span className="text-sm font-bold text-rose-600">
+                  {data.failed?.toLocaleString()}
+                </span>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
 
 function Transactions() {
   const { userEmail } = useAuth();
@@ -27,6 +76,7 @@ function Transactions() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [selectedRoute, setSelectedRoute] = useState("All Routes");
+  const [activeChartTab, setActiveChartTab] = useState<"volume" | "revenue">("volume");
 
   const { data: transactionsResponse, isLoading } = useQuery({
     queryKey: ["transactions", userEmail],
@@ -228,6 +278,61 @@ function Transactions() {
                 Clear Filters
               </button>
             )}
+          </div>
+        </div>
+      </div>
+
+      {/* Transaction Insights Chart */}
+      <div className="shrink-0 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm mb-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-base font-bold text-slate-900">Transaction Insights</h3>
+            <p className="text-xs text-slate-500">Real-time accumulation of successful and failed transactions.</p>
+          </div>
+          <div className="flex items-center gap-2 bg-slate-50 p-1 rounded-lg border border-slate-100">
+            <button
+              onClick={() => setActiveChartTab("volume")}
+              className={`px-3 py-1 text-xs font-medium rounded transition-all ${activeChartTab === "volume" ? "bg-white text-slate-900 shadow-sm border border-slate-200" : "text-slate-500 hover:text-slate-900"}`}
+            >
+              Volume
+            </button>
+            <button
+              onClick={() => setActiveChartTab("revenue")}
+              className={`px-3 py-1 text-xs font-medium rounded transition-all ${activeChartTab === "revenue" ? "bg-white text-slate-900 shadow-sm border border-slate-200" : "text-slate-500 hover:text-slate-900"}`}
+            >
+              Revenue
+            </button>
+          </div>
+        </div>
+
+        <div className="h-55 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={monthlyUsage}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+              <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "#64748B", fontSize: 12 }} dy={10} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fill: "#64748B", fontSize: 12 }} dx={-10} />
+              <Tooltip content={<CustomTooltip chartMode={activeChartTab} />} cursor={{ fill: "#F8FAFC" }} />
+              <Bar dataKey={activeChartTab === "volume" ? "successful" : "cost"} radius={[6, 6, 6, 6]} barSize={36}>
+                {monthlyUsage.map((_, index) => (
+                  <Cell key={`cell-${index}`} fill={index === monthlyUsage.length - 1 ? "#2563EB" : "#DBEAFE"} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-slate-100">
+          <div className="text-center">
+            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Current Month (Successful)</p>
+            <p className="text-xl font-bold text-slate-900">{monthlyUsage[monthlyUsage.length - 1].successful.toLocaleString()}</p>
+            <p className="text-[11px] text-emerald-600 font-semibold flex items-center justify-center gap-0.5">
+              <TrendingUp className="w-3 h-3" /> +21%
+            </p>
+          </div>
+          <div className="text-center border-l border-slate-100">
+            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Est. Next Bill</p>
+            <p className="text-xl font-bold text-slate-900">₦{(monthlyUsage[monthlyUsage.length - 1].successful * 10).toLocaleString()}</p>
+            <p className="text-[11px] text-slate-400 font-medium">Due Apr 15</p>
           </div>
         </div>
       </div>

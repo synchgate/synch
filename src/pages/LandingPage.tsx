@@ -1,31 +1,48 @@
 import { motion } from "framer-motion";
 import {
-  Building2,
+  ArrowRight,
+  Banknote,
+  Check,
   ChevronRight,
-  Cpu,
-  Globe,
-  Layers,
-  Link as LinkIcon,
+  FlaskConical,
+  KeyRound,
+  LayoutDashboard,
+  Lock,
   Minus,
   Plus,
+  ReceiptText,
+  Route,
   ShieldCheck,
-  ShoppingBag,
-  TrendingUp,
-  UserPlus,
-  Zap,
+  Shuffle,
+  X,
 } from "lucide-react";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import flutterwaveLogo from "../assets/brands/flutterwave.png";
 import nombaLogo from "../assets/brands/nomba.png";
 import pagaLogo from "../assets/brands/paga.png";
 import paypalLogo from "../assets/brands/paypal.png";
 import paystackLogo from "../assets/brands/paystack.png";
-import businessOwners from "../assets/business-owners.png";
+import { CodeTabs } from "../components/docs/CodeBlock";
+import { FlowAnimation } from "../components/docs/FlowAnimation";
+import { paymentFlow, transferFlow } from "../components/docs/flows";
+import { requestSnippets } from "../components/docs/snippets";
 import Footer from "../components/Footer";
+import { HeroRouter } from "../components/home/HeroRouter";
 import Navbar from "../components/Navbar";
+import {
+  formatNaira,
+  GROWTH_PLAN,
+  PLATFORM_FEE_NGN,
+  STARTER_PLAN,
+} from "../config/pricing";
 
-type Provider = { src: string; alt: string; size: string };
+type Provider = {
+  src: string;
+  alt: string;
+  size: string;
+  comingSoon?: boolean;
+};
 
 const PROVIDERS: Provider[] = [
   {
@@ -38,448 +55,638 @@ const PROVIDERS: Provider[] = [
     alt: "Flutterwave",
     size: "max-w-[200px] md:max-w-[270px] h-[72px] md:h-[98px]",
   },
-  { src: pagaLogo, alt: "Paga", size: "h-6 md:h-[32px]" },
   { src: nombaLogo, alt: "Nomba", size: "h-6 md:h-[30px]" },
-  { src: paypalLogo, alt: "PayPal", size: "h-7 md:h-[32px]" },
+  { src: pagaLogo, alt: "Paga", size: "h-6 md:h-[32px]", comingSoon: true },
+  { src: paypalLogo, alt: "PayPal", size: "h-7 md:h-[32px]", comingSoon: true },
 ];
+
+const FEATURES = [
+  {
+    icon: ReceiptText,
+    title: "Collect payments",
+    desc: "Create a hosted checkout on Paystack, Flutterwave or Nomba with one request, then verify every payment by its reference.",
+    to: "/docs/initiate-payment",
+  },
+  {
+    icon: Route,
+    title: "Smart Route",
+    desc: "Let SynchGate choose the provider, using your own routing rules or each provider's recent success rate.",
+    to: "/docs/smart-routes",
+  },
+  {
+    icon: Banknote,
+    title: "Bank transfers",
+    desc: "Pay out to bank accounts through the same API. List banks and confirm the account name before you send.",
+    to: "/docs/initiate-transfer",
+  },
+  {
+    icon: Shuffle,
+    title: "One response format",
+    desc: "Every provider's answer is normalised, so your code does not change when the provider behind it does.",
+    to: "/docs/errors",
+  },
+  {
+    icon: FlaskConical,
+    title: "Sandbox and live",
+    desc: "Build and test with a sandbox key. When you are ready, swap in your live key. Nothing else changes.",
+    to: "/docs/authentication",
+  },
+  {
+    icon: LayoutDashboard,
+    title: "One dashboard",
+    desc: "See transactions and API logs across every provider, and manage your keys and provider connections in one place.",
+    to: "/auth/signup",
+  },
+];
+
+const STEPS = [
+  {
+    title: "Connect your providers",
+    desc: "Add your Paystack, Flutterwave or Nomba credentials in the dashboard. Payments settle in your own provider accounts.",
+  },
+  {
+    title: "Send one request",
+    desc: "Call the SynchGate API with your sandbox key. The request and response look the same whichever provider handles it.",
+  },
+  {
+    title: "Go live",
+    desc: "Swap in your live key when you are ready. Add a provider or change routing later without touching your integration.",
+  },
+];
+
+const COMPARISON = [
+  {
+    topic: "Integrations to build",
+    alone: "One for every provider",
+    synch: "One, total",
+  },
+  {
+    topic: "Response format",
+    alone: "Different for each provider",
+    synch: "The same for all of them",
+  },
+  {
+    topic: "Adding or switching a provider",
+    alone: "A new integration",
+    synch: "Change one field, or use Smart Route",
+  },
+  {
+    topic: "Bank transfers and account lookup",
+    alone: "Separate APIs to learn",
+    synch: "Built into the same API",
+  },
+  {
+    topic: "Testing",
+    alone: "A separate sandbox each",
+    synch: "One sandbox key",
+  },
+];
+
+const TRUST = [
+  {
+    icon: ShieldCheck,
+    title: "Card data stays with the provider",
+    desc: "Customers pay on the provider's hosted checkout, so card details never touch your servers. SynchGate does not store them.",
+    to: "/docs/pci-compliance",
+    cta: "Our PCI approach",
+  },
+  {
+    icon: Lock,
+    title: "Credentials stored encrypted",
+    desc: "The provider credentials you connect are encrypted at rest.",
+    to: "/docs/data-privacy",
+    cta: "Data privacy",
+  },
+  {
+    icon: KeyRound,
+    title: "Secret-key authentication",
+    desc: "Every request is authenticated, with separate sandbox and live keys you can regenerate at any time.",
+    to: "/docs/authentication",
+    cta: "Authentication",
+  },
+];
+
+const FAQS = [
+  {
+    q: "How long does setup take?",
+    a: "Most teams send their first sandbox request within minutes. Create an account, copy your sandbox key, connect a provider in the dashboard and call the API.",
+  },
+  {
+    q: "Which payment providers do you support?",
+    a: "Paystack, Flutterwave and Nomba are available today. Paga and PayPal are coming soon.",
+  },
+  {
+    q: "Do I need my own provider accounts?",
+    a: "Yes. You connect your own Paystack, Flutterwave or Nomba credentials in the dashboard. Payments settle in your provider accounts, and SynchGate routes the requests for you.",
+  },
+  {
+    q: "How does Smart Route work?",
+    a: "If you have set up routing rules by amount, currency, country or time of day, the first rule that matches picks the provider. Otherwise SynchGate scores your providers on their success rate and volume over the last hour and uses the best one.",
+  },
+  {
+    q: "What happens if a provider is down?",
+    a: "Today you can name a different provider in your request, or use Smart Route, which favours providers that are succeeding. Automatic failover to another provider is planned but is not available yet.",
+  },
+  {
+    q: "Is SynchGate PCI compliant?",
+    a: "We do not process payments or handle card details. Payments are processed by the payment providers on their own hosted pages, and they securely handle sensitive card data.",
+  },
+  {
+    q: "Can I test before going live?",
+    a: "Yes. Every account has a sandbox key for testing and a live key for real transactions. Sandbox requests are recorded separately from live ones.",
+  },
+  {
+    q: "What does it cost?",
+    a: `The ${STARTER_PLAN.name} plan is free for up to ${STARTER_PLAN.transactions} successful transactions a month. ${GROWTH_PLAN.name} is ${formatNaira(GROWTH_PLAN.priceNgn)} a month for up to ${GROWTH_PLAN.transactions.toLocaleString("en-NG")}. A flat ${formatNaira(PLATFORM_FEE_NGN)} platform fee applies to each successful live transaction, and sandbox is free.`,
+  },
+];
+
+const fadeUp = {
+  initial: { opacity: 0, y: 20 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true },
+};
+
+const paymentSnippets = requestSnippets({
+  method: "POST",
+  path: "/initiate-payment/",
+  body: {
+    provider: "paystack",
+    email: "customer@example.com",
+    amount: 8000,
+    reference: "order-2026-000123",
+    callback_url: "https://yourdomain.com/payments/callback",
+  },
+});
+
+function SectionIntro({
+  eyebrow,
+  title,
+  children,
+}: {
+  eyebrow?: string;
+  title: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <div className="mx-auto mb-14 max-w-2xl text-center">
+      {eyebrow && (
+        <span className="mb-4 block text-sm font-semibold uppercase tracking-wider text-blue-600">
+          {eyebrow}
+        </span>
+      )}
+      <h2 className="font-['Outfit'] text-3xl font-bold text-balance text-black md:text-5xl">
+        {title}
+      </h2>
+      {children && (
+        <p className="mt-5 text-lg leading-relaxed text-slate-600">
+          {children}
+        </p>
+      )}
+    </div>
+  );
+}
 
 function LandingPage() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  const [demo, setDemo] = useState<"collect" | "payout">("collect");
+  const { hash } = useLocation();
+
+  // The navbar links to /#how-it-works, which the router does not scroll to by itself
+  useEffect(() => {
+    if (!hash) return;
+    document
+      .getElementById(hash.slice(1))
+      ?.scrollIntoView({ behavior: "smooth" });
+  }, [hash]);
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-500/30 overflow-hidden relative">
-      {/* Dynamic Background */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-100 blur-[120px]"></div>
-        <div className="absolute bottom-[10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-slate-100 blur-[100px]"></div>
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] rounded-lg"></div>
+    <div className="relative min-h-screen overflow-hidden bg-white font-sans text-slate-900 selection:bg-blue-500/30">
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <div className="absolute left-[-10%] top-[-20%] h-[50%] w-[50%] rounded-full bg-blue-100 blur-[120px]" />
+        <div className="absolute bottom-[10%] right-[-10%] h-[40%] w-[40%] rounded-full bg-slate-100 blur-[100px]" />
       </div>
 
       <Navbar />
 
-      <main className="relative z-10 pt-32 pb-20">
-        <div className="max-w-7xl mx-auto px-6">
-          {/* Hero Section */}
-          <section className="pt-20 pb-32 flex flex-col items-center text-center">
+      <main className="relative z-10 pb-20 pt-32">
+        <div className="mx-auto max-w-7xl px-6">
+          {/* Hero */}
+          <section className="flex flex-col items-center pb-24 pt-16 text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-slate-200 bg-white shadow-sm mb-8 cursor-pointer hover:border-blue-300 transition-colors"
             >
-              <span className="flex h-2 w-2 rounded-full bg-blue-500"></span>
-              <span className="text-xs font-medium text-slate-600 uppercase tracking-wider">
-                v1.0 API is now live
-              </span>
+              <Link
+                to="/docs"
+                className="mb-8 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 shadow-sm transition-colors hover:border-blue-300"
+              >
+                <span className="flex h-2 w-2 rounded-full bg-blue-500" />
+                <span className="text-xs font-medium uppercase tracking-wider text-slate-600">
+                  v1.0 API is live
+                </span>
+                <ArrowRight className="h-3 w-3 text-slate-400" />
+              </Link>
             </motion.div>
 
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="font-['Outfit'] text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-8 leading-[1.1] max-w-4xl text-black mx-auto"
+              className="mx-auto mb-8 max-w-4xl font-['Outfit'] text-5xl font-bold leading-[1.1] tracking-tight text-black md:text-6xl lg:text-7xl"
             >
-              Accept More Payments, <br className="hidden md:block" />
-              <span className="text-blue-600">Grow Revenue.</span>
+              One API for all your{" "}
+              <span className="text-blue-600">payment providers.</span>
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-sm md:text-base text-slate-600 max-w-2xl mb-12 font-light leading-relaxed"
+              className="mb-10 max-w-2xl text-base font-light leading-relaxed text-slate-600 md:text-lg"
             >
-              A simple payment system that lets your business connect to multiple payment providers 
-              in one place. It helps you manage all transactions easily, improve payment success rates, 
-              and reduce failed payments so you can grow revenue faster.
+              Collect payments and send bank transfers across Paystack,
+              Flutterwave and Nomba with a single integration, and route each
+              payment to the provider that is performing best.
             </motion.p>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto px-4 sm:px-0"
+              className="flex w-full flex-col items-center gap-4 px-4 sm:w-auto sm:flex-row sm:px-0"
             >
               <Link
+                to="/auth/signup"
+                className="inline-flex h-12 w-full items-center justify-center rounded-lg bg-blue-600 px-8 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition-all hover:bg-blue-700 hover:shadow-blue-500/50 sm:w-auto"
+              >
+                Start free
+              </Link>
+              <Link
                 to="/demo"
-                className="w-full sm:w-auto h-12 inline-flex items-center justify-center rounded-lg bg-blue-600 px-8 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition-all hover:bg-blue-700 hover:shadow-blue-500/50 cursor-pointer text-center"
+                className="inline-flex h-12 w-full items-center justify-center rounded-lg border border-slate-300 bg-white px-8 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:border-slate-400 hover:bg-slate-50 sm:w-auto"
               >
                 Book a demo
               </Link>
-              <Link
-                to="/auth/signup"
-                className="w-full sm:w-auto h-12 inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-8 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 hover:border-slate-400 cursor-pointer"
-              >
-                <UserPlus className="w-4 h-4 mr-2" />
-                Create an account
-              </Link>
+            </motion.div>
+
+            <p className="mt-5 text-xs text-slate-500">
+              Free plan: {STARTER_PLAN.transactions} successful transactions a
+              month · Test in the sandbox first
+            </p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="w-full"
+            >
+              <HeroRouter />
             </motion.div>
           </section>
 
-          {/* Integration Comparison Feature */}
-          <section
-            id="benefits"
-            className="py-24 border-t border-slate-200 relative"
-          >
-            <div className="grid lg:grid-cols-2 gap-16 items-center w-full">
-              <div className="order-2 lg:order-1 relative w-full min-w-0">
-                <div className="absolute -inset-1 bg-linear-to-r from-blue-100 to-slate-200 rounded-2xl blur opacity-50"></div>
-                <div className="relative glass-panel rounded-2xl p-2 overflow-hidden w-full shadow-2xl border border-slate-200/50">
+          {/* Providers */}
+          <section className="border-y border-slate-200 py-16">
+            <p className="mb-10 text-center text-sm font-medium uppercase tracking-widest text-slate-400">
+              Connect the providers you already use
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-14 gap-y-8 md:gap-x-20">
+              {PROVIDERS.map((provider) => (
+                <div
+                  key={provider.alt}
+                  className="flex flex-col items-center gap-3"
+                >
                   <img
-                    src={businessOwners}
-                    alt="Success Stories"
-                    className="w-full h-auto rounded-xl object-cover hover:scale-[1.02] transition-transform duration-700"
+                    src={provider.src}
+                    alt={provider.alt}
+                    className={`${provider.size} w-auto object-contain brightness-0 transition-all duration-300 ${
+                      provider.comingSoon
+                        ? "opacity-25"
+                        : "opacity-50 hover:opacity-100 hover:brightness-100"
+                    }`}
                   />
+                  {provider.comingSoon && (
+                    <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                      Coming soon
+                    </span>
+                  )}
                 </div>
-              </div>
-
-              <div className="order-1 lg:order-2">
-                <h2 className="font-['Outfit'] text-3xl md:text-5xl font-bold mb-6 text-black">
-                  All your payment
-                  <br />
-                  providers, One Unified control layer.
-                </h2>
-                <p className="text-slate-600 text-lg mb-8 leading-relaxed">
-                  Setting up different payment methods for your business is slow
-                  and frustrating. Instead of juggling multiple accounts and
-                  messy reports, SynchGate gives you one simple way to handle
-                  everything.
-                </p>
-
-                <div className="space-y-6">
-                  {[
-                    {
-                      icon: ShieldCheck,
-                      title: "One Connection",
-                      desc: "Connect once and get access to every payment method your customers want as you grow.",
-                    },
-                    {
-                      icon: Globe,
-                      title: "Smart Savings",
-                      desc: "We automatically find the best way to route every payment, saving you money on every sale.",
-                    },
-                    {
-                      icon: Layers,
-                      title: "Simple Dashboard",
-                      desc: "See all your sales and money in one clean view, no matter how your customers choose to pay.",
-                    },
-                  ].map((feature, i) => (
-                    <motion.div
-                      key={feature.title}
-                      initial={{ opacity: 0, x: 20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.1 }}
-                      className="flex gap-4"
-                    >
-                      <div className="shrink-0 w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100">
-                        <feature.icon className="w-6 h-6 text-blue-600" />
-                      </div>
-                      <div>
-                        <h3 className="text-slate-900 font-medium text-lg mb-1">
-                          {feature.title}
-                        </h3>
-                        <p className="text-slate-600 text-sm">{feature.desc}</p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
+              ))}
             </div>
           </section>
 
-          {/* Trusted By / Providers Marquee */}
-          <section className="py-20 overflow-hidden relative border-y border-slate-200">
-            <div className="max-w-7xl mx-auto px-6 mb-12 text-center">
-              <p className="text-sm font-medium text-slate-400 uppercase tracking-widest">
-                Our Available Payment Providers
-              </p>
-            </div>
+          {/* What you can do */}
+          <section id="benefits" className="py-28">
+            <SectionIntro
+              eyebrow="What you get"
+              title="Everything to move money, in one API"
+            >
+              Payments, payouts and routing behind one integration, so you spend
+              your time on your product instead of on provider quirks.
+            </SectionIntro>
 
-            <div className="relative max-w-full mx-auto flex items-center">
-              <motion.div
-                className="flex items-center w-max"
-                animate={{ x: ["0%", "-50%"] }}
-                transition={{ repeat: Infinity, ease: "linear", duration: 30 }}
-              >
-                {[1, 2].map((set) => (
-                  <div
-                    key={set}
-                    className="flex items-center gap-16 md:gap-32 px-8 md:px-16 shrink-0"
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {FEATURES.map((feature, i) => (
+                <motion.div
+                  key={feature.title}
+                  {...fadeUp}
+                  transition={{ delay: (i % 3) * 0.08 }}
+                >
+                  <Link
+                    to={feature.to}
+                    className="group block h-full rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
                   >
-                    {PROVIDERS.map((logo) => (
-                      <img
-                        key={logo.alt}
-                        src={logo.src}
-                        alt={logo.alt}
-                        className={`${logo.size} object-contain brightness-0 opacity-40 hover:brightness-100 hover:opacity-100 transition-all duration-300`}
-                      />
-                    ))}
-                  </div>
+                    <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl border border-blue-100 bg-blue-50 transition-colors group-hover:border-blue-600 group-hover:bg-blue-600">
+                      <feature.icon className="h-6 w-6 text-blue-600 transition-colors group-hover:text-white" />
+                    </div>
+                    <h3 className="mb-3 text-xl font-bold text-slate-900">
+                      {feature.title}
+                    </h3>
+                    <p className="text-sm leading-relaxed text-slate-600">
+                      {feature.desc}
+                    </p>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+
+          {/* See it in action */}
+          <section className="border-t border-slate-200 py-28">
+            <SectionIntro
+              eyebrow="See it in action"
+              title="Follow a request end to end"
+            >
+              Pick a scenario and watch it move through SynchGate, including
+              what happens when something goes wrong.
+            </SectionIntro>
+
+            <div className="mx-auto max-w-3xl">
+              <div
+                role="tablist"
+                className="mx-auto mb-6 flex w-fit rounded-full border border-slate-200 bg-white p-1 shadow-sm"
+              >
+                {(
+                  [
+                    ["collect", "Collect a payment"],
+                    ["payout", "Send a payout"],
+                  ] as const
+                ).map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    role="tab"
+                    aria-selected={demo === id}
+                    onClick={() => setDemo(id)}
+                    className={`rounded-full px-5 py-2 text-sm font-medium transition-colors ${
+                      demo === id
+                        ? "bg-black text-white"
+                        : "text-slate-600 hover:text-black"
+                    }`}
+                  >
+                    {label}
+                  </button>
                 ))}
-              </motion.div>
+              </div>
+
+              <FlowAnimation
+                key={demo}
+                title={
+                  demo === "collect" ? "Collect a payment" : "Send a payout"
+                }
+                {...(demo === "collect" ? paymentFlow : transferFlow)}
+              />
             </div>
           </section>
 
-          {/* How It Works Section */}
-          <section id="how-it-works" className="py-32 relative overflow-hidden">
-            <div className="absolute inset-0 bg-slate-50/50 -z-10"></div>
+          {/* How it works */}
+          <section
+            id="how-it-works"
+            className="relative -mx-6 overflow-hidden border-t border-slate-200 bg-slate-50/60 px-6 py-28"
+          >
+            <div className="mx-auto max-w-7xl">
+              <SectionIntro
+                eyebrow="Simple 3-step process"
+                title="From sign-up to first payment"
+              />
 
-            <div className="max-w-7xl mx-auto px-6">
-              <div className="text-center mb-20">
-                <motion.span
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  className="text-blue-600 font-semibold text-sm tracking-wider uppercase mb-4 block"
-                >
-                  Simple 3-Step Process
-                </motion.span>
-                <motion.h2
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.1 }}
-                  className="font-['Outfit'] text-4xl md:text-5xl font-bold text-black mb-6"
-                >
-                  How it works
-                </motion.h2>
-                <motion.p
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.2 }}
-                  className="text-slate-600 text-lg max-w-2xl mx-auto"
-                >
-                  We've simplified the complex world of global payments into
-                  three easy steps. No rocket science, just results.
-                </motion.p>
-              </div>
-
-              <div className="relative">
-                {/* Desktop Connectors */}
-                <div className="hidden lg:block absolute top-[28%] left-[25%] w-[18%] text-blue-200">
-                  <svg viewBox="0 0 100 20" className="w-full">
-                    <motion.path
-                      d="M0 10 Q 50 10 100 10"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeDasharray="4 4"
-                      fill="none"
-                      animate={{ strokeDashoffset: [0, -8] }}
-                      transition={{
-                        duration: 1,
-                        repeat: Infinity,
-                        ease: "linear",
-                      }}
-                    />
-                  </svg>
-                </div>
-                <div className="hidden lg:block absolute top-[28%] right-[25%] w-[18%] text-blue-200">
-                  <svg viewBox="0 0 100 20" className="w-full">
-                    <motion.path
-                      d="M0 10 Q 50 10 100 10"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeDasharray="4 4"
-                      fill="none"
-                      animate={{ strokeDashoffset: [0, -8] }}
-                      transition={{
-                        duration: 1,
-                        repeat: Infinity,
-                        ease: "linear",
-                      }}
-                    />
-                  </svg>
-                </div>
-
-                <div className="grid lg:grid-cols-3 gap-12 relative z-10">
-                  {[
-                    {
-                      icon: UserPlus,
-                      title: "1. Connect & Go",
-                      desc: "Sign up and connect your existing payment providers like Paystack or Flutterwave in minutes.",
-                      bgColor: "bg-blue-600/5",
-                      iconColor: "text-blue-600",
-                    },
-                    {
-                      icon: LinkIcon,
-                      title: "2. One Simple Tool",
-                      desc: "Use our single API or no-code dashboard to power your entire payment stack without the mess.",
-                      bgColor: "bg-indigo-600/5",
-                      iconColor: "text-indigo-600",
-                    },
-                    {
-                      icon: TrendingUp,
-                      title: "3. Routing",
-                      desc: "The current routing system uses explicit provider selection based on your preference.",
-                      bgColor: "bg-slate-600/5",
-                      iconColor: "text-slate-600",
-                    },
-                  ].map((step, i) => (
-                    <motion.div
+              <div className="grid items-start gap-12 lg:grid-cols-2">
+                <ol className="space-y-8">
+                  {STEPS.map((step, i) => (
+                    <motion.li
                       key={step.title}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.2 }}
-                      className="relative flex flex-col items-center text-center group"
+                      {...fadeUp}
+                      transition={{ delay: i * 0.1 }}
+                      className="flex gap-5"
                     >
-                      <div className="w-20 h-20 rounded-3xl glass-panel flex items-center justify-center mb-8 border border-slate-200 shadow-sm group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300 relative">
-                        <div
-                          className={`absolute inset-0 ${step.bgColor} rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity`}
-                        ></div>
-                        <step.icon
-                          className={`w-8 h-8 ${step.iconColor} relative z-10`}
-                        />
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-600 font-['Outfit'] text-lg font-bold text-white">
+                        {i + 1}
+                      </span>
+                      <div>
+                        <h3 className="mb-1 font-['Outfit'] text-2xl font-bold text-black">
+                          {step.title}
+                        </h3>
+                        <p className="leading-relaxed text-slate-600">
+                          {step.desc}
+                        </p>
                       </div>
-                      <h3 className="font-['Outfit'] text-2xl font-bold mb-4 text-black">
-                        {step.title}
-                      </h3>
-                      <p className="text-slate-600 leading-relaxed font-light px-4">
-                        {step.desc}
-                      </p>
-
-                      {/* Mobile Vertical Connector */}
-                      {i < 2 && (
-                        <div className="lg:hidden h-20 w-px bg-linear-to-b from-blue-200 to-transparent my-8 relative">
-                          <motion.div
-                            className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-4 bg-blue-400 rounded-full"
-                            animate={{
-                              top: ["0%", "100%"],
-                              opacity: [0, 1, 0],
-                            }}
-                            transition={{
-                              duration: 1.5,
-                              repeat: Infinity,
-                              ease: "linear",
-                            }}
-                          />
-                        </div>
-                      )}
-                    </motion.div>
+                    </motion.li>
                   ))}
-                </div>
+                  <li>
+                    <Link
+                      to="/docs/installation"
+                      className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:underline"
+                    >
+                      Read the quickstart <ChevronRight className="h-4 w-4" />
+                    </Link>
+                  </li>
+                </ol>
 
-                {/* Mobile Connectors */}
-                <div className="lg:hidden flex flex-col items-center gap-12 mt-12">
-                  {/* Mobile version would be easier with just vertical spacing, 
-                       but the icons above already show the sequence */}
+                <div className="min-w-0">
+                  <CodeTabs snippets={paymentSnippets} className="mb-0" />
                 </div>
               </div>
             </div>
           </section>
 
-          {/* Target Audience Section */}
-          <section className="py-24 border-b border-slate-200 bg-slate-50/50 -mx-8 px-8">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center mb-16">
-                <h2 className="font-['Outfit'] text-3xl md:text-5xl font-bold mb-4 text-black">
-                  Built for every stage of business
-                </h2>
-                <p className="text-slate-600 text-lg max-w-2xl mx-auto">
-                  Whether you're just starting or scaling globally, we
-                  provides the infrastructure you need to succeed.
-                </p>
-              </div>
+          {/* Comparison */}
+          <section className="py-28">
+            <SectionIntro
+              eyebrow="Why SynchGate"
+              title="Less to build, less to maintain"
+            >
+              Integrating every provider yourself means repeating the same work
+              for each one.
+            </SectionIntro>
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {[
-                  {
-                    icon: Zap,
-                    title: "Startups & Founders",
-                    desc: "Launch your product faster with a single integration that scales with you from day one.",
-                  },
-                  {
-                    icon: ShoppingBag,
-                    title: "E-commerce Brands",
-                    desc: "Expand to new markets instantly by enabling multiple payment gateways with a single API.",
-                  },
-                  {
-                    icon: Building2,
-                    title: "Scaling Platforms",
-                    desc: "Improve reliability with smart routing and automated failovers.",
-                  },
-                  {
-                    icon: Cpu,
-                    title: "Fintech Builders",
-                    desc: "Build complex payment experiences and custom flows on top of our robust, developer-first APIs.",
-                  },
-                ].map((item, i) => (
+            <div className="mx-auto max-w-4xl overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+                    <th className="px-6 py-4 font-medium" />
+                    <th className="px-6 py-4 font-medium">
+                      Integrating providers yourself
+                    </th>
+                    <th className="px-6 py-4 font-medium text-blue-600">
+                      With SynchGate
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {COMPARISON.map((row) => (
+                    <tr key={row.topic}>
+                      <td className="px-6 py-4 font-semibold text-slate-900">
+                        {row.topic}
+                      </td>
+                      <td className="px-6 py-4 text-slate-600">
+                        <span className="inline-flex items-center gap-2">
+                          <X className="h-4 w-4 shrink-0 text-slate-300" />
+                          {row.alone}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 font-medium text-slate-900">
+                        <span className="inline-flex items-center gap-2">
+                          <Check className="h-4 w-4 shrink-0 text-emerald-500" />
+                          {row.synch}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* Pricing teaser */}
+          <section className="border-t border-slate-200 py-28">
+            <SectionIntro
+              eyebrow="Pricing"
+              title="Start free, upgrade when you grow"
+            >
+              A monthly plan plus a flat fee on each successful live
+              transaction. Nothing is hidden, and the sandbox is always free.
+            </SectionIntro>
+
+            <div className="mx-auto grid max-w-3xl gap-6 md:grid-cols-2">
+              {[
+                {
+                  name: STARTER_PLAN.name,
+                  price: "Free",
+                  note: `${STARTER_PLAN.transactions} successful transactions a month`,
+                  highlight: false,
+                },
+                {
+                  name: GROWTH_PLAN.name,
+                  price: `${formatNaira(GROWTH_PLAN.priceNgn)}`,
+                  note: `${GROWTH_PLAN.transactions.toLocaleString("en-NG")} successful transactions a month`,
+                  highlight: true,
+                },
+              ].map((plan) => (
+                <div
+                  key={plan.name}
+                  className={`rounded-3xl border p-8 ${
+                    plan.highlight
+                      ? "border-blue-200 bg-blue-50/50"
+                      : "border-slate-200 bg-white"
+                  }`}
+                >
+                  <h3 className="mb-2 text-lg font-bold text-slate-900">
+                    {plan.name}
+                  </h3>
+                  <p className="font-['Outfit'] text-4xl font-bold text-black">
+                    {plan.price}
+                    {plan.highlight && (
+                      <span className="ml-1 text-base font-medium text-slate-500">
+                        / month
+                      </span>
+                    )}
+                  </p>
+                  <p className="mt-3 text-sm text-slate-600">{plan.note}</p>
+                </div>
+              ))}
+            </div>
+
+            <p className="mx-auto mt-6 max-w-3xl text-center text-sm text-slate-600">
+              Plus a flat {formatNaira(PLATFORM_FEE_NGN)} platform fee on each
+              successful live transaction.
+            </p>
+            <div className="mt-8 text-center">
+              <Link
+                to="/pricing"
+                className="inline-flex items-center gap-1 font-semibold text-blue-600 hover:underline"
+              >
+                See full pricing <ChevronRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </section>
+
+          {/* Trust */}
+          <section className="border-t border-slate-200 bg-slate-50/60 -mx-6 px-6 py-28">
+            <div className="mx-auto max-w-7xl">
+              <SectionIntro
+                eyebrow="Security"
+                title="Built to keep sensitive data out of your way"
+              />
+              <div className="grid gap-6 md:grid-cols-3">
+                {TRUST.map((item, i) => (
                   <motion.div
                     key={item.title}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
+                    {...fadeUp}
                     transition={{ delay: i * 0.1 }}
-                    className="p-8 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-shadow group"
+                    className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100 mb-6 group-hover:bg-blue-600 group-hover:border-blue-600 transition-colors">
-                      <item.icon className="w-6 h-6 text-blue-600 group-hover:text-white transition-colors" />
+                    <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl border border-blue-100 bg-blue-50">
+                      <item.icon className="h-5 w-5 text-blue-600" />
                     </div>
-                    <h3 className="text-slate-900 font-bold text-xl mb-3">
+                    <h3 className="mb-2 text-lg font-bold text-slate-900">
                       {item.title}
                     </h3>
-                    <p className="text-slate-600 text-sm leading-relaxed">
+                    <p className="mb-4 text-sm leading-relaxed text-slate-600">
                       {item.desc}
                     </p>
+                    <Link
+                      to={item.to}
+                      className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:underline"
+                    >
+                      {item.cta} <ChevronRight className="h-4 w-4" />
+                    </Link>
                   </motion.div>
                 ))}
               </div>
             </div>
           </section>
 
-          {/* FAQ Section */}
-          <section className="py-24 border-b border-slate-200">
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center mb-16">
-                <h2 className="font-['Outfit'] text-3xl md:text-5xl font-bold mb-4 text-black">
-                  Frequently Asked Questions
-                </h2>
-                <p className="text-slate-600 text-lg">
-                  Everything you need to know about Us.
-                </p>
-              </div>
+          {/* FAQ */}
+          <section className="border-b border-slate-200 py-28">
+            <div className="mx-auto max-w-4xl">
+              <SectionIntro title="Frequently asked questions">
+                Everything you need to know before you start.
+              </SectionIntro>
 
               <div className="space-y-4">
-                {[
-                  {
-                    q: "How long does setup take?",
-                    a: "You can be up and running in minutes. Our simplified dashboard help you setup your account, get your API keys and make your first charge.",
-                  },
-                  {
-                    q: "Which payment providers do you support?",
-                    a: "We currently support some global providers including Flutterwave, Paystack, and Nomba. We are constantly adding new integrations based on customer demand.",
-                  },
-                  {
-                    q: "Is SynchGate PCI compliant?",
-                    a: "We do not process payments or handle user cards details. All payments are processed by payment gateways (providers) and they securely handle sensitive payment data.",
-                  },
-                  {
-                    q: "How does smart routing work?",
-                    a: "(this feature is coming soon)",
-                  },
-                ].map((faq, i) => (
+                {FAQS.map((faq, i) => (
                   <motion.div
                     key={faq.q}
                     initial={{ opacity: 0, y: 10 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: i * 0.05 }}
-                    className="border border-slate-200 rounded-2xl overflow-hidden bg-white"
+                    transition={{ delay: i * 0.04 }}
+                    className="overflow-hidden rounded-2xl border border-slate-200 bg-white"
                   >
                     <button
                       type="button"
+                      aria-expanded={activeFaq === i}
                       onClick={() => setActiveFaq(activeFaq === i ? null : i)}
-                      className="w-full flex items-center justify-between p-6 text-left hover:bg-slate-50 transition-colors"
+                      className="flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-slate-50"
                     >
-                      <span className="font-bold text-slate-900 text-lg">
+                      <span className="text-lg font-bold text-slate-900">
                         {faq.q}
                       </span>
                       {activeFaq === i ? (
-                        <Minus className="w-5 h-5 text-blue-600 shrink-0" />
+                        <Minus className="h-5 w-5 shrink-0 text-blue-600" />
                       ) : (
-                        <Plus className="w-5 h-5 text-slate-400 shrink-0" />
+                        <Plus className="h-5 w-5 shrink-0 text-slate-400" />
                       )}
                     </button>
                     <motion.div
@@ -487,7 +694,7 @@ function LandingPage() {
                       animate={{ height: activeFaq === i ? "auto" : 0 }}
                       className="overflow-hidden"
                     >
-                      <div className="p-6 pt-0 text-slate-600 leading-relaxed border-t border-slate-100">
+                      <div className="border-t border-slate-100 p-6 pt-4 leading-relaxed text-slate-600">
                         {faq.a}
                       </div>
                     </motion.div>
@@ -497,35 +704,34 @@ function LandingPage() {
             </div>
           </section>
 
-          {/* CTA Section */}
-          <section className="py-32 relative text-center">
-            <div className="absolute inset-0 bg-blue-50 rounded-3xl blur-3xl"></div>
-            <div className="relative glass-panel rounded-3xl p-12 md:p-20 border border-slate-200 overflow-hidden shadow-sm">
-              <div className="absolute top-0 right-0 p-32 bg-blue-100 blur-[100px] rounded-full"></div>
-              <div className="absolute bottom-0 left-0 p-32 bg-slate-100 blur-[100px] rounded-full"></div>
+          {/* CTA */}
+          <section className="relative py-28 text-center">
+            <div className="absolute inset-0 rounded-3xl bg-blue-50 blur-3xl" />
+            <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white/70 p-12 shadow-sm backdrop-blur md:p-20">
+              <div className="absolute right-0 top-0 rounded-full bg-blue-100 p-32 blur-[100px]" />
+              <div className="absolute bottom-0 left-0 rounded-full bg-slate-100 p-32 blur-[100px]" />
 
-              <h2 className="font-['Outfit'] text-4xl md:text-5xl font-bold mb-6 text-black relative z-10">
-                Ready to simplify?
+              <h2 className="relative z-10 mb-6 font-['Outfit'] text-4xl font-bold text-black md:text-5xl">
+                Ready to simplify your payments?
               </h2>
-              <p className="text-slate-600 text-lg md:text-xl mb-10 max-w-2xl mx-auto relative z-10">
-                Join hundreds of businesses building on SynchGate. Create an
-                account, get your API keys, and make your first charge in
-                minutes.
+              <p className="relative z-10 mx-auto mb-10 max-w-2xl text-lg text-slate-600 md:text-xl">
+                Create an account, get your sandbox key and make your first
+                request in minutes.
               </p>
 
-              <div className="flex flex-col sm:flex-row justify-center items-center gap-4 relative z-10">
+              <div className="relative z-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <Link
                   to="/auth/signup"
-                  className="w-full sm:w-auto px-8 py-4 rounded-xl bg-black text-white font-semibold hover:bg-slate-800 transition-colors shadow-lg shadow-slate-200 cursor-pointer"
+                  className="w-full rounded-xl bg-black px-8 py-4 font-semibold text-white shadow-lg shadow-slate-200 transition-colors hover:bg-slate-800 sm:w-auto"
                 >
-                  Create Free Account
+                  Create free account
                 </Link>
                 <Link
                   to="/docs"
-                  className="w-full sm:w-auto px-8 py-4 rounded-xl bg-white border border-slate-200 text-slate-900 font-medium hover:bg-slate-50 transition-colors shadow-sm inline-flex items-center justify-center cursor-pointer"
+                  className="inline-flex w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-8 py-4 font-medium text-slate-900 shadow-sm transition-colors hover:bg-slate-50 sm:w-auto"
                 >
-                  Explore Documentation{" "}
-                  <ChevronRight className="w-4 h-4 ml-1" />
+                  Explore documentation{" "}
+                  <ChevronRight className="ml-1 h-4 w-4" />
                 </Link>
               </div>
             </div>

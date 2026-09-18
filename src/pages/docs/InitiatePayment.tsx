@@ -1,286 +1,336 @@
-import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { SimpleExample } from "../../components/docs/SimpleExample";
+import {
+  Endpoint,
+  ParamTable,
+  ReferenceTable,
+} from "../../components/docs/ApiReference";
+import { CodeBlock, CodeTabs } from "../../components/docs/CodeBlock";
+import {
+  Callout,
+  DocPage,
+  InlineCode,
+  PageHeader,
+  PageNav,
+  Prose,
+  SectionHeading,
+  SubHeading,
+} from "../../components/docs/DocLayout";
+import { FlowAnimation } from "../../components/docs/FlowAnimation";
+import { paymentFlow } from "../../components/docs/flows";
 import { SupportedProviders } from "../../components/docs/SupportedProviders";
-import { CopyButton } from "../../components/ui/CopyButton";
+import { requestSnippets } from "../../components/docs/snippets";
+
+const snippets = requestSnippets({
+  method: "POST",
+  path: "/initiate-payment/",
+  body: {
+    provider: "paystack",
+    email: "customer@example.com",
+    amount: 8000,
+    currency: "NGN",
+    reference: "order-2026-000123",
+    callback_url: "https://yourdomain.com/payments/callback",
+  },
+});
+
+const successResponse = `{
+  "status": "success",
+  "message": "Payment initiated successfully",
+  "data": {
+    "cleaned_data": {
+      "payment_url": "https://checkout.paystack.com/abc123xyz",
+      "amount": "8000.00",
+      "currency": "NGN",
+      "reference": "order-2026-000123",
+      "status": "success",
+      "provider": "paystack"
+    },
+    "provider_data": {
+      "data": {
+        "status": true,
+        "message": "Authorization URL created",
+        "data": {
+          "authorization_url": "https://checkout.paystack.com/abc123xyz",
+          "access_code": "abc123xyz",
+          "reference": "order-2026-000123"
+        }
+      }
+    }
+  },
+  "meta": {
+    "request_id": "41e97272-03b2-485c-a150-8e7c30737f3c",
+    "timestamp": "2026-09-18T11:44:41.828466Z"
+  }
+}`;
 
 function InitiatePayment() {
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 text-slate-900">
-      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-200 bg-blue-50 mb-6 shadow-sm">
-        <span className="text-xs font-medium text-blue-600 uppercase tracking-wider">
-          COLLECT PAYMENTS
-        </span>
-      </div>
-
-      <h1 className="font-['Outfit'] text-4xl md:text-5xl font-bold mb-6 text-black">
-        Initiate Payment
-      </h1>
-
-      <p className="text-lg text-slate-600 leading-relaxed mb-8">
-        Creates a new payment transaction across any of our supported providers.
-      </p>
+    <DocPage>
+      <PageHeader eyebrow="COLLECT PAYMENTS" title="Initiate Payment">
+        Create a payment and get back a hosted checkout link for your customer.
+        You name the provider that should process it, and SynchGate returns the
+        same response shape whichever one you choose.
+      </PageHeader>
 
       <SupportedProviders />
 
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
-        Base URL
-      </h2>
-      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10 relative group flex items-center justify-between">
-        <span>https://api.synchgate.com/v1/api</span>
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-          <CopyButton textToCopy="https://api.synchgate.com/v1/api" />
-        </div>
-      </div>
+      <SectionHeading>How it works</SectionHeading>
+      <FlowAnimation {...paymentFlow} />
 
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 border-b border-slate-200 pb-2 text-black">
-        Endpoint
-      </h2>
-      <div className="bg-slate-900 rounded-xl p-4 text-sm font-mono text-blue-300 mb-8 shadow-inner overflow-x-auto border border-white/10 relative group flex items-center justify-between">
-        <span>POST /initiate-payment/</span>
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-          <CopyButton textToCopy="POST /initiate-payment/" />
-        </div>
-      </div>
-
-      <h3 className="font-semibold text-slate-900 text-lg mb-3">
-        Request Body
-      </h3>
-      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-8 overflow-x-auto shadow-inner leading-relaxed border border-white/10">
-        <pre>
-          {`{
-  "provider": "provider_name",
-  "email": "customer@example.com",
-  "amount": 8000,
-  "currency": "NGN",
-  "callback_url": "https://synchgate.com/payments/",
-  "reference": "unique_tx_ref_001"
-}`}
-        </pre>
-      </div>
-
-      <div className="mb-8 overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
-        <table className="w-full text-sm text-left">
-          <thead className="bg-[#242424] text-slate-200 text-xs uppercase tracking-wider">
-            <tr>
-              <th className="px-6 py-4 font-medium">Field</th>
-              <th className="px-6 py-4 font-medium">Type</th>
-              <th className="px-6 py-4 font-medium text-center">Required</th>
-              <th className="px-6 py-4 font-medium">Description</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-700 bg-[#1e1e1e] text-slate-300">
-            <tr>
-              <td className="px-6 py-4 font-mono text-amber-300">provider</td>
-              <td className="px-6 py-4 text-blue-300 font-mono">string</td>
-              <td className="px-6 py-4 text-center text-emerald-400">✅</td>
-              <td className="px-6 py-4">
-                Payment provider to route transaction to (e.g., paystack,
-                flutterwave).
-              </td>
-            </tr>
-            <tr>
-              <td className="px-6 py-4 font-mono text-amber-300">email</td>
-              <td className="px-6 py-4 text-blue-300 font-mono">string</td>
-              <td className="px-6 py-4 text-center text-emerald-400">✅</td>
-              <td className="px-6 py-4">Customer email address.</td>
-            </tr>
-            <tr>
-              <td className="px-6 py-4 font-mono text-amber-300">amount</td>
-              <td className="px-6 py-4 text-emerald-300 font-mono">integer</td>
-              <td className="px-6 py-4 text-center text-emerald-400">✅</td>
-              <td className="px-6 py-4">Amount to charge</td>
-            </tr>
-            <tr>
-              <td className="px-6 py-4 font-mono text-amber-300">currency</td>
-              <td className="px-6 py-4 text-blue-300 font-mono">string</td>
-              <td className="px-6 py-4 text-center text-rose-400">❌</td>
-              <td className="px-6 py-4">
-                Transaction currency (e.g., NGN, USD, defaults to NGN)
-              </td>
-            </tr>
-            <tr>
-              <td className="px-6 py-4 font-mono text-amber-300">
-                callback_url
-              </td>
-              <td className="px-6 py-4 text-blue-300 font-mono">url</td>
-              <td className="px-6 py-4 text-center text-rose-400">❌</td>
-              <td className="px-6 py-4">
-                The URL to redirect the customer after payment
-              </td>
-            </tr>
-            <tr>
-              <td className="px-6 py-4 font-mono text-amber-300">reference</td>
-              <td className="px-6 py-4 text-blue-300 font-mono">string</td>
-              <td className="px-6 py-4 text-center text-emerald-400">✅</td>
-              <td className="px-6 py-4">
-                Unique transaction reference
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
-        Routing Logic
-      </h2>
-
-      <p className="text-slate-600 mb-4">
-        The current routing system uses{" "}
-        <strong>explicit provider selection</strong>.
-      </p>
-      <p className="text-slate-600 mb-6">
-        The provider is specified directly in the request payload, and the API
-        routes the request to that specific gateway.
-      </p>
-
-      <p className="text-slate-900 font-bold text-lg mb-2 mt-8">
-        Example Request (cURL)
-      </p>
-      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10 relative group">
-        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-          <CopyButton
-            textToCopy={`curl --location 'https://api.synchgate.com/v1/api/initiate-payment/' \\\n--header 'Client-Secret-Key: sk_live_your_key_here' \\\n--header 'Content-Type: application/json' \\\n--data-raw '{\n    "provider": "provider_name",\n    "email": "customer@example.com",\n    "amount": 8000,\n    "currency": "NGN"\n}'`}
-          />
-        </div>
-        <pre>
-          {`curl --location 'https://api.synchgate.com/v1/api/initiate-payment/' \\
---header 'Client-Secret-Key: sk_live_your_key_here' \\
---header 'Content-Type: application/json' \\
---data-raw '{
-    "provider": "provider_name",
-    "email": "customer@example.com",
-    "amount": 8000,
-    "currency": "NGN",
-    "reference": "transaction_reference",
-    "callback_url": "https://synchgate.com/payments/"
-}'`}
-        </pre>
-      </div>
-
-      <SimpleExample />
-
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
-        Example Response
-      </h2>
-      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10">
-        <pre>
-          {`{
-    "status": "success",
-    "message": "Payment initiated successfully",
-    "data": {
-        "cleaned_data": {
-            "payment_url": "https://checkout-v2.dev-flutterwave.com/v3/hosted/pay/b27556da90c41b410111",
-            "amount": "10000.00",
-            "currency": "NGN",
-            "reference": "hdjdjfkfkjdjdj",
-            "status": "success",
-            "provider": "provider_name"
-        },
-        "provider_data": {
-            "data": {
-                "status": "success",
-                "message": "Hosted Link",
-                "data": {
-                    "link": "https://checkout-v2.dev-flutterwave.com/v3/hosted/pay/b27556da90c41b410111",
-                    "tx_ref": "hdjdjfkfkjdjdj",
-                    "amount": "10000.00",
-                    "currency": "NGN",
-                    "redirect_url": "https://fintech-platform-weld.vercel.app/"
-                }
-            }
-        }
-    },
-    "meta": {
-        "request_id": "41e97272-03b2-485c-a150-8e7c30737f3c",
-        "timestamp": "2026-03-24T11:44:41.828466Z"
-    }
-}`}
-        </pre>
-      </div>
-
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
-        Unified Response Format
-      </h2>
-      <p className="text-slate-600 mb-4">
-        Fintech Platform normalizes responses from all providers into a single,
-        consistent format.
-      </p>
-      <p className="text-slate-600 mb-12">
-        This allows you to write one integration regardless of which underlying
-        payment gateway you use.
-      </p>
-
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
-        Transaction Tracking
-      </h2>
-      <p className="text-slate-600 mb-3">
-        All API transactions are tracked with one of the following states:
-      </p>
-      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-amber-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10">
-        <pre>
-          {`pending   - Payment is waiting for customer action
-success   - Payment was successfully processed
-failed    - Payment was declined or failed
-abandoned - Customer left the payment page`}
-        </pre>
-      </div>
-
-      <h2 className="font-['Outfit'] text-3xl font-bold mb-4 mt-8 border-b border-slate-200 pb-2 text-black">
-        Error Handling
-      </h2>
-      <p className="text-slate-600 mb-6">
-        All errors return a standard JSON structure with a descriptive message
-        and error code.
-      </p>
-      <div className="bg-slate-900 rounded-xl p-6 text-sm font-mono text-slate-300 mb-12 overflow-x-auto shadow-inner leading-relaxed border border-white/10">
-        <pre>
-          {`{
-    "status": "error",
-    "message": "Invalid client secret key.",
-    "error": {
-        "code": "authentication_failed"
-    }
-}`}
-        </pre>
-      </div>
-
-      {/* Navigation Footer */}
-      <div className="grid grid-cols-2 gap-4 items-center py-8 mt-16 border-t border-slate-200">
+      <SectionHeading>Endpoint</SectionHeading>
+      <Endpoint method="POST" path="/initiate-payment/" />
+      <Prose>
+        Authenticate with your secret key in the{" "}
+        <InlineCode>Client-Secret-Key</InlineCode> header, as described in{" "}
         <Link
-          to="/docs/installation"
-          className="flex items-center gap-2 text-slate-600 hover:text-blue-600 transition-colors group cursor-pointer min-w-0"
+          to="/docs/authentication"
+          className="text-blue-600 hover:underline"
         >
-          <div className="w-10 h-10 shrink-0 rounded-full border border-slate-200 flex items-center justify-center group-hover:bg-blue-50 group-hover:border-blue-200 transition-colors">
-            <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-blue-600 rotate-180" />
-          </div>
-          <div className="text-left min-w-0 pr-2">
-            <span className="text-xs text-slate-500 uppercase tracking-wider block">
-              Previous
-            </span>
-            <span className="font-medium text-blue-600 group-hover:text-blue-500 block truncate">
-              Installation
-            </span>
-          </div>
+          Authentication
         </Link>
-        <Link
-          to="/docs/transaction-verification"
-          className="flex items-center gap-2 text-slate-600 hover:text-blue-600 transition-colors group cursor-pointer min-w-0 justify-end text-right"
-        >
-          <div className="text-right min-w-0 pl-2">
-            <span className="text-xs text-slate-500 uppercase tracking-wider block">
-              Next
-            </span>
-            <span className="font-medium text-blue-600 group-hover:text-blue-500 block truncate">
-              Transaction Verification
-            </span>
-          </div>
-          <div className="w-10 h-10 shrink-0 rounded-full border border-slate-200 flex items-center justify-center group-hover:bg-blue-50 group-hover:border-blue-200 transition-colors">
-            <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-blue-600" />
-          </div>
-        </Link>
-      </div>
-    </div>
+        . The provider must already be connected in your dashboard.
+      </Prose>
+      <Callout title="Want SynchGate to choose the provider?">
+        Use{" "}
+        <Link to="/docs/smart-routes" className="underline font-medium">
+          Smart Route
+        </Link>{" "}
+        and leave the provider out of the request.
+      </Callout>
+
+      <SectionHeading>Request body</SectionHeading>
+      <ParamTable
+        params={[
+          {
+            name: "provider",
+            type: "string",
+            required: true,
+            description:
+              "Provider that should process the payment, for example paystack, flutterwave or nomba.",
+          },
+          {
+            name: "email",
+            type: "string",
+            required: true,
+            description: "Customer's email address. Up to 100 characters.",
+          },
+          {
+            name: "amount",
+            type: "integer",
+            required: true,
+            description:
+              "Amount in major units (naira, not kobo). Send a whole number: any decimal part is dropped. Must be greater than zero.",
+          },
+          {
+            name: "currency",
+            type: "string",
+            description: "Currency code. Defaults to NGN.",
+          },
+          {
+            name: "reference",
+            type: "string",
+            required: true,
+            description: (
+              <>
+                Your unique reference for this payment, up to 50 characters. See{" "}
+                <a href="#references" className="text-blue-300 underline">
+                  References
+                </a>
+                .
+              </>
+            ),
+          },
+          {
+            name: "callback_url",
+            type: "string",
+            description:
+              "URL the customer is sent back to after paying. Up to 100 characters.",
+          },
+        ]}
+      />
+
+      <SectionHeading>Example request</SectionHeading>
+      <CodeTabs snippets={snippets} />
+
+      <SectionHeading>Response</SectionHeading>
+      <CodeBlock code={successResponse} title="200 OK" />
+
+      <SubHeading>Response fields</SubHeading>
+      <p className="text-slate-600 mb-4">
+        Everything under <InlineCode>data.cleaned_data</InlineCode> has the same
+        shape for every provider. <InlineCode>data.provider_data</InlineCode> is
+        the provider's raw response, included for debugging. Do not build logic
+        on it, because it differs between providers.
+      </p>
+      <ReferenceTable
+        headers={["Field", "Description"]}
+        rows={[
+          {
+            key: "payment_url",
+            cells: [
+              "payment_url",
+              "The provider's hosted checkout page. Redirect your customer here.",
+            ],
+          },
+          {
+            key: "amount",
+            cells: ["amount", "Amount of the payment, as a string."],
+          },
+          {
+            key: "currency",
+            cells: ["currency", "Currency of the payment."],
+          },
+          {
+            key: "reference",
+            cells: [
+              "reference",
+              "The reference for this payment. Use it to verify the payment.",
+            ],
+          },
+          {
+            key: "status",
+            cells: [
+              "status",
+              "Whether the provider created the checkout. This is not the payment status. The customer has not paid yet.",
+            ],
+          },
+          {
+            key: "provider",
+            cells: ["provider", "Provider that handled the request."],
+          },
+        ]}
+      />
+
+      <SectionHeading>After the customer pays</SectionHeading>
+      <ol className="list-decimal list-inside space-y-2 mb-8 text-slate-600 ml-2">
+        <li>
+          Redirect the customer to <InlineCode>payment_url</InlineCode>.
+        </li>
+        <li>
+          After paying, the provider sends the customer to your{" "}
+          <InlineCode>callback_url</InlineCode>.
+        </li>
+        <li>
+          Confirm the outcome with{" "}
+          <Link
+            to="/docs/transaction-verification"
+            className="text-blue-600 hover:underline"
+          >
+            Transaction Verification
+          </Link>{" "}
+          before you deliver value. Never rely on the redirect alone.
+        </li>
+      </ol>
+
+      <SectionHeading>Payment status</SectionHeading>
+      <ReferenceTable
+        headers={["Status", "Meaning"]}
+        rows={[
+          {
+            key: "pending",
+            cells: ["pending", "The payment is waiting for the customer."],
+          },
+          {
+            key: "processing",
+            cells: [
+              "processing",
+              "The provider is still working on the payment.",
+            ],
+          },
+          {
+            key: "success",
+            cells: ["success", "The payment was completed."],
+          },
+          {
+            key: "failed",
+            cells: ["failed", "The payment was declined or failed."],
+          },
+          {
+            key: "abandoned",
+            cells: ["abandoned", "The customer left the checkout page."],
+          },
+        ]}
+      />
+
+      <SectionHeading id="references">References</SectionHeading>
+      <Prose>
+        Each <InlineCode>reference</InlineCode> can be used once per account,
+        across sandbox and live. Reusing one is rejected with{" "}
+        <InlineCode>duplicate_reference</InlineCode> and nothing is sent to the
+        provider.
+      </Prose>
+
+      <SectionHeading>Errors</SectionHeading>
+      <ReferenceTable
+        headers={["HTTP", "Code", "Meaning and what to do"]}
+        rows={[
+          {
+            key: "invalid",
+            cells: [
+              "400",
+              "invalid",
+              "A field is missing or malformed. The offending fields are listed in error.details.",
+            ],
+          },
+          {
+            key: "duplicate_reference",
+            cells: [
+              "400",
+              "duplicate_reference",
+              "The reference was already used. Send a new one.",
+            ],
+          },
+          {
+            key: "invalid_reference",
+            cells: ["400", "invalid_reference", "A reference is required."],
+          },
+          {
+            key: "payment_failed",
+            cells: [
+              "400",
+              "payment_failed",
+              "The payment could not be initiated. Check that the provider is connected in your dashboard and that the request is valid.",
+            ],
+          },
+          {
+            key: "authentication_failed",
+            cells: [
+              "403",
+              "authentication_failed",
+              "Your Client-Secret-Key is missing or invalid.",
+            ],
+          },
+          {
+            key: "subscription",
+            cells: [
+              "403",
+              "no_active_subscription, subscription_expired, no_plan_attached",
+              "Live payments need an active subscription with a plan.",
+            ],
+          },
+          {
+            key: "limit",
+            cells: [
+              "429",
+              "free_plan_limit_reached, plan_limit_reached",
+              "You have used your plan's transaction allowance.",
+            ],
+          },
+        ]}
+      />
+      <p className="text-slate-600 mb-8">
+        See{" "}
+        <Link to="/docs/errors" className="text-blue-600 hover:underline">
+          Response and Errors
+        </Link>{" "}
+        for the full error format and every code.
+      </p>
+
+      <PageNav
+        prev={{ label: "Response and Errors", to: "/docs/errors" }}
+        next={{ label: "Smart Route", to: "/docs/smart-routes" }}
+      />
+    </DocPage>
   );
 }
 
