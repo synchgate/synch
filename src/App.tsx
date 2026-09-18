@@ -8,7 +8,6 @@ import {
   Routes,
   useLocation,
 } from "react-router-dom";
-import { ALLOW_FEATURE } from "./config/features";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { queryClient } from "./lib/react-query";
 import AuthLayout from "./pages/auth/AuthLayout";
@@ -21,7 +20,6 @@ import ContactUs from "./pages/ContactUs";
 import Dashboard from "./pages/Dashboard";
 import DocsPage from "./pages/DocsPage";
 import Analytics from "./pages/dashboard/Analytics";
-import InvoiceHistory from "./pages/dashboard/InvoiceHistory";
 import Logs from "./pages/dashboard/Logs";
 import MyApiKey from "./pages/dashboard/MyApiKey";
 import Overview from "./pages/dashboard/Overview";
