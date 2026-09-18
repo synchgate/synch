@@ -15,6 +15,8 @@ import {
   SectionHeading,
   SubHeading,
 } from "../../components/docs/DocLayout";
+import { FlowAnimation } from "../../components/docs/FlowAnimation";
+import { smartRouteFlow } from "../../components/docs/flows";
 import { SupportedProviders } from "../../components/docs/SupportedProviders";
 import { requestSnippets } from "../../components/docs/snippets";
 
@@ -71,6 +73,9 @@ function SmartRoutes() {
       </PageHeader>
 
       <SupportedProviders />
+
+      <SectionHeading>How it works</SectionHeading>
+      <FlowAnimation {...smartRouteFlow} />
 
       <SectionHeading>Endpoint</SectionHeading>
       <Endpoint method="POST" path="/initiate-payment/smart-route/" />

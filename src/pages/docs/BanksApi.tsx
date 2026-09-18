@@ -14,6 +14,8 @@ import {
   Prose,
   SectionHeading,
 } from "../../components/docs/DocLayout";
+import { FlowAnimation } from "../../components/docs/FlowAnimation";
+import { banksFlow } from "../../components/docs/flows";
 import { SupportedProviders } from "../../components/docs/SupportedProviders";
 import { requestSnippets } from "../../components/docs/snippets";
 
@@ -55,6 +57,9 @@ function BanksApi() {
       </PageHeader>
 
       <SupportedProviders />
+
+      <SectionHeading>How it works</SectionHeading>
+      <FlowAnimation {...banksFlow} />
 
       <SectionHeading>Endpoint</SectionHeading>
       <Endpoint method="GET" path="/banks/" />

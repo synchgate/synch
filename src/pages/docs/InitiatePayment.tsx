@@ -15,6 +15,8 @@ import {
   SectionHeading,
   SubHeading,
 } from "../../components/docs/DocLayout";
+import { FlowAnimation } from "../../components/docs/FlowAnimation";
+import { paymentFlow } from "../../components/docs/flows";
 import { SupportedProviders } from "../../components/docs/SupportedProviders";
 import { requestSnippets } from "../../components/docs/snippets";
 
@@ -71,6 +73,9 @@ function InitiatePayment() {
       </PageHeader>
 
       <SupportedProviders />
+
+      <SectionHeading>How it works</SectionHeading>
+      <FlowAnimation {...paymentFlow} />
 
       <SectionHeading>Endpoint</SectionHeading>
       <Endpoint method="POST" path="/initiate-payment/" />

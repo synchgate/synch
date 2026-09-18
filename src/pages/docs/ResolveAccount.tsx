@@ -10,6 +10,8 @@ import {
   Prose,
   SectionHeading,
 } from "../../components/docs/DocLayout";
+import { FlowAnimation } from "../../components/docs/FlowAnimation";
+import { resolveFlow } from "../../components/docs/flows";
 import { SupportedProviders } from "../../components/docs/SupportedProviders";
 import { requestSnippets } from "../../components/docs/snippets";
 
@@ -45,6 +47,9 @@ function ResolveAccount() {
       </PageHeader>
 
       <SupportedProviders />
+
+      <SectionHeading>How it works</SectionHeading>
+      <FlowAnimation {...resolveFlow} />
 
       <SectionHeading>Endpoint</SectionHeading>
       <Endpoint method="POST" path="/bank/resolve/" />
