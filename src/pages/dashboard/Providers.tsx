@@ -44,12 +44,24 @@ type EnvModal = {
 
 // ─── Policy + Rule types ──────────────────────────────────────────────────────
 
+type PolicyRuleSummary = {
+  id: string;
+  name: string;
+  priority: number;
+  provider: string;
+  payment_channel?: string;
+  is_active: boolean;
+  condition_count: number;
+};
+
 type Policy = {
   id: string;
   name: string;
   description: string;
   status: "active" | "inactive";
   created_at?: string;
+  rule_count?: number;
+  rules?: PolicyRuleSummary[];
 };
 
 type PolicyConditionType = "time_of_day" | "amount_range" | "currency";
@@ -245,7 +257,7 @@ function Providers() {
       });
       return response.data;
     },
-    enabled: policiesModalOpen,
+    enabled: !!userEmail,
   });
 
   const policies: Policy[] = policiesData?.data || policiesData || [];
@@ -253,7 +265,6 @@ function Providers() {
   const { mutateAsync: createPolicy, isPending: isCreatingPolicy } =
     useMutation({
       mutationFn: async (payload: PolicyForm) => {
-        console.log("[createPolicy] POST /merchants/policies/", payload);
         const token = localStorage.getItem("authToken");
         const response = await api.post(
           "/merchants/policies/",
@@ -267,7 +278,6 @@ function Providers() {
   const { mutateAsync: updatePolicy, isPending: isUpdatingPolicy } =
     useMutation({
       mutationFn: async ({ id, payload }: { id: string; payload: PolicyForm }) => {
-        console.log(`[updatePolicy] PUT /merchants/policies/${id}`, payload);
         const token = localStorage.getItem("authToken");
         const response = await api.put(
           `/merchants/policies/${id}/`,
@@ -280,7 +290,6 @@ function Providers() {
 
   const { mutateAsync: deletePolicy } = useMutation({
     mutationFn: async (id: string) => {
-      console.log(`[deletePolicy] DELETE /merchants/policies/${id}/`);
       const token = localStorage.getItem("authToken");
       await api.delete(`/merchants/policies/${id}/`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -290,7 +299,6 @@ function Providers() {
 
   const { mutateAsync: activatePolicy } = useMutation({
     mutationFn: async (id: string) => {
-      console.log(`[activatePolicy] POST /merchants/policies/${id}/activate/`, {});
       const token = localStorage.getItem("authToken");
       await api.post(
         `/merchants/policies/${id}/activate/`,
@@ -302,7 +310,6 @@ function Providers() {
 
   const { mutateAsync: deactivatePolicy } = useMutation({
     mutationFn: async (id: string) => {
-      console.log(`[deactivatePolicy] POST /merchants/policies/${id}/deactivate/`, {});
       const token = localStorage.getItem("authToken");
       await api.post(
         `/merchants/policies/${id}/deactivate/`,
@@ -335,7 +342,6 @@ function Providers() {
 
   const { mutateAsync: createRule, isPending: isCreatingRule } = useMutation({
     mutationFn: async ({ policyId, payload }: { policyId: string; payload: any }) => {
-      console.log(`[createRule] POST /merchants/policies/${policyId}/rules/`, payload);
       const token = localStorage.getItem("authToken");
       const response = await api.post(
         `/merchants/policies/${policyId}/rules/`,
@@ -356,7 +362,6 @@ function Providers() {
       ruleId: string;
       payload: any;
     }) => {
-      console.log(`[updateRule] PUT /merchants/policies/${policyId}/rules/${ruleId}/`, payload);
       const token = localStorage.getItem("authToken");
       const response = await api.put(
         `/merchants/policies/${policyId}/rules/${ruleId}/`,
@@ -375,7 +380,6 @@ function Providers() {
       policyId: string;
       ruleId: string;
     }) => {
-      console.log(`[deleteRule] DELETE /merchants/policies/${policyId}/rules/${ruleId}/`);
       const token = localStorage.getItem("authToken");
       await api.delete(
         `/merchants/policies/${policyId}/rules/${ruleId}/`,
@@ -652,7 +656,6 @@ function Providers() {
         })),
       };
 
-      console.log("[handleSaveRule] payload", payload);
 
       if (policyView === "edit-rule" && selectedRule) {
         await updateRule({
@@ -723,10 +726,10 @@ function Providers() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="font-['Outfit'] text-2xl sm:text-3xl font-bold text-black mb-1">
-            Providers
+            Providers &amp; Routing
           </h1>
           <p className="text-slate-600 text-sm sm:text-base">
-            Manage your payment provider integrations and API credentials.
+            Connect your payment providers and decide how payments are routed between them.
           </p>
         </div>
         <button
@@ -735,7 +738,7 @@ function Providers() {
           className="flex items-center gap-2 px-4 py-2 font-medium rounded-lg transition-colors shadow-sm text-sm bg-blue-600 text-white hover:bg-blue-700 shadow-blue-500/20 cursor-pointer shrink-0"
         >
           <Shield className="w-4 h-4" />
-          Set Policies
+          Manage routing
         </button>
       </div>
 
@@ -747,7 +750,7 @@ function Providers() {
               Provider Integrations
             </h3>
             <p className="text-xs text-slate-500 mt-1">
-              Your API keys are highly encrypted, very safe, and secure.
+              Provider credentials are stored encrypted.
             </p>
           </div>
           <button
@@ -902,6 +905,96 @@ function Providers() {
           )}
         </div>
       </div>
+
+      {/* Smart Route summary */}
+      {(() => {
+        const activePolicy = policies.find((policy) => policy.status === "active");
+        const activeRules = [...(activePolicy?.rules ?? [])]
+          .filter((rule) => rule.is_active)
+          .sort((a, b) => a.priority - b.priority);
+
+        return (
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="px-6 py-5 border-b border-slate-200 flex items-center justify-between gap-4">
+              <div>
+                <h3 className="text-sm font-semibold text-slate-900">Smart Route</h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Used by payments sent to the Smart Route endpoint, where you don't name a provider.{" "}
+                  <a
+                    href="/docs/smart-routes"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    How it works
+                  </a>
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPoliciesModalOpen(true)}
+                className="px-4 py-2 font-medium rounded-lg text-sm bg-slate-900 text-white hover:bg-slate-800 cursor-pointer shrink-0"
+              >
+                {activePolicy ? "Manage policies" : "Set up routing"}
+              </button>
+            </div>
+
+            {isLoadingPolicies ? (
+              <div className="p-8 text-center text-sm text-slate-500">Loading routing policies…</div>
+            ) : !activePolicy ? (
+              <div className="p-6 text-sm text-slate-600 space-y-2">
+                <p className="font-medium text-slate-900">No active routing policy</p>
+                <p>
+                  Without one, Smart Route picks whichever of your providers has the best success
+                  rate over the last hour. This needs at least two connected providers. Create a
+                  policy to route by amount, currency or time of day instead.
+                </p>
+              </div>
+            ) : (
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-sm font-semibold text-slate-900">{activePolicy.name}</span>
+                  <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-wider">
+                    Active
+                  </span>
+                </div>
+                {activeRules.length === 0 ? (
+                  <p className="text-sm text-slate-500">
+                    This policy has no active rules yet, so Smart Route falls back to provider
+                    success rates.
+                  </p>
+                ) : (
+                  <ol className="space-y-2">
+                    {activeRules.map((rule, index) => (
+                      <li
+                        key={rule.id}
+                        className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm"
+                      >
+                        <span className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center shrink-0">
+                          {index + 1}
+                        </span>
+                        <span className="font-medium text-slate-900 flex-1 truncate">{rule.name}</span>
+                        <span className="text-slate-500 hidden sm:block">
+                          {rule.condition_count === 0
+                            ? "any payment"
+                            : `${rule.condition_count} ${rule.condition_count === 1 ? "condition" : "conditions"}`}
+                        </span>
+                        <span className="font-semibold text-slate-900 capitalize">
+                          {rule.provider}
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+                <p className="text-xs text-slate-500 mt-4">
+                  Rules are checked in order and the first match wins. If none match, providers are
+                  compared on recent success rate.
+                </p>
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* ── Provider credential modal ─────────────────────────────────────────── */}
       {envModal.open && (
