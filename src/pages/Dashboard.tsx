@@ -1,10 +1,15 @@
+import { useQuery } from "@tanstack/react-query";
+import type { LucideIcon } from "lucide-react";
 import {
   Activity,
-  Bell,
+  BarChart3,
   Building2,
   Code2,
+  CreditCard,
+  ExternalLink,
+  KeyRound,
   LayoutDashboard,
-  LineChart,
+  LifeBuoy,
   LogOut,
   Menu,
   Settings,
@@ -18,6 +23,57 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { useAuth } from "../contexts/AuthContext";
 import { api } from "../lib/api";
+import { unwrap } from "../lib/dashboard";
+
+type NavEntry = {
+  to: string;
+  label: string;
+  icon: LucideIcon;
+  /** matches only this exact path, not the pages beneath it */
+  exact?: boolean;
+  soon?: boolean;
+  external?: boolean;
+};
+
+const NAV_GROUPS: { heading?: string; items: NavEntry[] }[] = [
+  {
+    items: [
+      {
+        to: "/dashboard",
+        label: "Overview",
+        icon: LayoutDashboard,
+        exact: true,
+      },
+      { to: "/dashboard/transactions", label: "Transactions", icon: Activity },
+      { to: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
+      {
+        to: "/dashboard/providers",
+        label: "Providers & Routing",
+        icon: Building2,
+      },
+    ],
+  },
+  {
+    heading: "Developers",
+    items: [
+      { to: "/dashboard/api-keys", label: "API Keys", icon: KeyRound },
+      { to: "/dashboard/logs", label: "Logs", icon: Terminal, soon: true },
+      { to: "/docs", label: "Documentation", icon: Code2, external: true },
+    ],
+  },
+  {
+    heading: "Account",
+    items: [
+      { to: "/dashboard/billing", label: "Billing", icon: CreditCard },
+      { to: "/dashboard/settings", label: "Settings", icon: Settings },
+      {
+        to: "/dashboard/support-ticket",
+        label: "Help & support",
+        icon: LifeBuoy,
+      },
+    ],
+  },
+];
 
 function Dashboard() {
   const location = useLocation();
@@ -34,12 +90,23 @@ function Dashboard() {
   const [showKycPopup, setShowKycPopup] = useState(false);
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
 
-  const isActive = (path: string) => {
-    return (
-      location.pathname === path ||
-      (path === "/dashboard" && location.pathname === "/dashboard")
-    );
-  };
+  const isActive = (entry: NavEntry) =>
+    entry.exact
+      ? location.pathname === entry.to
+      : location.pathname === entry.to ||
+        location.pathname.startsWith(`${entry.to}/`);
+
+  // Shared with the Billing page, so this costs no extra request there
+  const { data: usage } = useQuery({
+    queryKey: ["billing-usage", userEmail],
+    queryFn: async () => unwrap<any>(await api.get("/billing/usage/")),
+    enabled: !!userEmail,
+    retry: false,
+    staleTime: 60_000,
+  });
+  const planName: string | undefined = usage?.plan;
+  const onFreePlan =
+    !planName || ["free", "starter"].includes(planName.toLowerCase());
 
   const getInitials = (name: string) => {
     if (!name) return "UU";
@@ -48,14 +115,6 @@ function Dashboard() {
       return (parts[0][0] + parts[1][0]).toUpperCase();
     }
     return name.slice(0, 2).toUpperCase();
-  };
-
-  const handleLogout = () => {
-    setShowLogoutPopup(true);
-  };
-
-  const confirmLogout = () => {
-    logout();
   };
 
   const handleToggleMode = async () => {
@@ -77,18 +136,9 @@ function Dashboard() {
     }
 
     try {
-      const token = localStorage.getItem("authToken");
-      // Use PATCH since it's commonly used for partial updates, or POST if needed.
-      await api.patch(
-        "/merchants/switch/toggle-merchant-mode/",
-        {
-          live_mode: wantsLive,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      // Mode transitioned successfully on the server
+      await api.patch("/merchants/switch/toggle-merchant-mode/", {
+        live_mode: wantsLive,
+      });
     } catch (error) {
       console.error("Failed to toggle mode:", error);
       // Revert if API call fails
@@ -98,6 +148,13 @@ function Dashboard() {
     }
   };
 
+  const linkClass = (active: boolean) =>
+    `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
+      active
+        ? "bg-slate-100 text-blue-600 font-medium"
+        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+    }`;
+
   return (
     <div
       key={userEmail}
@@ -105,18 +162,12 @@ function Dashboard() {
     >
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-slate-900/50 z-40 lg:hidden backdrop-blur-sm"
+        <button
+          type="button"
+          className="fixed inset-0 bg-slate-900/50 z-40 lg:hidden backdrop-blur-sm cursor-default"
           onClick={() => setIsSidebarOpen(false)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              setIsSidebarOpen(false);
-            }
-          }}
-          role="button"
-          tabIndex={0}
           aria-label="Close sidebar"
-        ></div>
+        />
       )}
 
       {/* KYC Popup */}
@@ -130,7 +181,7 @@ function Dashboard() {
               Verification Required
             </h3>
             <p className="text-sm text-slate-500 mb-6">
-              Please complete your KYC verification to toggle to live mode.
+              Please complete your KYC verification to switch to live mode.
             </p>
             <div className="flex gap-3 justify-center">
               <button
@@ -174,7 +225,7 @@ function Dashboard() {
               </button>
               <button
                 type="button"
-                onClick={confirmLogout}
+                onClick={logout}
                 className="flex-1 px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors shadow-sm cursor-pointer text-sm"
               >
                 Sign Out
@@ -192,18 +243,16 @@ function Dashboard() {
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
       `}
       >
-        <div className="h-16 flex items-center px-6 border-b border-slate-100">
+        <div className="h-16 flex items-center px-6 border-b border-slate-100 shrink-0">
           <Link
             to="/"
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
             <img src={logo} alt="SynchGate Logo" className="w-[150px]" />
-            {/* <span className="font-['Outfit'] font-bold text-xl tracking-tight text-black">
-              SynchGate
-            </span> */}
           </Link>
           <button
             type="button"
+            aria-label="Close menu"
             className="ml-auto lg:hidden text-slate-500 hover:text-slate-900"
             onClick={() => setIsSidebarOpen(false)}
           >
@@ -211,99 +260,88 @@ function Dashboard() {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto py-6 px-4">
-          {/* Primary Nav */}
-          <nav className="space-y-1 mb-8">
-            <Link
-              to="/dashboard"
-              onClick={() => setIsSidebarOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2 ${isActive("/dashboard") ? "bg-slate-100 text-blue-600 font-medium" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"} rounded-lg transition-colors cursor-pointer`}
-            >
-              <LayoutDashboard className="w-5 h-5" /> Overview
-            </Link>
+        <nav
+          className="flex-1 overflow-y-auto py-5 px-4 space-y-6"
+          aria-label="Dashboard"
+        >
+          {NAV_GROUPS.map((group) => (
+            <div key={group.heading ?? "main"}>
+              {group.heading && (
+                <h4 className="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                  {group.heading}
+                </h4>
+              )}
+              <div className="space-y-1">
+                {group.items.map((entry) => {
+                  const active = isActive(entry);
+                  const Icon = entry.icon;
+                  const content = (
+                    <>
+                      <Icon
+                        className={`w-5 h-5 ${active ? "text-blue-600" : "text-slate-400"}`}
+                      />
+                      <span className="flex-1">{entry.label}</span>
+                      {entry.soon && (
+                        <span className="text-[9px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">
+                          Soon
+                        </span>
+                      )}
+                      {entry.external && (
+                        <ExternalLink className="w-3.5 h-3.5 text-slate-300" />
+                      )}
+                    </>
+                  );
+                  return entry.external ? (
+                    <Link
+                      key={entry.to}
+                      to={entry.to}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={linkClass(false)}
+                    >
+                      {content}
+                    </Link>
+                  ) : (
+                    <Link
+                      key={entry.to}
+                      to={entry.to}
+                      onClick={() => setIsSidebarOpen(false)}
+                      aria-current={active ? "page" : undefined}
+                      className={linkClass(active)}
+                    >
+                      {content}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </nav>
 
-            <Link
-              to="/dashboard/transactions"
-              onClick={() => setIsSidebarOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2 ${isActive("/dashboard/transactions") ? "bg-slate-100 text-blue-600 font-medium" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"} rounded-lg transition-colors cursor-pointer`}
-            >
-              <Activity className="w-5 h-5" /> Transactions
-            </Link>
-            <Link
-              to="/dashboard/providers"
-              onClick={() => setIsSidebarOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2 ${isActive("/dashboard/providers") ? "bg-slate-100 text-blue-600 font-medium" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"} rounded-lg transition-colors cursor-pointer`}
-            >
-              <Building2 className="w-5 h-5" /> Providers
-            </Link>
-            <Link
-              to="/dashboard/analytics"
-              onClick={() => setIsSidebarOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2 ${isActive("/dashboard/analytics") ? "bg-slate-100 text-blue-600 font-medium" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"} rounded-lg transition-colors cursor-pointer`}
-            >
-              <LineChart className="w-5 h-5" /> Analytics
-            </Link>
-            <Link
-              to="/dashboard/logs"
-              onClick={() => setIsSidebarOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2 ${isActive("/dashboard/logs") ? "bg-slate-100 text-blue-600 font-medium" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"} rounded-lg transition-colors cursor-pointer`}
-            >
-              <Terminal className="w-5 h-5" /> Logs
-            </Link>
-          </nav>
-
-          {/* Secondary Nav */}
-          <div className="mb-4">
-            <h4 className="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-              Developers
-            </h4>
-            <nav className="space-y-1">
-              <Link
-                to="/docs"
-                target="_blank"
-                className="flex items-center gap-3 px-3 py-2 text-slate-600 font-medium rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-colors cursor-pointer"
-              >
-                <Code2 className="w-5 h-5 text-slate-400" /> Documentation
-              </Link>
-              <Link
-                to="/dashboard/api-keys"
-                onClick={() => setIsSidebarOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2 ${isActive("/dashboard/api-keys") ? "bg-slate-100 text-blue-600 font-medium" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"} rounded-lg transition-colors cursor-pointer`}
-              >
-                <ShieldCheck
-                  className={`w-5 h-5 ${isActive("/dashboard/api-keys") ? "text-blue-600" : "text-slate-400"}`}
-                />{" "}
-                My API Key
-              </Link>
-            </nav>
-          </div>
-        </div>
-
-        <div className="p-4 border-t border-slate-100">
-          <nav className="space-y-1">
-            <Link
-              to="/pricing"
-              onClick={() => setIsSidebarOpen(false)}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg transition-all cursor-pointer bg-linear-to-r from-blue-600 to-violet-600 text-white font-semibold shadow-md shadow-blue-500/30 hover:shadow-lg hover:shadow-blue-500/40 hover:from-blue-500 hover:to-violet-500 mb-1"
-            >
-              <Sparkles className="w-4 h-4 shrink-0" />
-              <span className="text-sm">Upgrade</span>
-            </Link>
-            <Link
-              to="/dashboard/settings"
-              onClick={() => setIsSidebarOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2 ${isActive("/dashboard/settings") ? "bg-slate-100 text-blue-600 font-medium" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"} rounded-lg transition-colors cursor-pointer`}
-            >
-              <Settings className="w-5 h-5 text-slate-400" /> Settings
-            </Link>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-3 py-2 text-slate-600 font-medium rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer"
-            >
-              <LogOut className="w-5 h-5" /> Sign Out
-            </button>
-          </nav>
+        <div className="p-4 border-t border-slate-100 space-y-3 shrink-0">
+          {planName && (
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <p className="text-xs text-slate-500">Current plan</p>
+              <p className="text-sm font-semibold text-slate-900">
+                {onFreePlan ? "Starter (free)" : planName}
+              </p>
+              {onFreePlan && (
+                <Link
+                  to="/pricing"
+                  className="mt-2 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-colors"
+                >
+                  <Sparkles className="w-3.5 h-3.5" /> Upgrade
+                </Link>
+              )}
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => setShowLogoutPopup(true)}
+            className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 font-medium rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer"
+          >
+            <LogOut className="w-5 h-5" /> Sign Out
+          </button>
         </div>
       </aside>
 
@@ -313,13 +351,13 @@ function Dashboard() {
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 lg:px-8 z-10 shrink-0">
           <button
             type="button"
+            aria-label="Open menu"
             className="lg:hidden text-slate-500 hover:text-slate-900 mr-4"
             onClick={() => setIsSidebarOpen(true)}
           >
             <Menu className="w-6 h-6" />
           </button>
 
-          {/* Environment Toggle and Profile */}
           <div className="ml-auto flex items-center gap-4 sm:gap-6">
             <div className="flex items-center gap-2 sm:gap-3 bg-slate-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-slate-200">
               <span
@@ -333,11 +371,11 @@ function Dashboard() {
                 type="button"
                 onClick={handleToggleMode}
                 disabled={isTogglingMode}
+                aria-label="Switch between test and live mode"
                 className={`relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-colors ${isTogglingMode ? "cursor-wait opacity-80" : "cursor-pointer"} focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${
                   merchantMode === "live" ? "bg-emerald-500" : "bg-amber-500"
                 }`}
               >
-                <span className="sr-only">Toggle environment</span>
                 <span
                   className={`flex h-3 w-3 sm:h-4 sm:w-4 transform rounded-full bg-white shadow-sm transition-transform items-center justify-center ${
                     merchantMode === "live"
@@ -361,37 +399,56 @@ function Dashboard() {
               </span>
             </div>
 
-            <button
-              type="button"
-              className="text-slate-400 hover:text-slate-600 transition-colors relative cursor-pointer"
+            <Link
+              to="/dashboard/settings"
+              aria-label="Account settings"
+              className="w-8 h-8 rounded-full bg-linear-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center text-sm font-semibold shadow-sm"
             >
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-0 right-0 w-2 h-2 bg-blue-600 rounded-full border border-white"></span>
-            </button>
-
-            <div className="w-8 h-8 rounded-full bg-linear-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center text-sm font-semibold cursor-pointer shadow-sm">
               {getInitials(userName)}
-            </div>
+            </Link>
           </div>
         </header>
 
-        {kycStatus === "pending" && (
-          <div className="bg-blue-600 px-3 py-2 sm:px-4 sm:py-3 text-white text-[11px] sm:text-sm flex flex-row items-center justify-between sm:justify-center gap-2 sm:gap-4 shadow-sm z-20 shrink-0">
-            <span className="font-medium truncate sm:whitespace-normal">
-              <span className="hidden sm:inline">
-                Your account is pending verification. Please complete your KYC
-                to unlock all features.
-              </span>
-              <span className="sm:hidden">KYC pending. Unlock features</span>
+        {merchantMode !== "live" ? (
+          <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 text-amber-900 text-xs sm:text-sm flex flex-wrap items-center justify-center gap-x-3 gap-y-1 shrink-0">
+            <span>
+              <strong>Test mode.</strong> You're viewing sandbox data. Nothing
+              here moves real money.
             </span>
-            <Link
-              to="/dashboard/settings"
-              state={{ tab: "kyc" }}
-              className="bg-white text-blue-600 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full font-semibold hover:bg-blue-50 transition-colors text-[10px] sm:text-xs whitespace-nowrap shadow-sm shrink-0"
-            >
-              Complete KYC
-            </Link>
+            {kycStatus === "pending" || !kycStatus ? (
+              <Link
+                to="/dashboard/settings"
+                state={{ tab: "kyc" }}
+                className="font-semibold underline underline-offset-2 hover:text-amber-700 whitespace-nowrap"
+              >
+                Complete KYC to go live
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={handleToggleMode}
+                disabled={isTogglingMode}
+                className="font-semibold underline underline-offset-2 hover:text-amber-700 cursor-pointer whitespace-nowrap"
+              >
+                Switch to live
+              </button>
+            )}
           </div>
+        ) : (
+          kycStatus === "pending" && (
+            <div className="bg-blue-600 px-4 py-2 text-white text-xs sm:text-sm flex items-center justify-center gap-3 shrink-0">
+              <span className="font-medium">
+                Your account is pending verification.
+              </span>
+              <Link
+                to="/dashboard/settings"
+                state={{ tab: "kyc" }}
+                className="bg-white text-blue-600 px-3 py-1 rounded-full font-semibold hover:bg-blue-50 transition-colors text-xs whitespace-nowrap"
+              >
+                Complete KYC
+              </Link>
+            </div>
+          )
         )}
 
         {/* Dashboard Scrollable Body */}

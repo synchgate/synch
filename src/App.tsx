@@ -22,6 +22,7 @@ import ContactUs from "./pages/ContactUs";
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const DocsPage = lazy(() => import("./pages/DocsPage"));
 const Analytics = lazy(() => import("./pages/dashboard/Analytics"));
+const Billing = lazy(() => import("./pages/dashboard/Billing"));
 const Logs = lazy(() => import("./pages/dashboard/Logs"));
 const MyApiKey = lazy(() => import("./pages/dashboard/MyApiKey"));
 const Overview = lazy(() => import("./pages/dashboard/Overview"));
@@ -116,7 +117,8 @@ function App() {
                 <Route path="transactions" element={<Transactions />} />
                 <Route path="providers" element={<Providers />} />
                 <Route path="logs" element={<Logs />} />
-                <Route path="settings" element={<Settings />} />
+                <Route path="billing" element={<Billing />} />
+              <Route path="settings" element={<Settings />} />
                 <Route path="api-keys" element={<MyApiKey />} />
                 <Route path="support-ticket" element={<SupportTicket />} />
               </Route>

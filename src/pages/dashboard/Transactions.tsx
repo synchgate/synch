@@ -1,508 +1,483 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
   CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
   Copy,
-  GitBranch,
   Loader2,
+  Receipt,
   Search,
   Server,
-  TrendingUp,
   X,
   XCircle,
-  Zap,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import { monthlyUsage } from "../../data/billingData";
+  EmptyState,
+  EnvironmentBadge,
+  PageHeader,
+  Pagination,
+  SegmentedControl,
+  StatusBadge,
+  TypeBadge,
+} from "../../components/dashboard/ui";
 import { useAuth } from "../../contexts/AuthContext";
 import { api } from "../../lib/api";
+import {
+  formatAmount,
+  formatDateTime,
+  PROVIDER_NAMES,
+  titleCase,
+  useEnvironment,
+} from "../../lib/dashboard";
 
-const CustomTooltip = ({ active, payload, label, chartMode }: any) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    return (
-      <div className="bg-white p-4 rounded-xl shadow-xl border border-slate-100 min-w-40">
-        <p className="text-sm font-bold text-slate-900 mb-2">{label}</p>
-        <div className="space-y-1.5">
-          {chartMode === "revenue" ? (
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-xs font-medium text-slate-500">Revenue</span>
-              <span className="text-sm font-bold text-blue-600">
-                ₦{data.cost?.toLocaleString()}
-              </span>
-            </div>
-          ) : (
-            <>
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-xs font-medium text-slate-500">Successful</span>
-                <span className="text-sm font-bold text-emerald-600">
-                  {data.successful?.toLocaleString()}
-                </span>
-              </div>
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-xs font-medium text-slate-500">Failed</span>
-                <span className="text-sm font-bold text-rose-600">
-                  {data.failed?.toLocaleString()}
-                </span>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    );
-  }
-  return null;
+const PAGE_SIZE = 25;
+
+type StatusTab = "all" | "success" | "failed" | "in_progress";
+
+const STATUS_QUERY: Record<StatusTab, string | undefined> = {
+  all: undefined,
+  success: "success",
+  failed: "failed,abandoned",
+  in_progress: "pending,processing,retrying",
 };
+
+const ROUTE_LABELS: Record<string, string> = {
+  basic: "Chosen by you",
+  smart_policy: "Smart Route rule",
+  smart_score: "Smart Route score",
+};
+
+/** Waits for typing to pause before it triggers a request. */
+function useDebounced<T>(value: T, delay = 350) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  return debounced;
+}
+
+function CopyValue({ value }: { value: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        navigator.clipboard.writeText(value);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      }}
+      className="inline-flex items-center gap-1 text-slate-400 hover:text-blue-600 cursor-pointer"
+      aria-label="Copy"
+    >
+      {copied ? (
+        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+      ) : (
+        <Copy className="w-3.5 h-3.5" />
+      )}
+    </button>
+  );
+}
+
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <p className="text-slate-500 text-xs mb-1">{label}</p>
+      <div className="font-medium text-slate-900 text-sm break-words">
+        {children || "—"}
+      </div>
+    </div>
+  );
+}
 
 function Transactions() {
   const { userEmail } = useAuth();
-  const [selectedTx, setSelectedTx] = useState<any>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedProvider, setSelectedProvider] = useState("All Providers");
-  const [selectedStatus, setSelectedStatus] = useState("All Statuses");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [selectedRoute, setSelectedRoute] = useState("All Routes");
-  const [activeChartTab, setActiveChartTab] = useState<"volume" | "revenue">("volume");
+  const environment = useEnvironment();
 
-  const { data: transactionsResponse, isLoading } = useQuery({
-    queryKey: ["transactions", userEmail],
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [statusTab, setStatusTab] = useState<StatusTab>("all");
+  const [provider, setProvider] = useState("");
+  const [type, setType] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [selected, setSelected] = useState<any>(null);
+
+  const debouncedSearch = useDebounced(search);
+
+  // any change to the filters or the Test/Live switch starts again from page 1
+  // biome-ignore lint/correctness/useExhaustiveDependencies: these are exactly the values that should reset the page
+  useEffect(() => {
+    setPage(1);
+  }, [
+    debouncedSearch,
+    statusTab,
+    provider,
+    type,
+    dateFrom,
+    dateTo,
+    environment,
+  ]);
+
+  const filtersActive = Boolean(
+    debouncedSearch ||
+      statusTab !== "all" ||
+      provider ||
+      type ||
+      dateFrom ||
+      dateTo,
+  );
+
+  const { data, isLoading, isFetching, isError, refetch } = useQuery({
+    queryKey: [
+      "transactions",
+      userEmail,
+      environment,
+      page,
+      debouncedSearch,
+      statusTab,
+      provider,
+      type,
+      dateFrom,
+      dateTo,
+    ],
     queryFn: async () => {
-      const token = localStorage.getItem("authToken");
       const response = await api.get("/transactions/", {
-        headers: {
-          Authorization: `Bearer ${token}`,
+        params: {
+          environment,
+          page,
+          page_size: PAGE_SIZE,
+          status: STATUS_QUERY[statusTab],
+          provider: provider || undefined,
+          type: type || undefined,
+          search: debouncedSearch || undefined,
+          date_from: dateFrom || undefined,
+          date_to: dateTo || undefined,
         },
       });
       return response.data;
     },
     enabled: !!userEmail,
+    placeholderData: keepPreviousData,
   });
 
-  const transactions = transactionsResponse?.data || [];
-
-  const filteredTransactions = transactions.filter((tx: any) => {
-    const matchesSearch =
-      tx.transaction_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tx.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tx.customer_email?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const provider = (
-      tx.final_provider ||
-      tx.preferred_provider ||
-      ""
-    ).toLowerCase();
-    const providerFilter = selectedProvider.toLowerCase();
-    const matchesProvider =
-      selectedProvider === "All Providers" || provider === providerFilter;
-
-    const status = (tx.status || "").toLowerCase();
-    const statusFilter = selectedStatus.toLowerCase();
-    const matchesStatus =
-      selectedStatus === "All Statuses" || status === statusFilter;
-
-    let matchesDate = true;
-    if (startDate || endDate) {
-      const txDate = new Date(tx.created_at);
-
-      if (startDate) {
-        const start = new Date(startDate);
-        start.setHours(0, 0, 0, 0); // Start of day
-        if (txDate < start) matchesDate = false;
-      }
-
-      if (endDate) {
-        const end = new Date(endDate);
-        end.setHours(23, 59, 59, 999); // End of day
-        if (txDate > end) matchesDate = false;
-      }
-    }
-
-    const routeType = (tx.route_type || "basic").toLowerCase();
-    const routeFilter = selectedRoute.toLowerCase();
-    const matchesRoute =
-      selectedRoute === "All Routes" || routeType === routeFilter;
-
-    return (
-      matchesSearch &&
-      matchesProvider &&
-      matchesStatus &&
-      matchesDate &&
-      matchesRoute
-    );
-  });
-
-  const formatCurrency = (amount: string, currency: string) => {
-    const num = parseFloat(amount || "0");
-    return new Intl.NumberFormat("en-NG", {
-      style: "currency",
-      currency: (currency || "ngn").toUpperCase(),
-    }).format(num);
+  const transactions: any[] = data?.data ?? [];
+  const pagination = data?.pagination ?? {
+    page: 1,
+    page_size: PAGE_SIZE,
+    total: 0,
+    total_pages: 1,
   };
 
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "-";
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-    }).format(date);
+  const clearFilters = () => {
+    setSearch("");
+    setStatusTab("all");
+    setProvider("");
+    setType("");
+    setDateFrom("");
+    setDateTo("");
   };
 
-  const StatusBadge = ({ status }: { status: string }) => {
-    const formattedStatus = status?.toLowerCase();
-    if (formattedStatus === "success")
-      return (
-        <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-wider text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded uppercase">
-          <CheckCircle2 className="w-3 h-3" /> Success
-        </span>
-      );
-    if (formattedStatus === "failed")
-      return (
-        <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-wider text-red-700 bg-red-100 px-2 py-0.5 rounded uppercase">
-          <XCircle className="w-3 h-3" /> Failed
-        </span>
-      );
-    return (
-      <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-wider text-amber-700 bg-amber-100 px-2 py-0.5 rounded uppercase">
-        <Clock className="w-3 h-3" />{" "}
-        {status ? status.charAt(0).toUpperCase() + status.slice(1) : "Pending"}
-      </span>
-    );
-  };
+  const selectClass =
+    "px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer";
 
   return (
-    <div className="max-w-6xl mx-auto flex flex-col h-[calc(100vh-6rem)] animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-hidden relative">
-      {/* Header & Filters */}
-      <div className="shrink-0 space-y-4 mb-6">
-        <div>
-          <h1 className="font-['Outfit'] text-2xl sm:text-3xl font-bold text-black mb-1">
-            Transactions
-          </h1>
-          <p className="text-slate-600 text-sm">
-            Monitor all transaction attempts across providers.
-          </p>
-        </div>
+    <div className="max-w-6xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
+      <PageHeader
+        title="Transactions"
+        description="Every payment you collect and every payout you send, across all providers."
+        actions={<EnvironmentBadge environment={environment} />}
+      />
 
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative w-full sm:w-64 shrink-0">
+      <div className="space-y-3">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+          <SegmentedControl<StatusTab>
+            label="Filter by status"
+            value={statusTab}
+            onChange={setStatusTab}
+            options={[
+              { value: "all", label: "All" },
+              { value: "success", label: "Successful" },
+              { value: "failed", label: "Failed" },
+              { value: "in_progress", label: "In progress" },
+            ]}
+          />
+          <div className="relative flex-1 lg:max-w-sm">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
-              type="text"
-              placeholder="Search by reference..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              type="search"
+              aria-label="Search transactions"
+              placeholder="Search reference, email, account…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div className="flex flex-wrap gap-2">
-            <div className="flex items-center gap-2">
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            aria-label="Type"
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            className={selectClass}
+          >
+            <option value="">Payments and payouts</option>
+            <option value="collection">Payments only</option>
+            <option value="payout">Payouts only</option>
+          </select>
+          <select
+            aria-label="Provider"
+            value={provider}
+            onChange={(e) => setProvider(e.target.value)}
+            className={selectClass}
+          >
+            <option value="">All providers</option>
+            {PROVIDER_NAMES.map((name) => (
+              <option key={name} value={name}>
+                {titleCase(name)}
+              </option>
+            ))}
+          </select>
+          <div className="flex items-center gap-2">
+            <input
+              type="date"
+              aria-label="From date"
+              value={dateFrom}
+              max={dateTo || undefined}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className={selectClass}
+            />
+            <span className="text-slate-400 text-sm">to</span>
+            <input
+              type="date"
+              aria-label="To date"
+              value={dateTo}
+              min={dateFrom || undefined}
+              onChange={(e) => setDateTo(e.target.value)}
+              className={selectClass}
+            />
+          </div>
+          {filtersActive && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg cursor-pointer"
+            >
+              Clear filters
+            </button>
+          )}
+          {isFetching && !isLoading && (
+            <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+          )}
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        {isLoading ? (
+          <div className="p-6 space-y-3">
+            {Array.from({ length: 6 }, (_, i) => (
+              <div
+                // biome-ignore lint/suspicious/noArrayIndexKey: static placeholder rows
+                key={i}
+                className="h-12 rounded bg-slate-100 animate-pulse"
               />
-              <span className="text-slate-500 text-sm">to</span>
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                min={startDate}
-                className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
-              />
-            </div>
-            <select
-              value={selectedProvider}
-              onChange={(e) => setSelectedProvider(e.target.value)}
-              className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
-            >
-              <option value="All Providers">All Providers</option>
-              <option value="Paystack">Paystack</option>
-              <option value="Flutterwave">Flutterwave</option>
-            </select>
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
-            >
-              <option value="All Statuses">All Statuses</option>
-              <option value="Success">Success</option>
-              <option value="Failed">Failed</option>
-              <option value="Pending">Pending</option>
-            </select>
-            <select
-              value={selectedRoute}
-              onChange={(e) => setSelectedRoute(e.target.value)}
-              className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
-            >
-              <option value="All Routes">All Routes</option>
-              <option value="Basic">Basic</option>
-              <option value="Auto">Auto</option>
-            </select>
-            {(startDate ||
-              endDate ||
-              selectedProvider !== "All Providers" ||
-              selectedStatus !== "All Statuses" ||
-              selectedRoute !== "All Routes" ||
-              searchTerm) && (
+            ))}
+          </div>
+        ) : isError ? (
+          <EmptyState
+            icon={<XCircle className="w-6 h-6" />}
+            title="We couldn't load your transactions"
+            action={
               <button
                 type="button"
-                onClick={() => {
-                  setStartDate("");
-                  setEndDate("");
-                  setSearchTerm("");
-                  setSelectedProvider("All Providers");
-                  setSelectedStatus("All Statuses");
-                  setSelectedRoute("All Routes");
-                }}
-                className="px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
+                onClick={() => refetch()}
+                className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 cursor-pointer"
               >
-                Clear Filters
+                Try again
               </button>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Transaction Insights Chart */}
-      <div className="shrink-0 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm mb-6">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h3 className="text-base font-bold text-slate-900">Transaction Insights</h3>
-            <p className="text-xs text-slate-500">Real-time accumulation of successful and failed transactions.</p>
-          </div>
-          <div className="flex items-center gap-2 bg-slate-50 p-1 rounded-lg border border-slate-100">
-            <button
-              onClick={() => setActiveChartTab("volume")}
-              className={`px-3 py-1 text-xs font-medium rounded transition-all ${activeChartTab === "volume" ? "bg-white text-slate-900 shadow-sm border border-slate-200" : "text-slate-500 hover:text-slate-900"}`}
-            >
-              Volume
-            </button>
-            <button
-              onClick={() => setActiveChartTab("revenue")}
-              className={`px-3 py-1 text-xs font-medium rounded transition-all ${activeChartTab === "revenue" ? "bg-white text-slate-900 shadow-sm border border-slate-200" : "text-slate-500 hover:text-slate-900"}`}
-            >
-              Revenue
-            </button>
-          </div>
-        </div>
-
-        <div className="h-55 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={monthlyUsage}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-              <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "#64748B", fontSize: 12 }} dy={10} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fill: "#64748B", fontSize: 12 }} dx={-10} />
-              <Tooltip content={<CustomTooltip chartMode={activeChartTab} />} cursor={{ fill: "#F8FAFC" }} />
-              <Bar dataKey={activeChartTab === "volume" ? "successful" : "cost"} radius={[6, 6, 6, 6]} barSize={36}>
-                {monthlyUsage.map((_, index) => (
-                  <Cell key={`cell-${index}`} fill={index === monthlyUsage.length - 1 ? "#2563EB" : "#DBEAFE"} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-slate-100">
-          <div className="text-center">
-            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Current Month (Successful)</p>
-            <p className="text-xl font-bold text-slate-900">{monthlyUsage[monthlyUsage.length - 1].successful.toLocaleString()}</p>
-            <p className="text-[11px] text-emerald-600 font-semibold flex items-center justify-center gap-0.5">
-              <TrendingUp className="w-3 h-3" /> +21%
-            </p>
-          </div>
-          <div className="text-center border-l border-slate-100">
-            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Est. Next Bill</p>
-            <p className="text-xl font-bold text-slate-900">₦{(monthlyUsage[monthlyUsage.length - 1].successful * 10).toLocaleString()}</p>
-            <p className="text-[11px] text-slate-400 font-medium">Due Apr 15</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Table Area */}
-      <div className="flex-1 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col relative z-10 w-full mb-10">
-        <div className="flex-1 overflow-auto">
-          {isLoading ? (
-            <div className="flex items-center justify-center p-12 h-full">
-              <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-            </div>
+            }
+          >
+            Check your connection and try again.
+          </EmptyState>
+        ) : transactions.length === 0 ? (
+          filtersActive ? (
+            <EmptyState
+              icon={<Search className="w-6 h-6" />}
+              title="No transactions match these filters"
+              action={
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-800 cursor-pointer"
+                >
+                  Clear filters
+                </button>
+              }
+            />
           ) : (
+            <EmptyState
+              icon={<Receipt className="w-6 h-6" />}
+              title={
+                environment === "live"
+                  ? "No live transactions yet"
+                  : "No test transactions yet"
+              }
+              action={
+                <Link
+                  to="/docs/installation"
+                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700"
+                >
+                  Make your first request
+                </Link>
+              }
+            >
+              {environment === "live"
+                ? "Payments and payouts you make with your live key will show up here."
+                : "Send a request with your sandbox key and it will appear here. Nothing in test mode moves real money."}
+            </EmptyState>
+          )
+        ) : (
+          <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
-              <thead className="bg-slate-50 text-xs uppercase text-slate-500 sticky top-0 z-10 border-b border-slate-200">
+              <thead className="bg-slate-50 text-xs uppercase text-slate-500 border-b border-slate-200">
                 <tr>
-                  <th className="px-6 py-4 font-medium">Reference</th>
-                  <th className="px-6 py-4 font-medium">Provider</th>
-                  <th className="px-6 py-4 font-medium">Amount</th>
-                  <th className="px-6 py-4 font-medium">Channel</th>
-                  <th className="px-6 py-4 font-medium text-center">Route</th>
-                  <th className="px-6 py-4 font-medium">Status</th>
-                  {/* <th className="px-6 py-4 font-medium">Reason</th> */}
-                  <th className="px-6 py-4 font-medium text-left">
-                    Date & Time
+                  <th className="px-5 py-3 font-medium">Reference</th>
+                  <th className="px-5 py-3 font-medium">Type</th>
+                  <th className="px-5 py-3 font-medium">
+                    Customer / recipient
                   </th>
-                  <th className="px-6 py-4 font-medium"></th>
+                  <th className="px-5 py-3 font-medium">Provider</th>
+                  <th className="px-5 py-3 font-medium text-right">Amount</th>
+                  <th className="px-5 py-3 font-medium">Status</th>
+                  <th className="px-5 py-3 font-medium">Date</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filteredTransactions.length > 0 ? (
-                  filteredTransactions.map((tx: any) => (
-                    <tr
-                      key={tx.id}
-                      className="hover:bg-slate-50 transition-colors group"
-                    >
-                      <td className="px-6 py-4 font-mono text-xs text-blue-600 font-medium">
-                        {tx.transaction_id}
-                      </td>
-                      <td className="px-6 py-4 text-slate-900 flex items-center gap-2 font-medium capitalize">
-                        <Server className="w-3.5 h-3.5 text-slate-400" />{" "}
-                        {tx.final_provider || tx.preferred_provider || "-"}
-                      </td>
-                      <td className="px-6 py-4 text-slate-900 font-semibold">
-                        {formatCurrency(tx.amount, tx.currency)}
-                      </td>
-                      <td className="px-6 py-4 text-slate-600 capitalize">
-                        {tx.channel || "-"}
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <span
-                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                            (tx.route_type || "basic").toLowerCase() === "auto"
-                              ? "bg-indigo-100 text-indigo-700 border border-indigo-200"
-                              : "bg-slate-100 text-slate-600 border border-slate-200"
-                          }`}
-                        >
-                          {(tx.route_type || "basic").toLowerCase() ===
-                          "auto" ? (
-                            <Zap className="w-2.5 h-2.5" />
-                          ) : (
-                            <GitBranch className="w-2.5 h-2.5" />
-                          )}
-                          {tx.route_type || "Basic"}
+                {transactions.map((tx) => (
+                  <tr
+                    key={tx.id}
+                    // biome-ignore lint/a11y/useKeyWithClickEvents: the reference button in the first cell is the keyboard target
+                    onClick={() => setSelected(tx)}
+                    className="hover:bg-slate-50 transition-colors cursor-pointer"
+                  >
+                    <td className="px-5 py-3.5">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelected(tx);
+                        }}
+                        className="text-left cursor-pointer"
+                      >
+                        <span className="block font-medium text-slate-900 max-w-[220px] truncate">
+                          {tx.reference || tx.transaction_id}
                         </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <StatusBadge status={tx.status} />
-                      </td>
-                      {/* <td className="px-6 py-4 text-slate-500 text-xs">
-                        {tx.message || "-"}
-                      </td> */}
-                      <td className="px-6 py-4 text-slate-500 text-left whitespace-nowrap">
-                        {formatDate(tx.created_at)}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <button
-                          type="button"
-                          onClick={() => setSelectedTx(tx)}
-                          className="text-xs font-medium text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:underline"
-                        >
-                          View
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td
-                      colSpan={8}
-                      className="px-6 py-8 text-center text-slate-500"
-                    >
-                      No transactions found.
+                        <span className="block font-mono text-[11px] text-slate-400">
+                          {tx.transaction_id}
+                        </span>
+                      </button>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <TypeBadge type={tx.transaction_type} />
+                    </td>
+                    <td className="px-5 py-3.5 text-slate-600 max-w-[200px]">
+                      <span className="block truncate">
+                        {tx.transaction_type === "payout"
+                          ? tx.beneficiary?.name || "—"
+                          : tx.customer_email || "—"}
+                      </span>
+                      {tx.transaction_type === "payout" &&
+                        tx.beneficiary?.bank_name && (
+                          <span className="block text-[11px] text-slate-400 truncate">
+                            {tx.beneficiary.bank_name}
+                          </span>
+                        )}
+                    </td>
+                    <td className="px-5 py-3.5 text-slate-700 capitalize">
+                      {tx.provider || "—"}
+                    </td>
+                    <td className="px-5 py-3.5 text-right font-semibold text-slate-900 whitespace-nowrap">
+                      {tx.transaction_type === "payout" ? "−" : ""}
+                      {formatAmount(tx.amount, tx.currency)}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <StatusBadge status={tx.status} />
+                    </td>
+                    <td className="px-5 py-3.5 text-slate-500 whitespace-nowrap">
+                      {formatDateTime(tx.created_at)}
                     </td>
                   </tr>
-                )}
+                ))}
               </tbody>
             </table>
-          )}
-        </div>
-        <div className="bg-slate-50 border-t border-slate-200 p-3 px-6 flex items-center justify-between shrink-0">
-          <span className="text-xs text-slate-500">
-            Showing {filteredTransactions.length} of {transactions.length}{" "}
-            transactions
-          </span>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              className="p-1 rounded bg-white border border-slate-200 text-slate-400 hover:text-slate-600 shadow-sm cursor-pointer disabled:opacity-50"
-              disabled
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              className="p-1 rounded bg-white border border-slate-200 text-slate-600 hover:text-slate-900 shadow-sm cursor-pointer"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
           </div>
-        </div>
+        )}
+        {!isLoading && !isError && transactions.length > 0 && (
+          <Pagination
+            page={pagination.page}
+            totalPages={pagination.total_pages}
+            total={pagination.total}
+            pageSize={pagination.page_size}
+            onChange={setPage}
+          />
+        )}
       </div>
 
-      {/* Transaction Detail Modal Overlay */}
-      {selectedTx && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop */}
+      {/* Details panel */}
+      {selected && (
+        <div className="fixed inset-0 z-50 flex justify-end">
           <button
             type="button"
-            className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity w-full h-full border-none p-0 m-0"
-            onClick={() => setSelectedTx(null)}
-            aria-label="Close modal"
+            aria-label="Close details"
+            className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm cursor-default"
+            onClick={() => setSelected(null)}
           />
-
-          {/* Modal */}
-          <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 overflow-hidden">
-            {/* Header */}
-            <div className="px-6 py-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
-              <div>
+          <aside className="relative w-full max-w-xl bg-white shadow-2xl flex flex-col h-full animate-in slide-in-from-right duration-200">
+            <div className="px-6 py-5 border-b border-slate-200 flex items-start justify-between gap-4">
+              <div className="min-w-0">
                 <h2 className="font-semibold text-slate-900">
-                  Transaction Details
+                  {selected.transaction_type === "payout"
+                    ? "Payout details"
+                    : "Payment details"}
                 </h2>
-                <p className="text-xs font-mono text-slate-500 mt-0.5">
-                  {selectedTx.transaction_id}
+                <p className="text-xs font-mono text-slate-500 mt-0.5 flex items-center gap-2">
+                  {selected.transaction_id}{" "}
+                  <CopyValue value={selected.transaction_id} />
                 </p>
               </div>
               <button
                 type="button"
-                onClick={() => setSelectedTx(null)}
-                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                onClick={() => setSelected(null)}
+                aria-label="Close"
+                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Drawer Content */}
             <div className="flex-1 overflow-y-auto p-6 space-y-8">
               <div className="bg-slate-50 rounded-xl p-5 flex items-center justify-between border border-slate-100">
                 <div>
                   <p className="text-xs text-slate-500 font-medium mb-1 uppercase tracking-wider">
-                    Amount Processed
+                    {selected.transaction_type === "payout"
+                      ? "Amount sent"
+                      : "Amount"}
                   </p>
                   <p className="font-['Outfit'] text-3xl font-bold text-slate-900">
-                    {formatCurrency(selectedTx.amount, selectedTx.currency)}
+                    {formatAmount(selected.amount, selected.currency)}
                   </p>
                 </div>
                 <div className="text-right flex flex-col items-end gap-2">
-                  <StatusBadge status={selectedTx.status} />
-                  <p className="text-xs text-slate-500 font-medium">
-                    {formatDate(selectedTx.created_at)}
-                  </p>
+                  <StatusBadge status={selected.status} />
+                  <EnvironmentBadge environment={environment} />
                 </div>
               </div>
 
@@ -510,118 +485,156 @@ function Transactions() {
                 <h3 className="font-semibold text-slate-900 text-sm border-b border-slate-100 pb-2">
                   Overview
                 </h3>
-                <div className="grid grid-cols-2 gap-y-4 text-sm">
-                  <div>
-                    <p className="text-slate-500 text-xs mb-1">Provider</p>
-                    <p className="font-medium text-slate-900 capitalize">
-                      {selectedTx.final_provider ||
-                        selectedTx.preferred_provider ||
-                        "-"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-slate-500 text-xs mb-1">Channel</p>
-                    <p className="font-medium text-slate-900 capitalize">
-                      {selectedTx.channel || "-"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-slate-500 text-xs mb-1">Routing Mode</p>
-                    <div className="flex items-center gap-1.5 font-medium text-slate-900 capitalize">
-                      {(selectedTx.route_type || "basic").toLowerCase() ===
-                      "auto" ? (
-                        <Zap className="w-3.5 h-3.5 text-indigo-500" />
-                      ) : (
-                        <GitBranch className="w-3.5 h-3.5 text-slate-500" />
+                <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                  <Field label="Your reference">
+                    <span className="inline-flex items-center gap-2">
+                      {selected.reference}
+                      {selected.reference && (
+                        <CopyValue value={selected.reference} />
                       )}
-                      {selectedTx.route_type || "Basic"}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-slate-500 text-xs mb-1">
-                      Customer Email
-                    </p>
-                    <p className="font-medium text-slate-900 truncate">
-                      {selectedTx.customer_email || "-"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-slate-500 text-xs mb-1">Message</p>
-                    <p className="font-medium text-slate-900">
-                      {selectedTx.message || "-"}
-                    </p>
+                    </span>
+                  </Field>
+                  <Field label="Provider">
+                    <span className="capitalize">{selected.provider}</span>
+                  </Field>
+                  <Field label="Type">
+                    <TypeBadge type={selected.transaction_type} />
+                  </Field>
+                  <Field label="Channel">{titleCase(selected.channel)}</Field>
+                  {selected.transaction_type !== "payout" && (
+                    <>
+                      <Field label="Customer">{selected.customer_email}</Field>
+                      <Field label="Routing">
+                        {ROUTE_LABELS[selected.route] ??
+                          titleCase(selected.route)}
+                      </Field>
+                    </>
+                  )}
+                  <Field label="Created">
+                    {formatDateTime(selected.created_at)}
+                  </Field>
+                  <Field label="Completed">
+                    {formatDateTime(selected.completed_at)}
+                  </Field>
+                </div>
+                {selected.message && (
+                  <Field label="Message">{selected.message}</Field>
+                )}
+              </div>
+
+              {selected.beneficiary && (
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-slate-900 text-sm border-b border-slate-100 pb-2">
+                    Recipient
+                  </h3>
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                    <Field label="Account name">
+                      {selected.beneficiary.name}
+                    </Field>
+                    <Field label="Account number">
+                      <span className="font-mono">
+                        {selected.beneficiary.account_number}
+                      </span>
+                    </Field>
+                    <Field label="Bank">
+                      {selected.beneficiary.bank_name ||
+                        selected.beneficiary.bank_code}
+                    </Field>
+                    <Field label="Narration">
+                      {selected.beneficiary.narration}
+                    </Field>
+                    <Field label="Provider reference">
+                      <span className="font-mono text-xs">
+                        {selected.beneficiary.provider_reference}
+                      </span>
+                    </Field>
+                    <Field label="Provider fee">
+                      {selected.beneficiary.fee != null
+                        ? formatAmount(
+                            selected.beneficiary.fee,
+                            selected.currency,
+                          )
+                        : null}
+                    </Field>
                   </div>
                 </div>
-              </div>
+              )}
 
               <div className="space-y-4">
                 <h3 className="font-semibold text-slate-900 text-sm border-b border-slate-100 pb-2">
-                  Timeline
+                  What happened
                 </h3>
-                <div className="space-y-4 relative before:absolute before:inset-0 before:ml-[11px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-linear-to-b before:from-transparent before:via-slate-200 before:to-transparent">
-                  <div className="relative flex items-start gap-4 text-sm z-10">
-                    <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 border border-white ring-4 ring-white shadow-sm mt-0.5">
-                      <ArrowRight className="w-3 h-3" />
-                    </div>
-                    <div className="bg-white border text-left flex-1 p-3 rounded-xl border-slate-200 shadow-sm">
-                      <p className="font-medium text-slate-900">
-                        Request Initiated
-                      </p>
-                      <p className="text-xs text-slate-500 mt-1">
-                        SynchGate engine receives standard /charge payload
-                      </p>
-                    </div>
-                  </div>
-                  <div className="relative flex items-start gap-4 text-sm z-10">
-                    <div className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0 border border-white ring-4 ring-white shadow-sm mt-0.5">
-                      <Server className="w-3 h-3" />
-                    </div>
-                    <div className="bg-white border text-left flex-1 p-3 rounded-xl border-slate-200 shadow-sm">
-                      <p className="font-medium text-slate-900">
-                        Provider Match
-                      </p>
-                      <p className="text-xs text-slate-500 mt-1 capitalize">
-                        Routed to {selectedTx.final_provider} Based on Merchant
-                        Request state
-                      </p>
-                    </div>
-                  </div>
-                  <div className="relative flex items-start gap-4 text-sm z-10">
-                    <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 border border-white ring-4 ring-white shadow-sm mt-0.5 ${selectedTx.status?.toLowerCase() === "success" ? "bg-emerald-100 text-emerald-600" : selectedTx.status?.toLowerCase() === "failed" ? "bg-red-100 text-red-600" : "bg-amber-100 text-amber-600"}`}
+                <ol className="space-y-3">
+                  {[
+                    {
+                      icon: <ArrowRight className="w-3 h-3" />,
+                      tone: "bg-blue-100 text-blue-600",
+                      title: "Request received",
+                      text: `Your request reached SynchGate on ${formatDateTime(selected.created_at)}.`,
+                    },
+                    {
+                      icon: <Server className="w-3 h-3" />,
+                      tone: "bg-indigo-100 text-indigo-600",
+                      title: `Sent to ${titleCase(selected.provider)}`,
+                      text:
+                        selected.transaction_type === "payout"
+                          ? "Paid out through the provider you named."
+                          : (ROUTE_LABELS[selected.route] ??
+                              "Routed to the provider.") + ".",
+                    },
+                    {
+                      icon:
+                        selected.status === "success" ? (
+                          <CheckCircle2 className="w-3 h-3" />
+                        ) : (
+                          <XCircle className="w-3 h-3" />
+                        ),
+                      tone:
+                        selected.status === "success"
+                          ? "bg-emerald-100 text-emerald-600"
+                          : selected.status === "failed"
+                            ? "bg-red-100 text-red-600"
+                            : "bg-amber-100 text-amber-600",
+                      title: `Status: ${titleCase(selected.status)}`,
+                      text:
+                        selected.message ||
+                        (selected.completed_at
+                          ? `Finished on ${formatDateTime(selected.completed_at)}.`
+                          : "Not finished yet."),
+                    },
+                  ].map((step) => (
+                    <li
+                      key={step.title}
+                      className="flex items-start gap-3 text-sm"
                     >
-                      {selectedTx.status?.toLowerCase() === "success" ? (
-                        <CheckCircle2 className="w-3 h-3" />
-                      ) : (
-                        <XCircle className="w-3 h-3" />
-                      )}
-                    </div>
-                    <div className="bg-white border text-left flex-1 p-3 rounded-xl border-slate-200 shadow-sm">
-                      <p className="font-medium text-slate-900">
-                        Final Outcome
-                      </p>
-                      <p className="text-xs text-slate-500 mt-1 capitalize">
-                        Provider returned status: {selectedTx.status}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                      <span
+                        className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${step.tone}`}
+                      >
+                        {step.icon}
+                      </span>
+                      <div>
+                        <p className="font-medium text-slate-900">
+                          {step.title}
+                        </p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {step.text}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                   <h3 className="font-semibold text-slate-900 text-sm">
-                    Provider Response (Raw)
+                    Provider response
                   </h3>
                   <button
                     type="button"
                     onClick={() =>
                       navigator.clipboard.writeText(
-                        JSON.stringify(
-                          selectedTx.metadata || selectedTx,
-                          null,
-                          2,
-                        ),
+                        JSON.stringify(selected.metadata ?? selected, null, 2),
                       )
                     }
                     className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1 font-medium cursor-pointer"
@@ -629,14 +642,14 @@ function Transactions() {
                     <Copy className="w-3 h-3" /> Copy JSON
                   </button>
                 </div>
-                <div className="bg-slate-900 rounded-xl p-4 overflow-x-auto shadow-inner">
-                  <pre className="text-xs text-slate-300 font-mono text-left whitespace-pre-wrap">
-                    {JSON.stringify(selectedTx.metadata || selectedTx, null, 2)}
+                <div className="bg-slate-900 rounded-xl p-4 overflow-x-auto max-h-80 overflow-y-auto">
+                  <pre className="text-xs text-slate-300 font-mono whitespace-pre-wrap">
+                    {JSON.stringify(selected.metadata ?? selected, null, 2)}
                   </pre>
                 </div>
               </div>
             </div>
-          </div>
+          </aside>
         </div>
       )}
     </div>
