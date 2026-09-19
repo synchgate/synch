@@ -59,12 +59,37 @@ const successResponse = `{
   }
 }`;
 
+const payoutResponse = `{
+  "status": "success",
+  "message": "Verification requested",
+  "data": {
+    "cleaned_data": {
+      "provider": "paystack",
+      "status": "success",
+      "amount": "5000.00",
+      "reference": "payout-2026-000041",
+      "currency": "NGN",
+      "transaction_type": "payout",
+      "final": true,
+      "message": "Transfer has been completed"
+    },
+    "provider_response": {
+      "data": { "status": "success", "transfer_code": "TRF_x7d1kqz0f2" }
+    }
+  },
+  "meta": {
+    "request_id": "8d2f6c1e-31a4-4c19-9a55-0b0a4c1d7e02",
+    "timestamp": "2026-09-19T09:14:52.387939Z"
+  }
+}`;
+
 function TransactionVerification() {
   return (
     <DocPage>
       <PageHeader eyebrow="COLLECT PAYMENTS" title="Transaction Verification">
-        Check the current status of a payment by its reference. Call it after
-        the customer returns to your site, before you deliver value.
+        Check the current status of a payment or a payout by its reference. Call
+        it after the customer returns to your site, before you deliver value, or
+        to find out how a payout ended.
       </PageHeader>
 
       <SupportedProviders />
@@ -86,9 +111,14 @@ function TransactionVerification() {
         . The environment of the key decides whether the sandbox or live payment
         is looked up.
       </Prose>
-      <Callout title="Payments only">
-        This endpoint verifies payments (collections). It does not return the
-        status of a transfer.
+      <Callout title="Payments and payouts">
+        Send the reference of a payment or of a{" "}
+        <Link to="/docs/initiate-transfer" className="underline font-medium">
+          transfer
+        </Link>{" "}
+        and the response follows the same shape. For a payout that is still
+        processing, this call asks the provider and records the answer, so it is
+        also the way to settle one on demand.
       </Callout>
 
       <SectionHeading>Path parameters</SectionHeading>
@@ -99,7 +129,7 @@ function TransactionVerification() {
             name: "reference",
             type: "string",
             description:
-              "The reference you sent when you initiated the payment.",
+              "The reference you sent when you initiated the payment or transfer.",
           },
         ]}
       />
@@ -145,8 +175,34 @@ function TransactionVerification() {
             key: "currency",
             cells: ["currency", "Currency of the payment."],
           },
+          {
+            key: "transaction_type",
+            cells: [
+              "transaction_type",
+              "Payouts only. Always payout. Absent for payments.",
+            ],
+          },
+          {
+            key: "final",
+            cells: [
+              "final",
+              "Payouts only. true once the outcome is settled, false while it is still processing.",
+            ],
+          },
+          {
+            key: "message",
+            cells: [
+              "message",
+              "Payouts only. Where the payout stands, in words.",
+            ],
+          },
         ]}
       />
+      <p className="text-slate-600 mb-4">
+        For a payout, <InlineCode>amount</InlineCode> is the amount you sent in
+        naira, as a string, rather than the provider's own unit.
+      </p>
+      <CodeBlock code={payoutResponse} title="200 OK, a payout" />
 
       <SectionHeading>Payment status</SectionHeading>
       <ReferenceTable
@@ -174,6 +230,42 @@ function TransactionVerification() {
         ]}
       />
 
+      <SectionHeading>Payout status</SectionHeading>
+      <ReferenceTable
+        headers={["Status", "Meaning"]}
+        rows={[
+          {
+            key: "success",
+            cells: ["success", "The provider confirmed the money was sent."],
+          },
+          {
+            key: "failed",
+            cells: [
+              "failed",
+              "The provider confirmed it was not sent, or has no record of it. It is safe to retry with a new reference.",
+            ],
+          },
+          {
+            key: "processing",
+            cells: [
+              "processing",
+              "Not settled yet, including when the provider could not be reached to ask. Check again shortly, and do not send it again.",
+            ],
+          },
+        ]}
+      />
+      <Callout title="Only failed means safe to resend">
+        A payout is marked <InlineCode>failed</InlineCode> only when the
+        provider says so. A timeout or an answer we don't recognise leaves it as{" "}
+        <InlineCode>processing</InlineCode>. Paying again while it is processing
+        risks sending the money twice. SynchGate also re-checks open payouts
+        every couple of minutes and sends a{" "}
+        <Link to="/docs/webhooks" className="underline font-medium">
+          webhook
+        </Link>{" "}
+        when one settles.
+      </Callout>
+
       <SectionHeading>Errors</SectionHeading>
       <ReferenceTable
         headers={["HTTP", "Meaning"]}
@@ -182,7 +274,7 @@ function TransactionVerification() {
             key: "400",
             cells: [
               "400",
-              "No payment was found for the reference, or the provider could not be reached. See message.",
+              "No payment or payout of yours has this reference, or the provider could not be reached. See message.",
             ],
           },
           {

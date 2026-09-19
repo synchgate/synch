@@ -23,7 +23,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { useAuth } from "../contexts/AuthContext";
 import { api } from "../lib/api";
-import { unwrap } from "../lib/dashboard";
+import { creditRestriction, unwrap } from "../lib/dashboard";
 
 type NavEntry = {
   to: string;
@@ -104,6 +104,7 @@ function Dashboard() {
     retry: false,
     staleTime: 60_000,
   });
+  const restriction = creditRestriction(usage);
   const planName: string | undefined = usage?.plan;
   const onFreePlan =
     !planName || ["free", "starter"].includes(planName.toLowerCase());
@@ -449,6 +450,23 @@ function Dashboard() {
               </Link>
             </div>
           )
+        )}
+
+        {restriction && (
+          <div className="bg-red-600 px-4 py-2 text-white text-xs sm:text-sm flex flex-wrap items-center justify-center gap-x-3 gap-y-1 shrink-0">
+            <span>
+              <strong>Live payments and payouts are paused.</strong>{" "}
+              {restriction === "locked"
+                ? "Your account is restricted because invoices are overdue."
+                : "Your unpaid platform fees have reached your credit limit."}
+            </span>
+            <Link
+              to="/dashboard/billing"
+              className="bg-white text-red-600 px-3 py-1 rounded-full font-semibold hover:bg-red-50 transition-colors text-xs whitespace-nowrap"
+            >
+              View billing
+            </Link>
+          </div>
         )}
 
         {/* Dashboard Scrollable Body */}

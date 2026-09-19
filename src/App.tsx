@@ -41,6 +41,7 @@ const Introduction = lazy(() => import("./pages/docs/Introduction"));
 const PCICompliance = lazy(() => import("./pages/docs/PCICompliance"));
 const ResolveAccount = lazy(() => import("./pages/docs/ResolveAccount"));
 const SmartRoutes = lazy(() => import("./pages/docs/SmartRoutes"));
+const Webhooks = lazy(() => import("./pages/docs/Webhooks"));
 const TransactionVerification = lazy(
   () => import("./pages/docs/TransactionVerification"),
 );
@@ -118,7 +119,7 @@ function App() {
                 <Route path="providers" element={<Providers />} />
                 <Route path="logs" element={<Logs />} />
                 <Route path="billing" element={<Billing />} />
-              <Route path="settings" element={<Settings />} />
+                <Route path="settings" element={<Settings />} />
                 <Route path="api-keys" element={<MyApiKey />} />
                 <Route path="support-ticket" element={<SupportTicket />} />
               </Route>
@@ -144,6 +145,7 @@ function App() {
                   path="initiate-transfer"
                   element={<InitiateTransfer />}
                 />
+                <Route path="webhooks" element={<Webhooks />} />
                 <Route path="pci-compliance" element={<PCICompliance />} />
                 <Route path="data-privacy" element={<DataPrivacy />} />
               </Route>
