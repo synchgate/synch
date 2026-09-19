@@ -1,4 +1,9 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import {
   ArrowRight,
   CheckCircle2,
@@ -41,6 +46,9 @@ const STATUS_QUERY: Record<StatusTab, string | undefined> = {
   failed: "failed,abandoned",
   in_progress: "pending,processing,retrying",
 };
+
+// a payout in one of these has not reached a final answer yet
+const OPEN_STATUSES = ["pending", "processing", "retrying"];
 
 const ROUTE_LABELS: Record<string, string> = {
   basic: "Chosen by you",
@@ -109,8 +117,36 @@ function Transactions() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [selected, setSelected] = useState<any>(null);
+  const [checkNote, setCheckNote] = useState<string | null>(null);
 
+  const queryClient = useQueryClient();
   const debouncedSearch = useDebounced(search);
+
+  // asks the provider where an open payout stands and records the answer
+  const checkStatus = useMutation({
+    mutationFn: async (id: string) =>
+      (
+        await api.post(`/transactions/${id}/refresh/`, null, {
+          params: { environment },
+        })
+      ).data,
+    onSuccess: (body) => {
+      if (body?.data) setSelected(body.data);
+      setCheckNote(
+        body?.refresh?.checked
+          ? (body.message ?? null)
+          : "Couldn't get an answer from the provider just now. Try again in a moment.",
+      );
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    },
+    onError: () =>
+      setCheckNote("Couldn't check the status. Try again in a moment."),
+  });
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: a different transaction starts with no note
+  useEffect(() => {
+    setCheckNote(null);
+  }, [selected?.id]);
 
   // any change to the filters or the Test/Live switch starts again from page 1
   // biome-ignore lint/correctness/useExhaustiveDependencies: these are exactly the values that should reset the page
@@ -364,7 +400,6 @@ function Transactions() {
                 {transactions.map((tx) => (
                   <tr
                     key={tx.id}
-                    // biome-ignore lint/a11y/useKeyWithClickEvents: the reference button in the first cell is the keyboard target
                     onClick={() => setSelected(tx)}
                     className="hover:bg-slate-50 transition-colors cursor-pointer"
                   >
@@ -480,6 +515,32 @@ function Transactions() {
                   <EnvironmentBadge environment={environment} />
                 </div>
               </div>
+
+              {selected.transaction_type === "payout" &&
+                OPEN_STATUSES.includes(selected.status) && (
+                  <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 flex items-start justify-between gap-4">
+                    <div className="text-sm">
+                      <p className="font-semibold text-amber-900">
+                        This payout hasn't finished
+                      </p>
+                      <p className="text-xs text-amber-800 mt-1">
+                        {checkNote ??
+                          "We check with the provider every couple of minutes and update this page. Don't send it again unless it shows Failed, or the money may go out twice."}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => checkStatus.mutate(selected.id)}
+                      disabled={checkStatus.isPending}
+                      className="shrink-0 inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-amber-300 text-amber-900 text-xs font-semibold rounded-lg hover:bg-amber-100 disabled:opacity-60 cursor-pointer"
+                    >
+                      {checkStatus.isPending && (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      )}
+                      Check status
+                    </button>
+                  </div>
+                )}
 
               <div className="space-y-4">
                 <h3 className="font-semibold text-slate-900 text-sm border-b border-slate-100 pb-2">
