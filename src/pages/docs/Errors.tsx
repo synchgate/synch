@@ -125,7 +125,7 @@ function Errors() {
             key: "403",
             cells: [
               "403",
-              "Your Client-Secret-Key is missing or invalid, or your subscription does not allow the request.",
+              "Your Client-Secret-Key is missing or invalid, your subscription does not allow the request, or your account is restricted for unpaid fees.",
             ],
           },
           {
@@ -223,11 +223,19 @@ function Errors() {
             ],
           },
           {
+            key: "credit_limit",
+            cells: [
+              "credit_limit_exceeded, account_restricted",
+              "403",
+              "Live payments and payouts are paused because your unpaid platform fees reached your credit limit, or your account is locked for overdue invoices. Sandbox is unaffected. Settle your invoices to resume.",
+            ],
+          },
+          {
             key: "plan_limit",
             cells: [
               "free_plan_limit_reached, plan_limit_reached",
               "429",
-              "Your plan's transaction allowance is used up.",
+              "Your plan's allowance of successful live transactions is used up. Payouts count as well as payments.",
             ],
           },
           {
@@ -235,7 +243,7 @@ function Errors() {
             cells: [
               "transfer_outcome_unknown",
               "502",
-              "The provider did not confirm a transfer. It may still complete. Do not retry with a new reference.",
+              "The provider did not confirm a transfer. It may still complete. Do not retry with a new reference. Check it with Transaction Verification.",
             ],
           },
           {

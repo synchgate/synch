@@ -80,3 +80,21 @@ export const titleCase = (value?: string | null) =>
   value
     ? value.charAt(0).toUpperCase() + value.slice(1).replace(/_/g, " ")
     : "—";
+
+/**
+ * Why live transactions are being refused on credit grounds, or null when they are not.
+ * Mirrors the backend check: a locked or suspended account, or unpaid fees at the credit limit.
+ */
+export function creditRestriction(usage?: {
+  account_status?: string;
+  current_balance?: number | string;
+  credit_limit?: number | string;
+}): "locked" | "limit" | null {
+  if (!usage) return null;
+  const status = (usage.account_status ?? "active").toLowerCase();
+  if (status !== "active") return "locked";
+  const limit = Number(usage.credit_limit ?? 0);
+  return limit > 0 && Number(usage.current_balance ?? 0) >= limit
+    ? "limit"
+    : null;
+}

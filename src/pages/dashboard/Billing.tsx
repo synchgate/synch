@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { CreditCard, FileText, Receipt } from "lucide-react";
+import { AlertTriangle, CreditCard, FileText, Receipt } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   Card,
@@ -12,6 +12,7 @@ import { STARTER_PLAN } from "../../config/pricing";
 import { useAuth } from "../../contexts/AuthContext";
 import { api } from "../../lib/api";
 import {
+  creditRestriction,
   formatDate,
   formatNaira,
   formatNumber,
@@ -81,7 +82,8 @@ function Billing() {
     retry: false,
   });
 
-  // successful live payments since the 1st of the month, which is what the plan limit counts
+  // successful live transactions since the 1st of the month, which is what the plan limit counts.
+  // Payouts count towards it as well as collections.
   const dayOfMonth = new Date().getDate();
   const monthUsage = useQuery({
     queryKey: ["billing-month-usage", userEmail, dayOfMonth],
@@ -91,7 +93,8 @@ function Billing() {
           params: { environment: "live", days: dayOfMonth },
         }),
       );
-      return (summary?.collections?.successful_transactions ?? 0) as number;
+      return ((summary?.collections?.successful_transactions ?? 0) +
+        (summary?.payouts?.successful_transactions ?? 0)) as number;
     },
     enabled: !!userEmail,
     retry: false,
@@ -137,6 +140,8 @@ function Billing() {
     ? planHistory.data
     : [];
   const feePerTransaction = usage.data?.fee_per_transaction ?? 20;
+  const restriction = creditRestriction(usage.data);
+  const creditLimit = Number(usage.data?.credit_limit ?? 0);
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
@@ -144,6 +149,35 @@ function Billing() {
         title="Billing"
         description="Your plan, usage, platform fees and invoices."
       />
+
+      {restriction && (
+        <div
+          role="alert"
+          className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-red-900"
+        >
+          <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
+          <div className="text-sm">
+            <p className="font-semibold">
+              Live payments and payouts are paused
+            </p>
+            <p className="mt-1 text-red-800">
+              {restriction === "locked"
+                ? "Your account is restricted because invoices are overdue. "
+                : "Your unpaid platform fees have reached your credit limit. "}
+              Sandbox is unaffected. Once your payment is received it is applied
+              to your invoices and live traffic resumes. To confirm a payment,
+              email{" "}
+              <a
+                href="mailto:support@synchgate.com"
+                className="font-semibold underline underline-offset-2"
+              >
+                support@synchgate.com
+              </a>{" "}
+              with your invoice reference.
+            </p>
+          </div>
+        </div>
+      )}
 
       <Card>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
@@ -185,7 +219,7 @@ function Billing() {
           <div className="mt-6 pt-6 border-t border-slate-100">
             <div className="flex items-center justify-between text-sm mb-2">
               <span className="font-medium text-slate-700">
-                Successful live payments this month
+                Successful live transactions this month
               </span>
               <span className="font-semibold text-slate-900">
                 {formatNumber(used)} of {formatNumber(limit)}
@@ -200,7 +234,7 @@ function Billing() {
             {nearLimit && (
               <p className="text-xs text-amber-700 mt-2">
                 {percentUsed >= 100
-                  ? "You've reached your limit, so new live payments are paused until next month or an upgrade."
+                  ? "You've reached your limit, so new live payments and payouts are paused until next month or an upgrade."
                   : "You're close to your monthly limit."}
               </p>
             )}
@@ -208,16 +242,21 @@ function Billing() {
         )}
       </Card>
 
-      <div className="grid sm:grid-cols-3 gap-4">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           label="Platform fee per transaction"
           value={formatNaira(feePerTransaction)}
-          hint="On each successful live transaction. Sandbox is free."
+          hint="On each successful live payment. Payouts and sandbox are free."
         />
         <StatCard
           label="Unpaid fees"
           value={formatNaira(usage.data?.current_balance ?? 0)}
           hint={`${formatNumber(usage.data?.pending_fee_count ?? 0)} pending, ${formatNumber(usage.data?.invoiced_fee_count ?? 0)} invoiced`}
+        />
+        <StatCard
+          label="Credit limit"
+          value={formatNaira(creditLimit)}
+          hint={`${formatNaira(usage.data?.available_credit ?? 0)} available before live traffic pauses`}
         />
         <StatCard
           label="Account status"

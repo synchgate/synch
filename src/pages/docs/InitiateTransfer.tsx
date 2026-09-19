@@ -323,15 +323,23 @@ function InitiateTransfer() {
       />
 
       <Callout title="Checking a transfer's final status">
-        The{" "}
+        A transfer that comes back <InlineCode>processing</InlineCode> is
+        settled later. SynchGate re-checks it with the provider every couple of
+        minutes and calls your{" "}
+        <Link to="/docs/webhooks" className="underline font-medium">
+          webhook
+        </Link>{" "}
+        with <InlineCode>payout.completed</InlineCode> or{" "}
+        <InlineCode>payout.failed</InlineCode>. You can also ask at any time
+        with{" "}
         <Link
           to="/docs/transaction-verification"
           className="underline font-medium"
         >
           Transaction Verification
-        </Link>{" "}
-        endpoint currently supports payments only, so it does not return the
-        settlement status of a transfer.
+        </Link>
+        , using the same reference. Don't send it again until it shows{" "}
+        <InlineCode>failed</InlineCode>.
       </Callout>
 
       <SectionHeading id="references">References and retries</SectionHeading>
@@ -489,7 +497,7 @@ function InitiateTransfer() {
 
       <PageNav
         prev={{ label: "Resolve Account", to: "/docs/resolve-account" }}
-        next={{ label: "PCI Compliance", to: "/docs/pci-compliance" }}
+        next={{ label: "Webhooks", to: "/docs/webhooks" }}
       />
     </DocPage>
   );

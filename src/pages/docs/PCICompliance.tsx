@@ -134,7 +134,7 @@ function PCICompliance() {
       </Callout>
 
       <PageNav
-        prev={{ label: "Initiate Transfer", to: "/docs/initiate-transfer" }}
+        prev={{ label: "Webhooks", to: "/docs/webhooks" }}
         next={{ label: "Data Privacy", to: "/docs/data-privacy" }}
       />
     </DocPage>
