@@ -1,34 +1,58 @@
-import { useQuery } from "@tanstack/react-query";
-import { AlertTriangle, CreditCard, FileText, Receipt } from "lucide-react";
-import { Link } from "react-router-dom";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Loader2,
+  Receipt,
+  Wallet,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import {
   Card,
   EmptyState,
   LoadingBlock,
   PageHeader,
-  StatCard,
+  Pagination,
 } from "../../components/dashboard/ui";
-import { STARTER_PLAN } from "../../config/pricing";
+import { MIN_TOPUP_NGN, topUpBreakdown } from "../../config/pricing";
 import { useAuth } from "../../contexts/AuthContext";
 import { api } from "../../lib/api";
 import {
-  creditRestriction,
-  formatDate,
+  formatDateTime,
   formatNaira,
   formatNumber,
   titleCase,
   unwrap,
+  type WalletSummary,
+  walletState,
 } from "../../lib/dashboard";
 
+const QUICK_AMOUNTS = [5000, 10000, 25000, 50000];
+const LEDGER_PAGE_SIZE = 15;
+
+const ENTRY_LABELS: Record<string, string> = {
+  topup: "Top-up",
+  bonus: "Top-up bonus",
+  hold: "Fee set aside",
+  release: "Fee released",
+  charge: "Platform fee",
+  fee_refund: "Fee refunded",
+  withdrawal: "Refund to you",
+  adjustment: "Adjustment",
+};
+
 const STATUS_TONE: Record<string, string> = {
-  paid: "bg-emerald-100 text-emerald-700",
-  active: "bg-emerald-100 text-emerald-700",
   success: "bg-emerald-100 text-emerald-700",
+  paid: "bg-emerald-100 text-emerald-700",
   pending: "bg-amber-100 text-amber-700",
-  invoiced: "bg-blue-100 text-blue-700",
-  overdue: "bg-red-100 text-red-700",
-  cancelled: "bg-slate-100 text-slate-600",
   failed: "bg-red-100 text-red-700",
+  rejected: "bg-red-100 text-red-700",
+  expired: "bg-slate-100 text-slate-600",
 };
 
 function Pill({ value }: { value?: string }) {
@@ -42,79 +66,187 @@ function Pill({ value }: { value?: string }) {
   );
 }
 
+/** A signed naira amount for the statement: +₦500, −₦20, or a dash when it did not move. */
+function signed(value: string | number) {
+  const n = Number(value);
+  if (!n) return <span className="text-slate-300">—</span>;
+  return (
+    <span className={n > 0 ? "text-emerald-600" : "text-slate-700"}>
+      {n > 0 ? "+" : "−"}
+      {formatNaira(Math.abs(n))}
+    </span>
+  );
+}
+
+const errorMessage = (error: any, fallback: string) =>
+  error?.response?.data?.message ?? fallback;
+
 function Billing() {
   const { userEmail } = useAuth();
+  const queryClient = useQueryClient();
 
-  const subscription = useQuery({
-    queryKey: ["billing-subscription", userEmail],
-    queryFn: async () => {
-      try {
-        return unwrap<any>(await api.get("/billing/subscriptions/current/"));
-      } catch (error: any) {
-        // a merchant on the free plan has no subscription record
-        if (error?.response?.status === 404) return null;
-        throw error;
+  const [amountInput, setAmountInput] = useState(String(MIN_TOPUP_NGN));
+  const [ledgerPage, setLedgerPage] = useState(1);
+  const [notice, setNotice] = useState<{
+    tone: "ok" | "warn" | "error";
+    text: string;
+  } | null>(null);
+  const [refundAmount, setRefundAmount] = useState("");
+  const [refundNote, setRefundNote] = useState("");
+
+  const wallet = useQuery({
+    queryKey: ["wallet", userEmail],
+    queryFn: async () => unwrap<WalletSummary>(await api.get("/wallet/")),
+    enabled: !!userEmail,
+    retry: false,
+  });
+
+  const ledger = useQuery({
+    queryKey: ["wallet-ledger", userEmail, ledgerPage],
+    queryFn: async () =>
+      (
+        await api.get("/wallet/ledger/", {
+          params: { page: ledgerPage, page_size: LEDGER_PAGE_SIZE },
+        })
+      ).data,
+    enabled: !!userEmail,
+    placeholderData: keepPreviousData,
+    retry: false,
+  });
+
+  const topups = useQuery({
+    queryKey: ["wallet-topups", userEmail],
+    queryFn: async () => unwrap<any[]>(await api.get("/wallet/topups/")),
+    enabled: !!userEmail,
+    retry: false,
+  });
+
+  const refunds = useQuery({
+    queryKey: ["wallet-refunds", userEmail],
+    queryFn: async () =>
+      unwrap<any[]>(await api.get("/wallet/refund-requests/")),
+    enabled: !!userEmail,
+    retry: false,
+  });
+
+  const refreshWallet = () => {
+    queryClient.invalidateQueries({ queryKey: ["wallet"] });
+    queryClient.invalidateQueries({ queryKey: ["wallet-ledger"] });
+    queryClient.invalidateQueries({ queryKey: ["wallet-topups"] });
+    queryClient.invalidateQueries({ queryKey: ["wallet-refunds"] });
+  };
+
+  const summary = wallet.data;
+  const fee = Number(summary?.fee_per_transaction ?? 20);
+  const minTopUp = Number(summary?.min_topup ?? MIN_TOPUP_NGN);
+  const bonusPercent = Number(summary?.topup_bonus_percent ?? 10);
+
+  const amount = Number(amountInput.replace(/,/g, ""));
+  const validAmount = Number.isFinite(amount) && amount >= minTopUp;
+  const preview = topUpBreakdown(validAmount ? amount : 0, fee, bonusPercent);
+
+  const startTopUp = useMutation({
+    mutationFn: async () =>
+      unwrap<any>(
+        await api.post("/wallet/topups/", {
+          amount,
+          callback_url: `${window.location.origin}/dashboard/billing`,
+        }),
+      ),
+    onSuccess: (topup) => {
+      if (topup?.payment_url) {
+        window.location.href = topup.payment_url;
+      } else {
+        setNotice({
+          tone: "error",
+          text: "We couldn't open the payment page. Please try again.",
+        });
       }
     },
-    enabled: !!userEmail,
-    retry: false,
+    onError: (error) =>
+      setNotice({
+        tone: "error",
+        text: errorMessage(error, "Couldn't start the top-up. Try again."),
+      }),
   });
 
-  const usage = useQuery({
-    queryKey: ["billing-usage", userEmail],
-    queryFn: async () => unwrap<any>(await api.get("/billing/usage/")),
-    enabled: !!userEmail,
-    retry: false,
-  });
-
-  const history = useQuery({
-    queryKey: ["billing-history", userEmail],
-    queryFn: async () => unwrap<any>(await api.get("/billing/history/")),
-    enabled: !!userEmail,
-    retry: false,
-  });
-
-  const planHistory = useQuery({
-    queryKey: ["billing-plan-history", userEmail],
-    queryFn: async () =>
-      unwrap<any[]>(await api.get("/billing/subscriptions/history/")),
-    enabled: !!userEmail,
-    retry: false,
-  });
-
-  // successful live transactions since the 1st of the month, which is what the plan limit counts.
-  // Payouts count towards it as well as collections.
-  const dayOfMonth = new Date().getDate();
-  const monthUsage = useQuery({
-    queryKey: ["billing-month-usage", userEmail, dayOfMonth],
-    queryFn: async () => {
-      const summary = unwrap<any>(
-        await api.get("/analytics/summary/", {
-          params: { environment: "live", days: dayOfMonth },
-        }),
-      );
-      return ((summary?.collections?.successful_transactions ?? 0) +
-        (summary?.payouts?.successful_transactions ?? 0)) as number;
+  // Checks one top-up with the provider and credits it if it was paid.
+  const checkTopUp = useMutation({
+    mutationFn: async (reference: string) =>
+      unwrap<any>(await api.post(`/wallet/topups/${reference}/verify/`)),
+    onSuccess: (topup) => {
+      refreshWallet();
+      if (topup?.status === "success") {
+        setNotice({
+          tone: "ok",
+          text: `Your wallet has been topped up with ${formatNaira(Number(topup.amount))} and ${formatNaira(Number(topup.bonus_amount))} bonus.`,
+        });
+      } else if (topup?.status === "pending") {
+        setNotice({
+          tone: "warn",
+          text: "We haven't received confirmation of that payment yet. It will be credited as soon as it clears.",
+        });
+      } else {
+        setNotice({
+          tone: "error",
+          text: "That payment didn't go through, so nothing was added.",
+        });
+      }
     },
-    enabled: !!userEmail,
-    retry: false,
+    onError: (error) =>
+      setNotice({
+        tone: "error",
+        text: errorMessage(error, "Couldn't check that payment. Try again."),
+      }),
   });
 
-  const forbidden = [subscription, usage, history].some(
-    (query) => (query.error as any)?.response?.status === 403,
-  );
+  // Coming back from the payment page: confirm the top-up straight away, then tidy the address bar.
+  const handledReturn = useRef(false);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: this must run once, on arrival
+  useEffect(() => {
+    if (handledReturn.current) return;
+    const params = new URLSearchParams(window.location.search);
+    const reference = params.get("reference") ?? params.get("trxref");
+    if (!reference?.startsWith("topup-")) return;
+    handledReturn.current = true;
+    window.history.replaceState({}, "", window.location.pathname);
+    checkTopUp.mutate(reference);
+  }, []);
 
-  if (subscription.isLoading || usage.isLoading)
-    return <LoadingBlock label="Loading billing…" />;
+  const requestRefund = useMutation({
+    mutationFn: async () =>
+      unwrap<any>(
+        await api.post("/wallet/refund-requests/", {
+          amount: Number(refundAmount),
+          note: refundNote || undefined,
+        }),
+      ),
+    onSuccess: () => {
+      setRefundAmount("");
+      setRefundNote("");
+      refreshWallet();
+      setNotice({
+        tone: "ok",
+        text: "Refund requested. We'll pay it to your bank account. The status shows here.",
+      });
+    },
+    onError: (error) =>
+      setNotice({
+        tone: "error",
+        text: errorMessage(error, "Couldn't request that refund."),
+      }),
+  });
 
-  if (forbidden) {
+  if (wallet.isLoading) return <LoadingBlock label="Loading your wallet…" />;
+
+  if ((wallet.error as any)?.response?.status === 403) {
     return (
       <div className="max-w-6xl mx-auto">
-        <PageHeader title="Billing" />
+        <PageHeader title="Wallet" />
         <Card className="mt-6" padded={false}>
           <EmptyState
-            icon={<CreditCard className="w-6 h-6" />}
-            title="You don't have access to billing"
+            icon={<Wallet className="w-6 h-6" />}
+            title="You don't have access to the wallet"
           >
             Ask the owner of this business to give you billing access.
           </EmptyState>
@@ -123,287 +255,402 @@ function Billing() {
     );
   }
 
-  const plan = subscription.data?.plan;
-  const planName = plan?.name ?? usage.data?.plan ?? "Starter";
-  const isFree = !plan || plan.tier === "free" || plan.tier === "starter";
-  const limit =
-    plan?.transaction_limit || (isFree ? STARTER_PLAN.transactions : 0);
-  const used = monthUsage.data ?? 0;
-  const percentUsed = limit
-    ? Math.min(100, Math.round((used / limit) * 100))
-    : 0;
-  const nearLimit = limit > 0 && percentUsed >= 80;
+  const state = walletState(summary);
+  const entries: any[] = ledger.data?.data ?? [];
+  const pagination = ledger.data?.pagination ?? {
+    page: 1,
+    page_size: LEDGER_PAGE_SIZE,
+    total: 0,
+    total_pages: 1,
+  };
+  const pendingTopUps = (topups.data ?? []).filter(
+    (topup) => topup.status === "pending",
+  );
+  const openRefund = (refunds.data ?? []).find(
+    (refund) => refund.status === "pending",
+  );
+  const refundable = Number(summary?.refundable ?? 0);
+  const refundValue = Number(refundAmount);
+  const validRefund =
+    Number.isFinite(refundValue) &&
+    refundValue > 0 &&
+    refundValue <= refundable;
 
-  const invoices: any[] = history.data?.invoices ?? [];
-  const fees: any[] = history.data?.fees ?? [];
-  const planEntries: any[] = Array.isArray(planHistory.data)
-    ? planHistory.data
-    : [];
-  const feePerTransaction = usage.data?.fee_per_transaction ?? 20;
-  const restriction = creditRestriction(usage.data);
-  const creditLimit = Number(usage.data?.credit_limit ?? 0);
+  const noticeTone = {
+    ok: "border-emerald-200 bg-emerald-50 text-emerald-900",
+    warn: "border-amber-200 bg-amber-50 text-amber-900",
+    error: "border-red-200 bg-red-50 text-red-900",
+  };
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
       <PageHeader
-        title="Billing"
-        description="Your plan, usage, platform fees and invoices."
+        title="Wallet"
+        description={`Prepay for platform fees. ${formatNaira(fee)} is taken for each successful live payment or payout. Failed transactions and the sandbox are free.`}
       />
 
-      {restriction && (
+      {notice && (
+        <output
+          className={`flex items-start gap-3 rounded-xl border p-4 text-sm ${noticeTone[notice.tone]}`}
+        >
+          {notice.tone === "ok" ? (
+            <CheckCircle2 className="w-5 h-5 shrink-0" />
+          ) : (
+            <AlertTriangle className="w-5 h-5 shrink-0" />
+          )}
+          <p className="flex-1">{notice.text}</p>
+          <button
+            type="button"
+            onClick={() => setNotice(null)}
+            className="text-xs font-semibold underline cursor-pointer"
+          >
+            Dismiss
+          </button>
+        </output>
+      )}
+
+      {state && (
         <div
           role="alert"
-          className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-red-900"
+          className={`flex items-start gap-3 rounded-xl border p-4 ${
+            state === "empty"
+              ? "border-red-200 bg-red-50 text-red-900"
+              : "border-amber-200 bg-amber-50 text-amber-900"
+          }`}
         >
           <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
           <div className="text-sm">
             <p className="font-semibold">
-              Live payments and payouts are paused
+              {state === "empty"
+                ? "Live payments and payouts are paused"
+                : "Your wallet is running low"}
             </p>
-            <p className="mt-1 text-red-800">
-              {restriction === "locked"
-                ? "Your account is restricted because invoices are overdue. "
-                : "Your unpaid platform fees have reached your credit limit. "}
-              Sandbox is unaffected. Once your payment is received it is applied
-              to your invoices and live traffic resumes. To confirm a payment,
-              email{" "}
-              <a
-                href="mailto:support@synchgate.com"
-                className="font-semibold underline underline-offset-2"
-              >
-                support@synchgate.com
-              </a>{" "}
-              with your invoice reference.
+            <p className="mt-1">
+              {state === "empty"
+                ? "There isn't enough in your wallet to cover the fee for a new transaction. Add funds to resume. Sandbox is unaffected."
+                : `You have enough for about ${formatNumber(summary?.transactions_remaining)} more transactions. Add funds so live traffic doesn't stop.`}
             </p>
           </div>
         </div>
       )}
 
-      <Card>
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <div
-              className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                isFree
-                  ? "bg-slate-100 text-slate-500"
-                  : "bg-blue-600 text-white"
-              }`}
-            >
-              <CreditCard className="w-6 h-6" />
+      <div className="grid lg:grid-cols-5 gap-6">
+        <Card className="lg:col-span-3">
+          <p className="text-sm font-medium text-slate-500">
+            Available balance
+          </p>
+          <p className="mt-1 font-['Outfit'] text-5xl font-bold text-slate-900">
+            {formatNaira(Number(summary?.available ?? 0))}
+          </p>
+          <p className="mt-2 text-sm text-slate-500">
+            Enough for about{" "}
+            <strong className="text-slate-800">
+              {formatNumber(summary?.transactions_remaining)}
+            </strong>{" "}
+            more live transactions.
+          </p>
+
+          <dl className="mt-6 grid sm:grid-cols-3 gap-4 border-t border-slate-100 pt-5 text-sm">
+            <div>
+              <dt className="text-slate-500">Cash</dt>
+              <dd className="mt-1 font-semibold text-slate-900">
+                {formatNaira(Number(summary?.cash_balance ?? 0))}
+              </dd>
+              <dd className="text-xs text-slate-400">What you paid in</dd>
             </div>
             <div>
-              <p className="text-lg font-bold text-slate-900">
-                {planName} plan
-              </p>
-              <p className="text-sm text-slate-500">
-                {isFree
-                  ? "Free. Upgrade for a higher monthly transaction limit."
-                  : `${formatNaira(plan?.price)} a month`}
-                {subscription.data?.end_date && !isFree
-                  ? ` · renews ${formatDate(subscription.data.end_date)}`
-                  : ""}
-              </p>
+              <dt className="text-slate-500">Bonus</dt>
+              <dd className="mt-1 font-semibold text-slate-900">
+                {formatNaira(Number(summary?.bonus_balance ?? 0))}
+              </dd>
+              <dd className="text-xs text-slate-400">
+                Spent after your cash. Not refundable
+              </dd>
             </div>
-          </div>
-          {isFree && (
-            <Link
-              to="/pricing"
-              className="self-start sm:self-auto px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700"
-            >
-              Upgrade to Growth
-            </Link>
-          )}
-        </div>
+            <div>
+              <dt className="text-slate-500">Set aside</dt>
+              <dd className="mt-1 font-semibold text-slate-900">
+                {formatNaira(Number(summary?.held_amount ?? 0))}
+              </dd>
+              <dd className="text-xs text-slate-400">
+                For transactions in progress
+              </dd>
+            </div>
+          </dl>
+        </Card>
 
-        {limit > 0 && (
-          <div className="mt-6 pt-6 border-t border-slate-100">
-            <div className="flex items-center justify-between text-sm mb-2">
-              <span className="font-medium text-slate-700">
-                Successful live transactions this month
-              </span>
-              <span className="font-semibold text-slate-900">
-                {formatNumber(used)} of {formatNumber(limit)}
-              </span>
-            </div>
-            <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all ${nearLimit ? "bg-amber-500" : "bg-blue-600"}`}
-                style={{ width: `${percentUsed}%` }}
-              />
-            </div>
-            {nearLimit && (
-              <p className="text-xs text-amber-700 mt-2">
-                {percentUsed >= 100
-                  ? "You've reached your limit, so new live payments and payouts are paused until next month or an upgrade."
-                  : "You're close to your monthly limit."}
+        <Card
+          className="lg:col-span-2"
+          title="Add funds"
+          description={`Minimum ${formatNaira(minTopUp)}. You get ${bonusPercent}% extra on every top-up.`}
+        >
+          <label
+            htmlFor="topup-amount"
+            className="block text-xs font-medium text-slate-600 mb-1"
+          >
+            Amount (₦)
+          </label>
+          <input
+            id="topup-amount"
+            inputMode="numeric"
+            value={amountInput}
+            onChange={(event) =>
+              setAmountInput(event.target.value.replace(/[^\d,]/g, ""))
+            }
+            className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <div className="mt-3 flex flex-wrap gap-2">
+            {QUICK_AMOUNTS.map((quick) => (
+              <button
+                key={quick}
+                type="button"
+                onClick={() => setAmountInput(String(quick))}
+                className={`px-3 py-1 rounded-full border text-xs font-semibold cursor-pointer ${
+                  amount === quick
+                    ? "border-blue-600 bg-blue-50 text-blue-700"
+                    : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                {formatNaira(quick)}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-4 rounded-xl bg-slate-50 border border-slate-100 p-4 text-sm space-y-1.5">
+            {validAmount ? (
+              <>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">You pay</span>
+                  <span className="font-medium">{formatNaira(amount)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">
+                    Bonus ({bonusPercent}%)
+                  </span>
+                  <span className="font-medium text-emerald-600">
+                    +{formatNaira(preview.bonus)}
+                  </span>
+                </div>
+                <div className="flex justify-between border-t border-slate-200 pt-1.5">
+                  <span className="text-slate-500">Added to your wallet</span>
+                  <span className="font-semibold">
+                    {formatNaira(preview.credit)}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 pt-1">
+                  About {formatNumber(preview.transactions)} transactions at{" "}
+                  {formatNaira(fee)} each.
+                </p>
+              </>
+            ) : (
+              <p className="text-slate-500">
+                Enter at least {formatNaira(minTopUp)}.
               </p>
             )}
           </div>
-        )}
-      </Card>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          label="Platform fee per transaction"
-          value={formatNaira(feePerTransaction)}
-          hint="On each successful live payment. Payouts and sandbox are free."
-        />
-        <StatCard
-          label="Unpaid fees"
-          value={formatNaira(usage.data?.current_balance ?? 0)}
-          hint={`${formatNumber(usage.data?.pending_fee_count ?? 0)} pending, ${formatNumber(usage.data?.invoiced_fee_count ?? 0)} invoiced`}
-        />
-        <StatCard
-          label="Credit limit"
-          value={formatNaira(creditLimit)}
-          hint={`${formatNaira(usage.data?.available_credit ?? 0)} available before live traffic pauses`}
-        />
-        <StatCard
-          label="Account status"
-          value={titleCase(usage.data?.account_status ?? "active")}
-          hint="Your billing standing"
-        />
+          <button
+            type="button"
+            disabled={!validAmount || startTopUp.isPending}
+            onClick={() => {
+              setNotice(null);
+              startTopUp.mutate();
+            }}
+            className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          >
+            {startTopUp.isPending && (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            )}
+            {validAmount ? `Pay ${formatNaira(amount)}` : "Add funds"}
+          </button>
+
+          {pendingTopUps.length > 0 && (
+            <div className="mt-5 border-t border-slate-100 pt-4">
+              <p className="text-xs font-semibold text-slate-600 mb-2">
+                Waiting for payment
+              </p>
+              <ul className="space-y-2">
+                {pendingTopUps.map((topup) => (
+                  <li
+                    key={topup.id}
+                    className="flex items-center justify-between gap-3 text-xs"
+                  >
+                    <span className="text-slate-600">
+                      {formatNaira(Number(topup.amount))} ·{" "}
+                      {formatDateTime(topup.created_at)}
+                    </span>
+                    <button
+                      type="button"
+                      disabled={checkTopUp.isPending}
+                      onClick={() => checkTopUp.mutate(topup.reference)}
+                      className="font-semibold text-blue-600 hover:underline disabled:opacity-50 cursor-pointer"
+                    >
+                      Check payment
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </Card>
       </div>
 
       <Card
         padded={false}
-        title="Invoices"
-        description="Platform fees are billed on invoices."
+        title="Statement"
+        description="Every movement in your wallet, newest first."
       >
-        {history.isLoading ? (
+        {ledger.isLoading ? (
           <LoadingBlock />
-        ) : invoices.length === 0 ? (
-          <EmptyState
-            icon={<FileText className="w-6 h-6" />}
-            title="No invoices yet"
-          >
-            When your platform fees are invoiced, they appear here.
-          </EmptyState>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-slate-50 text-xs uppercase text-slate-500">
-                <tr>
-                  <th className="px-5 py-3 font-medium">Invoice</th>
-                  <th className="px-5 py-3 font-medium">Period</th>
-                  <th className="px-5 py-3 font-medium">Due</th>
-                  <th className="px-5 py-3 font-medium text-right">Amount</th>
-                  <th className="px-5 py-3 font-medium text-right">
-                    Remaining
-                  </th>
-                  <th className="px-5 py-3 font-medium">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {invoices.map((invoice) => (
-                  <tr key={invoice.id}>
-                    <td className="px-5 py-3.5 font-medium text-slate-900">
-                      {invoice.reference}
-                    </td>
-                    <td className="px-5 py-3.5 text-slate-600 whitespace-nowrap">
-                      {formatDate(invoice.period_start)} –{" "}
-                      {formatDate(invoice.period_end)}
-                    </td>
-                    <td className="px-5 py-3.5 text-slate-600 whitespace-nowrap">
-                      {formatDate(invoice.due_date)}
-                    </td>
-                    <td className="px-5 py-3.5 text-right font-medium text-slate-900">
-                      {formatNaira(invoice.amount_due)}
-                    </td>
-                    <td className="px-5 py-3.5 text-right text-slate-600">
-                      {formatNaira(invoice.amount_remaining)}
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <Pill value={invoice.status} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Card>
-
-      <Card padded={false} title="Recent platform fees">
-        {fees.length === 0 ? (
+        ) : entries.length === 0 ? (
           <EmptyState
             icon={<Receipt className="w-6 h-6" />}
-            title="No fees yet"
+            title="Nothing yet"
           >
-            A fee is recorded for each successful live transaction.
+            Top-ups and platform fees show up here.
           </EmptyState>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-slate-50 text-xs uppercase text-slate-500">
-                <tr>
-                  <th className="px-5 py-3 font-medium">Transaction</th>
-                  <th className="px-5 py-3 font-medium">Date</th>
-                  <th className="px-5 py-3 font-medium text-right">Fee</th>
-                  <th className="px-5 py-3 font-medium">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {fees.slice(0, 10).map((fee) => (
-                  <tr key={fee.id}>
-                    <td className="px-5 py-3.5 font-mono text-xs text-slate-700">
-                      {fee.transaction_id}
-                    </td>
-                    <td className="px-5 py-3.5 text-slate-600 whitespace-nowrap">
-                      {formatDate(fee.created_at)}
-                    </td>
-                    <td className="px-5 py-3.5 text-right font-medium text-slate-900">
-                      {formatNaira(fee.fee_amount)}
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <Pill value={fee.status} />
-                    </td>
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+                  <tr>
+                    <th className="px-5 py-3 font-medium">Date</th>
+                    <th className="px-5 py-3 font-medium">Activity</th>
+                    <th className="px-5 py-3 font-medium">Reference</th>
+                    <th className="px-5 py-3 font-medium text-right">Cash</th>
+                    <th className="px-5 py-3 font-medium text-right">Bonus</th>
+                    <th className="px-5 py-3 font-medium text-right">
+                      Set aside
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {entries.map((entry) => (
+                    <tr key={entry.id}>
+                      <td className="px-5 py-3.5 text-slate-600 whitespace-nowrap">
+                        {formatDateTime(entry.created_at)}
+                      </td>
+                      <td className="px-5 py-3.5 font-medium text-slate-900">
+                        {ENTRY_LABELS[entry.entry_type] ?? entry.description}
+                        {entry.entry_type === "adjustment" &&
+                          entry.description && (
+                            <span className="block text-xs font-normal text-slate-500">
+                              {entry.description}
+                            </span>
+                          )}
+                      </td>
+                      <td className="px-5 py-3.5 font-mono text-xs text-slate-600">
+                        {entry.reference || "—"}
+                      </td>
+                      <td className="px-5 py-3.5 text-right">
+                        {signed(entry.cash_delta)}
+                      </td>
+                      <td className="px-5 py-3.5 text-right">
+                        {signed(entry.bonus_delta)}
+                      </td>
+                      <td className="px-5 py-3.5 text-right text-slate-500">
+                        {signed(entry.held_delta)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <Pagination
+              page={pagination.page}
+              totalPages={pagination.total_pages}
+              total={pagination.total}
+              pageSize={pagination.page_size}
+              onChange={setLedgerPage}
+              noun="entries"
+            />
+          </>
         )}
       </Card>
 
-      <Card padded={false} title="Plan history">
-        {planEntries.length === 0 ? (
-          <EmptyState title="No plan changes yet">
-            Upgrades and cancellations appear here.
-          </EmptyState>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-slate-50 text-xs uppercase text-slate-500">
-                <tr>
-                  <th className="px-5 py-3 font-medium">Date</th>
-                  <th className="px-5 py-3 font-medium">Plan</th>
-                  <th className="px-5 py-3 font-medium text-right">Price</th>
-                  <th className="px-5 py-3 font-medium">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {planEntries.map((entry) => (
-                  <tr key={entry.id}>
-                    <td className="px-5 py-3.5 text-slate-600 whitespace-nowrap">
-                      {formatDate(entry.recorded_at)}
-                    </td>
-                    <td className="px-5 py-3.5 font-medium text-slate-900">
-                      {entry.plan?.name ?? "—"}
-                    </td>
-                    <td className="px-5 py-3.5 text-right text-slate-700">
-                      {entry.plan?.price != null
-                        ? formatNaira(entry.plan.price)
-                        : "—"}
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <Pill value={entry.status} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      <Card
+        title="Refund unused balance"
+        description="Cash you haven't used can be paid back to your bank account. Bonus credit can't be refunded."
+      >
+        <div className="grid sm:grid-cols-3 gap-4 items-end">
+          <div>
+            <p className="text-xs text-slate-500">Refundable now</p>
+            <p className="mt-1 text-xl font-bold text-slate-900">
+              {formatNaira(refundable)}
+            </p>
           </div>
+          {openRefund ? (
+            <p className="sm:col-span-2 text-sm text-slate-600">
+              Your request for{" "}
+              <strong>{formatNaira(Number(openRefund.amount))}</strong> is being
+              processed. The status here updates once it's paid.
+            </p>
+          ) : (
+            <>
+              <div>
+                <label
+                  htmlFor="refund-amount"
+                  className="block text-xs font-medium text-slate-600 mb-1"
+                >
+                  Amount (₦)
+                </label>
+                <input
+                  id="refund-amount"
+                  inputMode="decimal"
+                  value={refundAmount}
+                  onChange={(event) =>
+                    setRefundAmount(event.target.value.replace(/[^\d.]/g, ""))
+                  }
+                  disabled={refundable <= 0}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50"
+                />
+              </div>
+              <button
+                type="button"
+                disabled={!validRefund || requestRefund.isPending}
+                onClick={() => requestRefund.mutate()}
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-slate-300 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              >
+                {requestRefund.isPending && (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                )}
+                Request refund
+              </button>
+            </>
+          )}
+        </div>
+        {!openRefund && (
+          <input
+            aria-label="Note for the refund (optional)"
+            placeholder="Note (optional)"
+            value={refundNote}
+            onChange={(event) => setRefundNote(event.target.value)}
+            maxLength={255}
+            className="mt-3 w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        )}
+
+        {(refunds.data ?? []).length > 0 && (
+          <ul className="mt-5 divide-y divide-slate-100 border-t border-slate-100">
+            {(refunds.data ?? []).map((refund) => (
+              <li
+                key={refund.id}
+                className="py-3 flex items-center justify-between gap-4 text-sm"
+              >
+                <span className="text-slate-600">
+                  {formatNaira(Number(refund.amount))} ·{" "}
+                  {formatDateTime(refund.created_at)}
+                  {refund.staff_note && (
+                    <span className="block text-xs text-slate-500">
+                      {refund.staff_note}
+                    </span>
+                  )}
+                </span>
+                <Pill value={refund.status} />
+              </li>
+            ))}
+          </ul>
         )}
       </Card>
     </div>

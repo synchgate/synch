@@ -125,12 +125,15 @@ function Errors() {
             key: "403",
             cells: [
               "403",
-              "Your Client-Secret-Key is missing or invalid, your subscription does not allow the request, or your account is restricted for unpaid fees.",
+              "Your Client-Secret-Key is missing or invalid, or your account is not in live mode.",
             ],
           },
           {
-            key: "429",
-            cells: ["429", "You have reached your plan's transaction limit."],
+            key: "402",
+            cells: [
+              "402",
+              "Your wallet cannot cover the platform fee for a live transaction. Add funds to resume.",
+            ],
           },
           {
             key: "502",
@@ -215,27 +218,11 @@ function Errors() {
             ],
           },
           {
-            key: "no_active_subscription",
+            key: "insufficient_wallet_balance",
             cells: [
-              "no_active_subscription, subscription_expired, no_plan_attached",
-              "403",
-              "Live requests need an active subscription with a plan.",
-            ],
-          },
-          {
-            key: "credit_limit",
-            cells: [
-              "credit_limit_exceeded, account_restricted",
-              "403",
-              "Live payments and payouts are paused because your unpaid platform fees reached your credit limit, or your account is locked for overdue invoices. Sandbox is unaffected. Settle your invoices to resume.",
-            ],
-          },
-          {
-            key: "plan_limit",
-            cells: [
-              "free_plan_limit_reached, plan_limit_reached",
-              "429",
-              "Your plan's allowance of successful live transactions is used up. Payouts count as well as payments.",
+              "insufficient_wallet_balance",
+              "402",
+              "Live payments and payouts are paused because your wallet cannot cover the fee for a new transaction. Add funds in the dashboard. The sandbox is unaffected.",
             ],
           },
           {

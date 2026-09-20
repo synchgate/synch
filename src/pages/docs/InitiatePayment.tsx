@@ -301,19 +301,11 @@ function InitiatePayment() {
             ],
           },
           {
-            key: "subscription",
+            key: "wallet",
             cells: [
-              "403",
-              "no_active_subscription, subscription_expired, no_plan_attached",
-              "Live payments need an active subscription with a plan.",
-            ],
-          },
-          {
-            key: "limit",
-            cells: [
-              "429",
-              "free_plan_limit_reached, plan_limit_reached",
-              "You have used your plan's transaction allowance.",
+              "402",
+              "insufficient_wallet_balance",
+              "Your wallet cannot cover the fee for a live payment. Add funds in the dashboard. Sandbox needs no wallet.",
             ],
           },
         ]}

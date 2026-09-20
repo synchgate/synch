@@ -32,9 +32,9 @@ import { HeroRouter } from "../components/home/HeroRouter";
 import Navbar from "../components/Navbar";
 import {
   formatNaira,
-  GROWTH_PLAN,
+  MIN_TOPUP_NGN,
   PLATFORM_FEE_NGN,
-  STARTER_PLAN,
+  TOPUP_BONUS_PERCENT,
 } from "../config/pricing";
 
 type Provider = {
@@ -197,7 +197,7 @@ const FAQS = [
   },
   {
     q: "What does it cost?",
-    a: `The ${STARTER_PLAN.name} plan is free for up to ${STARTER_PLAN.transactions} successful transactions a month. ${GROWTH_PLAN.name} is ${formatNaira(GROWTH_PLAN.priceNgn)} a month for up to ${GROWTH_PLAN.transactions.toLocaleString("en-NG")}. A flat ${formatNaira(PLATFORM_FEE_NGN)} platform fee applies to each successful live transaction, and sandbox is free.`,
+    a: `There is no monthly fee. You fund a wallet (from ${formatNaira(MIN_TOPUP_NGN)}, with ${TOPUP_BONUS_PERCENT}% extra on every top-up) and ${formatNaira(PLATFORM_FEE_NGN)} is taken for each successful live payment or payout. Failed transactions cost nothing, unused cash can be refunded, and the sandbox is free.`,
   },
 ];
 
@@ -332,8 +332,8 @@ function LandingPage() {
             </motion.div>
 
             <p className="mt-5 text-xs text-slate-500">
-              Free plan: {STARTER_PLAN.transactions} successful transactions a
-              month · Test in the sandbox first
+              No monthly fee · {formatNaira(PLATFORM_FEE_NGN)} only on
+              successful transactions · Test in the sandbox first
             </p>
 
             <motion.div
@@ -560,56 +560,49 @@ function LandingPage() {
 
           {/* Pricing teaser */}
           <section className="border-t border-slate-200 py-28">
-            <SectionIntro
-              eyebrow="Pricing"
-              title="Start free, upgrade when you grow"
-            >
-              A monthly plan plus a flat fee on each successful live
-              transaction. Nothing is hidden, and the sandbox is always free.
+            <SectionIntro eyebrow="Pricing" title="Pay only when money moves">
+              No monthly fee. Fund a wallet and a flat fee is taken for each
+              successful live payment or payout. Nothing is hidden, and the
+              sandbox is always free.
             </SectionIntro>
 
-            <div className="mx-auto grid max-w-3xl gap-6 md:grid-cols-2">
+            <div className="mx-auto grid max-w-3xl gap-6 md:grid-cols-3">
               {[
                 {
-                  name: STARTER_PLAN.name,
-                  price: "Free",
-                  note: `${STARTER_PLAN.transactions} successful transactions a month`,
+                  price: formatNaira(PLATFORM_FEE_NGN),
+                  note: "per successful transaction, payments and payouts alike",
+                  highlight: true,
+                },
+                {
+                  price: `${TOPUP_BONUS_PERCENT}% extra`,
+                  note: `on every top-up, from ${formatNaira(MIN_TOPUP_NGN)}`,
                   highlight: false,
                 },
                 {
-                  name: GROWTH_PLAN.name,
-                  price: `${formatNaira(GROWTH_PLAN.priceNgn)}`,
-                  note: `${GROWTH_PLAN.transactions.toLocaleString("en-NG")} successful transactions a month`,
-                  highlight: true,
+                  price: "₦0",
+                  note: "for failed transactions, the sandbox and the monthly fee",
+                  highlight: false,
                 },
-              ].map((plan) => (
+              ].map((item) => (
                 <div
-                  key={plan.name}
+                  key={item.price}
                   className={`rounded-3xl border p-8 ${
-                    plan.highlight
+                    item.highlight
                       ? "border-blue-200 bg-blue-50/50"
                       : "border-slate-200 bg-white"
                   }`}
                 >
-                  <h3 className="mb-2 text-lg font-bold text-slate-900">
-                    {plan.name}
-                  </h3>
                   <p className="font-['Outfit'] text-4xl font-bold text-black">
-                    {plan.price}
-                    {plan.highlight && (
-                      <span className="ml-1 text-base font-medium text-slate-500">
-                        / month
-                      </span>
-                    )}
+                    {item.price}
                   </p>
-                  <p className="mt-3 text-sm text-slate-600">{plan.note}</p>
+                  <p className="mt-3 text-sm text-slate-600">{item.note}</p>
                 </div>
               ))}
             </div>
 
             <p className="mx-auto mt-6 max-w-3xl text-center text-sm text-slate-600">
-              Plus a flat {formatNaira(PLATFORM_FEE_NGN)} platform fee on each
-              successful live transaction.
+              Cash you haven't used can be refunded, and the fee is given back
+              if a payout is reversed.
             </p>
             <div className="mt-8 text-center">
               <Link

@@ -1,130 +1,57 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Check, Clock, LineChart, Loader2, Sparkles, Zap } from "lucide-react";
+import { ArrowRight, Check, Sparkles, Wallet } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import {
   formatNaira,
-  GROWTH_PLAN,
+  MIN_TOPUP_NGN,
   PLATFORM_FEE_NGN,
-  STARTER_PLAN,
+  TOPUP_BONUS_PERCENT,
+  topUpBreakdown,
 } from "../config/pricing";
 import { useAuth } from "../contexts/AuthContext";
-import { api } from "../lib/api";
 
-type PlanUI = {
-  key: "starter" | "growth";
-  name: string;
-  price: string;
-  unit: string;
-  volume: string;
-  description: string;
-  features: string[];
-  comingSoon?: string[];
-  tag: string;
-  icon: typeof LineChart;
-  color: "emerald" | "blue";
-  ctaText: string;
-};
-
-const PLAN_UI: PlanUI[] = [
+const STEPS = [
   {
-    key: "starter",
-    name: STARTER_PLAN.name,
-    price: "Free",
-    unit: "",
-    volume: `${STARTER_PLAN.transactions} successful transactions a month`,
-    description: "Everything you need to start collecting and sending money.",
-    features: [
-      "Payments, bank transfers and account lookup",
-      "Smart Route provider selection",
-      "Sandbox and live API keys",
-      "Transaction logs and dashboard",
-    ],
-    tag: "Free",
-    icon: LineChart,
-    color: "emerald",
-    ctaText: "Get started",
+    title: "Add funds",
+    text: `Top up your wallet from ${formatNaira(MIN_TOPUP_NGN)}. Every top-up comes with ${TOPUP_BONUS_PERCENT}% extra.`,
   },
   {
-    key: "growth",
-    name: GROWTH_PLAN.name,
-    price: formatNaira(GROWTH_PLAN.priceNgn),
-    unit: "/ month",
-    volume: `${GROWTH_PLAN.transactions.toLocaleString("en-NG")} successful transactions a month`,
-    description: "For businesses processing higher volume.",
-    features: [
-      "Everything in Starter, plus:",
-      `${GROWTH_PLAN.transactions.toLocaleString("en-NG")} successful transactions a month`,
-    ],
-    comingSoon: [
-      "Advanced analytics dashboard",
-      "Success rate by gateway, bank and time",
-      "Failure reason breakdown",
-      "Auto-retry of failed transactions",
-    ],
-    tag: "Higher volume",
-    icon: Zap,
-    color: "blue",
-    ctaText: "Upgrade to Growth",
+    title: "Go live",
+    text: "Collect payments and send payouts through the providers you already use.",
   },
+  {
+    title: "Pay only on success",
+    text: `${formatNaira(PLATFORM_FEE_NGN)} is taken when a payment or payout succeeds. Nothing is taken when one fails.`,
+  },
+];
+
+const INCLUDED = [
+  "Payments, bank transfers and account lookup",
+  "Smart Route provider selection",
+  "Sandbox and live API keys",
+  "Transaction logs and dashboard",
+  "Webhooks for payouts",
+  "Unused cash refunded on request",
 ];
 
 const BILLING_NOTES = [
-  `Starter is free. Growth is ${formatNaira(GROWTH_PLAN.priceNgn)} a month.`,
-  `A flat ${formatNaira(PLATFORM_FEE_NGN)} platform fee applies to each successful live transaction, on top of the fees your payment provider charges you.`,
-  "The sandbox is free and has no platform fee.",
-  `Starter includes ${STARTER_PLAN.transactions} successful transactions a month and Growth includes ${GROWTH_PLAN.transactions.toLocaleString("en-NG")}.`,
+  `A flat ${formatNaira(PLATFORM_FEE_NGN)} is taken for each successful live payment and each successful payout, on top of the fees your payment provider charges you.`,
+  "Failed and abandoned transactions cost nothing. The fee is set aside when a transaction starts and given back if it doesn't succeed.",
+  "If a bank sends a payout back, the fee for it is refunded.",
+  `The ${TOPUP_BONUS_PERCENT}% top-up bonus is spent after your own cash and can't be refunded. Cash you haven't used can be paid back to your bank account.`,
+  "There is no monthly fee and no contract. The sandbox is free and has no fee.",
+  "Your wallet only pays for SynchGate. Your customers' money goes straight to your own payment provider account and never passes through it.",
 ];
 
-type Plan = { id: string; tier: string };
+const QUICK_AMOUNTS = [5000, 10000, 50000];
 
 const PricingPage = () => {
   const { isAuthenticated } = useAuth();
-
-  // The plans endpoint needs a signed-in user, so only ask for it once there is one
-  const { data: plansData } = useQuery<Plan[]>({
-    queryKey: ["billing-plans"],
-    enabled: isAuthenticated,
-    queryFn: async () => {
-      const res = await api.get("/billing/plans");
-      return res.data?.data ?? res.data;
-    },
-    staleTime: 1000 * 60 * 5,
-  });
-
-  const growthPlanId =
-    (Array.isArray(plansData) ? plansData : []).find(
-      (plan) => plan.tier === "growth",
-    )?.id ?? null;
-
-  const subscribeMutation = useMutation({
-    mutationFn: async (planId: string) => {
-      const res = await api.post("/billing/subscriptions/", {
-        plan_id: planId,
-      });
-      return res.data;
-    },
-    onSuccess: (data) => {
-      const paymentUrl =
-        data?.data?.cleaned_data?.payment_url ||
-        data?.payment_url ||
-        data?.authorization_url ||
-        data?.checkout_url ||
-        data?.url;
-      if (paymentUrl) {
-        window.location.href = paymentUrl;
-      }
-    },
-  });
-
-  const handleGrowthClick = () => {
-    if (!growthPlanId) return;
-    subscribeMutation.mutate(growthPlanId);
-  };
-
-  const growthUnavailable = isAuthenticated && plansData && !growthPlanId;
+  const [amount, setAmount] = useState(10000);
+  const example = topUpBreakdown(amount);
 
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-500/30 overflow-x-hidden relative">
@@ -137,7 +64,7 @@ const PricingPage = () => {
 
       <main className="relative z-10 pt-40 pb-32">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center max-w-2xl mx-auto mb-20">
+          <div className="text-center max-w-2xl mx-auto mb-16">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -147,178 +74,140 @@ const PricingPage = () => {
               Transparent Pricing
             </motion.div>
             <h1 className="text-5xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight leading-[1.1]">
-              Start free.{" "}
-              <span className="text-blue-600">Scale when ready.</span>
+              Pay only when <span className="text-blue-600">money moves.</span>
             </h1>
             <p className="text-lg text-slate-600 font-light">
-              A monthly plan plus a small flat fee on each successful live
-              transaction. Everything is listed on this page.
+              No monthly fee. Fund a wallet, and {formatNaira(PLATFORM_FEE_NGN)}{" "}
+              is taken for each successful live payment or payout.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 max-w-4xl mx-auto">
-            {PLAN_UI.map((plan, index) => (
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-16">
+            {STEPS.map((step, index) => (
               <motion.div
-                key={plan.key}
-                initial={{ opacity: 0, y: 30 }}
+                key={step.title}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-                className="relative rounded-[2.5rem] border p-10 transition-all duration-500 overflow-hidden flex flex-col bg-white border-slate-200 shadow-xl shadow-slate-200/50 hover:border-slate-300"
+                transition={{ delay: index * 0.1 }}
+                className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm"
               >
-                <div className="absolute top-6 right-6 z-20">
-                  <div
-                    className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider shadow-lg ${
-                      plan.color === "emerald"
-                        ? "bg-emerald-500 text-white shadow-emerald-100"
-                        : "bg-blue-600 text-white shadow-blue-100"
-                    }`}
-                  >
-                    {plan.tag}
-                  </div>
-                </div>
-
-                <div
-                  className={`w-16 h-16 rounded-[1.25rem] flex items-center justify-center mb-10 shadow-sm ${
-                    plan.color === "emerald"
-                      ? "bg-emerald-600 text-white shadow-emerald-200"
-                      : "bg-blue-600 text-white shadow-blue-200"
-                  }`}
-                >
-                  <plan.icon className="w-8 h-8" />
-                </div>
-
-                <h3 className="text-3xl font-black text-slate-900 mb-4">
-                  {plan.name}
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-sm font-black text-white">
+                  {index + 1}
+                </span>
+                <h3 className="mt-4 text-lg font-black text-slate-900">
+                  {step.title}
                 </h3>
-                <p className="text-sm text-slate-500 mb-8 min-h-[50px] leading-relaxed font-medium">
-                  {plan.description}
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                  {step.text}
                 </p>
-
-                <div className="flex flex-col gap-1 mb-10">
-                  <div className="flex items-baseline gap-1">
-                    <span className="font-black text-slate-900 tracking-tighter text-5xl">
-                      {plan.price}
-                    </span>
-                    {plan.unit && (
-                      <span className="text-slate-500 font-bold text-lg">
-                        {plan.unit}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-slate-500 font-bold text-sm tracking-wide">
-                    {plan.volume}
-                  </span>
-                </div>
-
-                <div className="space-y-5 mb-8 flex-1">
-                  {plan.features.map((feature) => (
-                    <div key={feature} className="flex items-start gap-4">
-                      <div
-                        className={`mt-1 w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
-                          plan.color === "emerald"
-                            ? "bg-emerald-100 text-emerald-600"
-                            : "bg-blue-100 text-blue-600"
-                        }`}
-                      >
-                        <Check className="w-3 h-4 stroke-[4px]" />
-                      </div>
-                      <span
-                        className={`text-[15px] leading-tight ${
-                          feature.includes("Everything in")
-                            ? "font-black text-slate-900 underline decoration-blue-500/30 underline-offset-4"
-                            : "text-slate-700 font-bold"
-                        }`}
-                      >
-                        {feature}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                {plan.comingSoon && (
-                  <div className="mb-10 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5">
-                    <p className="mb-3 flex items-center gap-2 text-xs font-black uppercase tracking-wider text-slate-500">
-                      <Clock className="w-3.5 h-3.5" /> Coming soon
-                    </p>
-                    <ul className="space-y-2">
-                      {plan.comingSoon.map((item) => (
-                        <li
-                          key={item}
-                          className="text-sm font-medium text-slate-500"
-                        >
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {plan.key === "starter" ? (
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <Link
-                      to="/auth/signup"
-                      className="block w-full py-5 rounded-3xl font-black text-center text-[17px] transition-all duration-300 bg-emerald-600 text-white hover:bg-emerald-700 shadow-xl shadow-emerald-200"
-                    >
-                      {plan.ctaText}
-                    </Link>
-                  </motion.div>
-                ) : isAuthenticated ? (
-                  <motion.div
-                    whileHover={{
-                      scale: subscribeMutation.isPending ? 1 : 1.02,
-                    }}
-                    whileTap={{
-                      scale: subscribeMutation.isPending ? 1 : 0.98,
-                    }}
-                  >
-                    <button
-                      type="button"
-                      onClick={handleGrowthClick}
-                      disabled={subscribeMutation.isPending || !growthPlanId}
-                      className="w-full py-5 rounded-3xl font-black text-center text-[17px] transition-all duration-300 bg-blue-600 text-white hover:bg-blue-700 shadow-xl shadow-blue-200 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
-                    >
-                      {subscribeMutation.isPending ? (
-                        <>
-                          <Loader2 className="w-5 h-5 animate-spin" />
-                          Processing...
-                        </>
-                      ) : (
-                        plan.ctaText
-                      )}
-                    </button>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <Link
-                      to="/auth/signup"
-                      className="block w-full py-5 rounded-3xl font-black text-center text-[17px] transition-all duration-300 bg-blue-600 text-white hover:bg-blue-700 shadow-xl shadow-blue-200"
-                    >
-                      Create account to upgrade
-                    </Link>
-                  </motion.div>
-                )}
-
-                {plan.key === "growth" && subscribeMutation.isError && (
-                  <p className="text-xs text-red-500 text-center mt-3 font-medium">
-                    Something went wrong. Please try again.
-                  </p>
-                )}
-                {plan.key === "growth" && growthUnavailable && (
-                  <p className="text-xs text-red-500 text-center mt-3 font-medium">
-                    This plan is not available right now. Please contact us.
-                  </p>
-                )}
               </motion.div>
             ))}
           </div>
 
-          <div className="max-w-4xl mx-auto rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+          <div className="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto mb-16">
+            <div className="rounded-[2.5rem] border border-slate-200 bg-white p-10 shadow-xl shadow-slate-200/50">
+              <div className="mb-8 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-200">
+                <Wallet className="h-7 w-7" />
+              </div>
+              <h2 className="text-3xl font-black text-slate-900">
+                Pay as you go
+              </h2>
+              <div className="mt-4 flex items-baseline gap-2">
+                <span className="text-5xl font-black tracking-tighter text-slate-900">
+                  {formatNaira(PLATFORM_FEE_NGN)}
+                </span>
+                <span className="text-lg font-bold text-slate-500">
+                  per successful transaction
+                </span>
+              </div>
+              <ul className="mt-8 space-y-4">
+                {INCLUDED.map((item) => (
+                  <li key={item} className="flex items-start gap-3">
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                      <Check className="h-3 w-4 stroke-[4px]" />
+                    </span>
+                    <span className="text-[15px] font-bold leading-tight text-slate-700">
+                      {item}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="mt-10"
+              >
+                <Link
+                  to={isAuthenticated ? "/dashboard/billing" : "/auth/signup"}
+                  className="flex w-full items-center justify-center gap-2 rounded-3xl bg-blue-600 py-5 text-[17px] font-black text-white shadow-xl shadow-blue-200 transition-all duration-300 hover:bg-blue-700"
+                >
+                  {isAuthenticated ? "Add funds" : "Get started"}
+                  <ArrowRight className="h-5 w-5" />
+                </Link>
+              </motion.div>
+            </div>
+
+            <div className="rounded-[2.5rem] border border-slate-200 bg-slate-50 p-10">
+              <h2 className="text-xl font-black text-slate-900">
+                What a top-up buys
+              </h2>
+              <p className="mt-2 text-sm text-slate-600">
+                Choose an amount to see what lands in your wallet.
+              </p>
+
+              <div className="mt-6 flex flex-wrap gap-2">
+                {QUICK_AMOUNTS.map((quick) => (
+                  <button
+                    key={quick}
+                    type="button"
+                    onClick={() => setAmount(quick)}
+                    className={`rounded-full border px-4 py-2 text-sm font-bold cursor-pointer transition-colors ${
+                      amount === quick
+                        ? "border-blue-600 bg-blue-600 text-white"
+                        : "border-slate-300 bg-white text-slate-700 hover:border-slate-400"
+                    }`}
+                  >
+                    {formatNaira(quick)}
+                  </button>
+                ))}
+              </div>
+
+              <dl className="mt-8 space-y-3 text-sm">
+                <div className="flex justify-between">
+                  <dt className="text-slate-500">You pay</dt>
+                  <dd className="font-bold text-slate-900">
+                    {formatNaira(amount)}
+                  </dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-slate-500">
+                    Bonus ({TOPUP_BONUS_PERCENT}%)
+                  </dt>
+                  <dd className="font-bold text-emerald-600">
+                    +{formatNaira(example.bonus)}
+                  </dd>
+                </div>
+                <div className="flex justify-between border-t border-slate-200 pt-3">
+                  <dt className="text-slate-500">Added to your wallet</dt>
+                  <dd className="font-black text-slate-900">
+                    {formatNaira(example.credit)}
+                  </dd>
+                </div>
+              </dl>
+
+              <div className="mt-8 rounded-2xl bg-white p-5 text-center border border-slate-200">
+                <p className="text-4xl font-black text-blue-600">
+                  {example.transactions.toLocaleString("en-NG")}
+                </p>
+                <p className="mt-1 text-sm font-medium text-slate-600">
+                  successful transactions at {formatNaira(PLATFORM_FEE_NGN)}{" "}
+                  each
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="max-w-5xl mx-auto rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
             <h2 className="mb-4 text-xl font-black text-slate-900">
               How billing works
             </h2>
