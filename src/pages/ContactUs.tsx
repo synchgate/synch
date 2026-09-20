@@ -12,7 +12,9 @@ export default function ContactUs() {
     phone: "",
     details: "",
   });
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (
@@ -48,8 +50,8 @@ export default function ContactUs() {
       console.error("Contact form error:", error);
       setStatus("error");
       setErrorMessage(
-        error.response?.data?.message || 
-        "Something went wrong. Please try again later."
+        error.response?.data?.message ||
+          "Something went wrong. Please try again later.",
       );
     }
   };
@@ -89,9 +91,12 @@ export default function ContactUs() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Message Sent!</h2>
+                    <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+                      Message Sent!
+                    </h2>
                     <p className="text-slate-600 max-w-xs mx-auto leading-relaxed">
-                      Thank you for reaching out. Our team will get back to you as soon as possible.
+                      Thank you for reaching out. Our team will get back to you
+                      as soon as possible.
                     </p>
                   </div>
                   <button
@@ -109,7 +114,7 @@ export default function ContactUs() {
                       <p className="text-sm font-medium">{errorMessage}</p>
                     </div>
                   )}
-                  
+
                   <div className="space-y-6">
                     <div className="flex flex-col gap-2">
                       <label
@@ -170,44 +175,44 @@ export default function ContactUs() {
                     </div>
                   </div>
 
-                <div className="flex flex-col gap-2 pt-2">
-                  <label
-                    htmlFor="details"
-                    className="text-[13px] font-semibold text-slate-800 tracking-wide"
-                  >
-                    Give us details on your interest in SynchGate. *
-                  </label>
-                  <textarea
-                    id="details"
-                    name="details"
-                    value={form.details}
-                    onChange={handleChange}
-                    required
-                    rows={6}
-                    className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white resize-none text-[15px]"
-                  ></textarea>
-                </div>
+                  <div className="flex flex-col gap-2 pt-2">
+                    <label
+                      htmlFor="details"
+                      className="text-[13px] font-semibold text-slate-800 tracking-wide"
+                    >
+                      Give us details on your interest in SynchGate. *
+                    </label>
+                    <textarea
+                      id="details"
+                      name="details"
+                      value={form.details}
+                      onChange={handleChange}
+                      required
+                      rows={6}
+                      className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white resize-none text-[15px]"
+                    ></textarea>
+                  </div>
 
-                <div className="pt-4">
-                  <button
-                    type="submit"
-                    disabled={status === "loading"}
-                    className="w-full bg-[#007edc] hover:bg-[#006bbd] text-white font-medium py-[10px] px-6 rounded-lg transition-all shadow-sm text-[15px] flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed active:scale-[0.98]"
-                  >
-                    {status === "loading" ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Sending...
-                      </>
-                    ) : (
-                      "Send Message"
-                    )}
-                  </button>
-                </div>
-              </form>
-            )}
+                  <div className="pt-4">
+                    <button
+                      type="submit"
+                      disabled={status === "loading"}
+                      className="w-full bg-[#007edc] hover:bg-[#006bbd] text-white font-medium py-[10px] px-6 rounded-lg transition-all shadow-sm text-[15px] flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed active:scale-[0.98]"
+                    >
+                      {status === "loading" ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Sending...
+                        </>
+                      ) : (
+                        "Send Message"
+                      )}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
           </div>
-        </div>
         </div>
       </main>
 

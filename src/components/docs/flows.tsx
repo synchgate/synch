@@ -547,7 +547,8 @@ export const transferFlow: Flow = {
         {
           from: "synch",
           to: "synch",
-          label: "Checks your key, your plan and that the reference is unused",
+          label:
+            "Checks your key, your wallet and that the reference is unused",
         },
         {
           from: "synch",

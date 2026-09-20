@@ -30,7 +30,7 @@ const SupportTicket = () => {
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    >,
   ) => {
     const { id, value } = e.target;
     setForm((prev) => ({ ...prev, [id]: value }));
@@ -54,7 +54,7 @@ const SupportTicket = () => {
       setIsSubmitting(false);
       setError(
         err.response?.data?.message ||
-          "Failed to create support ticket. Please try again."
+          "Failed to create support ticket. Please try again.",
       );
     }
   };

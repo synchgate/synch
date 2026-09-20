@@ -23,7 +23,12 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { useAuth } from "../contexts/AuthContext";
 import { api } from "../lib/api";
-import { creditRestriction, unwrap } from "../lib/dashboard";
+import {
+  formatNaira,
+  unwrap,
+  type WalletSummary,
+  walletState,
+} from "../lib/dashboard";
 
 type NavEntry = {
   to: string;
@@ -64,7 +69,7 @@ const NAV_GROUPS: { heading?: string; items: NavEntry[] }[] = [
   {
     heading: "Account",
     items: [
-      { to: "/dashboard/billing", label: "Billing", icon: CreditCard },
+      { to: "/dashboard/billing", label: "Wallet", icon: CreditCard },
       { to: "/dashboard/settings", label: "Settings", icon: Settings },
       {
         to: "/dashboard/support-ticket",
@@ -96,18 +101,15 @@ function Dashboard() {
       : location.pathname === entry.to ||
         location.pathname.startsWith(`${entry.to}/`);
 
-  // Shared with the Billing page, so this costs no extra request there
-  const { data: usage } = useQuery({
-    queryKey: ["billing-usage", userEmail],
-    queryFn: async () => unwrap<any>(await api.get("/billing/usage/")),
+  // Shared with the Wallet page, so this costs no extra request there
+  const { data: wallet } = useQuery({
+    queryKey: ["wallet", userEmail],
+    queryFn: async () => unwrap<WalletSummary>(await api.get("/wallet/")),
     enabled: !!userEmail,
     retry: false,
     staleTime: 60_000,
   });
-  const restriction = creditRestriction(usage);
-  const planName: string | undefined = usage?.plan;
-  const onFreePlan =
-    !planName || ["free", "starter"].includes(planName.toLowerCase());
+  const walletStatus = walletState(wallet);
 
   const getInitials = (name: string) => {
     if (!name) return "UU";
@@ -320,20 +322,20 @@ function Dashboard() {
         </nav>
 
         <div className="p-4 border-t border-slate-100 space-y-3 shrink-0">
-          {planName && (
+          {wallet && (
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-              <p className="text-xs text-slate-500">Current plan</p>
-              <p className="text-sm font-semibold text-slate-900">
-                {onFreePlan ? "Starter (free)" : planName}
+              <p className="text-xs text-slate-500">Wallet balance</p>
+              <p
+                className={`text-sm font-semibold ${walletStatus === "empty" ? "text-red-600" : "text-slate-900"}`}
+              >
+                {formatNaira(Number(wallet.available))}
               </p>
-              {onFreePlan && (
-                <Link
-                  to="/pricing"
-                  className="mt-2 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-colors"
-                >
-                  <Sparkles className="w-3.5 h-3.5" /> Upgrade
-                </Link>
-              )}
+              <Link
+                to="/dashboard/billing"
+                className="mt-2 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-colors"
+              >
+                <Sparkles className="w-3.5 h-3.5" /> Add funds
+              </Link>
             </div>
           )}
           <button
@@ -452,19 +454,28 @@ function Dashboard() {
           )
         )}
 
-        {restriction && (
-          <div className="bg-red-600 px-4 py-2 text-white text-xs sm:text-sm flex flex-wrap items-center justify-center gap-x-3 gap-y-1 shrink-0">
+        {walletStatus && (
+          <div
+            className={`px-4 py-2 text-white text-xs sm:text-sm flex flex-wrap items-center justify-center gap-x-3 gap-y-1 shrink-0 ${walletStatus === "empty" ? "bg-red-600" : "bg-amber-600"}`}
+          >
             <span>
-              <strong>Live payments and payouts are paused.</strong>{" "}
-              {restriction === "locked"
-                ? "Your account is restricted because invoices are overdue."
-                : "Your unpaid platform fees have reached your credit limit."}
+              {walletStatus === "empty" ? (
+                <>
+                  <strong>Live payments and payouts are paused.</strong> Your
+                  wallet can't cover the fee for a new transaction.
+                </>
+              ) : (
+                <>
+                  <strong>Your wallet is running low.</strong> About{" "}
+                  {wallet?.transactions_remaining} live transactions left.
+                </>
+              )}
             </span>
             <Link
               to="/dashboard/billing"
-              className="bg-white text-red-600 px-3 py-1 rounded-full font-semibold hover:bg-red-50 transition-colors text-xs whitespace-nowrap"
+              className="bg-white text-slate-900 px-3 py-1 rounded-full font-semibold hover:bg-slate-100 transition-colors text-xs whitespace-nowrap"
             >
-              View billing
+              Add funds
             </Link>
           </div>
         )}

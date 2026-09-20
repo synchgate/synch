@@ -81,20 +81,32 @@ export const titleCase = (value?: string | null) =>
     ? value.charAt(0).toUpperCase() + value.slice(1).replace(/_/g, " ")
     : "—";
 
+/** The wallet as `GET /wallet/` returns it. Money arrives as strings, so convert before comparing. */
+export type WalletSummary = {
+  cash_balance: string | number;
+  bonus_balance: string | number;
+  held_amount: string | number;
+  available: string | number;
+  refundable: string | number;
+  fee_per_transaction: string | number;
+  transactions_remaining: number;
+  min_topup: string | number;
+  topup_bonus_percent: string | number;
+};
+
+/** Below this many transactions' worth of balance, the dashboard starts warning. */
+export const LOW_BALANCE_TRANSACTIONS = 25;
+
 /**
- * Why live transactions are being refused on credit grounds, or null when they are not.
- * Mirrors the backend check: a locked or suspended account, or unpaid fees at the credit limit.
+ * How the wallet stands for live traffic: `empty` when live payments and payouts are refused,
+ * `low` when they are close to being, otherwise null. Mirrors the backend check.
  */
-export function creditRestriction(usage?: {
-  account_status?: string;
-  current_balance?: number | string;
-  credit_limit?: number | string;
-}): "locked" | "limit" | null {
-  if (!usage) return null;
-  const status = (usage.account_status ?? "active").toLowerCase();
-  if (status !== "active") return "locked";
-  const limit = Number(usage.credit_limit ?? 0);
-  return limit > 0 && Number(usage.current_balance ?? 0) >= limit
-    ? "limit"
+export function walletState(wallet?: WalletSummary): "empty" | "low" | null {
+  if (!wallet) return null;
+  if (Number(wallet.available) < Number(wallet.fee_per_transaction)) {
+    return "empty";
+  }
+  return wallet.transactions_remaining <= LOW_BALANCE_TRANSACTIONS
+    ? "low"
     : null;
 }

@@ -90,7 +90,6 @@ function Settings() {
     }
   }, [providers.length]);
 
-
   const firstName =
     settingsData?.profile?.first_name || settingsData?.first_name || "";
   const lastName =

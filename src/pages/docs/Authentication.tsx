@@ -85,7 +85,7 @@ function Authentication() {
             cells: [
               "synch_sk_live_",
               "Live",
-              "Real transactions. Only works once your account is in live mode and has an active subscription.",
+              "Real transactions. Only works once your account is in live mode. Each successful transaction is paid for from your wallet.",
             ],
           },
         ]}
