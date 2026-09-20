@@ -153,8 +153,10 @@ const CONDITION_CONFIG: Record<
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function getConditionSummary(c: Rule["conditions"][number]): string {
-  if (c.condition_type === "time_of_day") return `${c.time_start} — ${c.time_end}`;
-  if (c.condition_type === "amount_range") return `${c.amount_min} — ${c.amount_max}`;
+  if (c.condition_type === "time_of_day")
+    return `${c.time_start} — ${c.time_end}`;
+  if (c.condition_type === "amount_range")
+    return `${c.amount_min} — ${c.amount_max}`;
   if (c.condition_type === "currency") return c.currencies || "";
   return "";
 }
@@ -173,7 +175,8 @@ function Providers() {
 
   // ── Policy / Rule modal state ───────────────────────────────────────────────
   const [policiesModalOpen, setPoliciesModalOpen] = useState(false);
-  const [policyView, setPolicyView] = useState<PolicyModalView>("policies-list");
+  const [policyView, setPolicyView] =
+    useState<PolicyModalView>("policies-list");
   const [selectedPolicy, setSelectedPolicy] = useState<Policy | null>(null);
   const [selectedRule, setSelectedRule] = useState<Rule | null>(null);
   const [policyForm, setPolicyForm] = useState<PolicyForm>(DEFAULT_POLICY_FORM);
@@ -266,24 +269,26 @@ function Providers() {
     useMutation({
       mutationFn: async (payload: PolicyForm) => {
         const token = localStorage.getItem("authToken");
-        const response = await api.post(
-          "/merchants/policies/",
-          payload,
-          { headers: { Authorization: `Bearer ${token}` } },
-        );
+        const response = await api.post("/merchants/policies/", payload, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         return response.data;
       },
     });
 
   const { mutateAsync: updatePolicy, isPending: isUpdatingPolicy } =
     useMutation({
-      mutationFn: async ({ id, payload }: { id: string; payload: PolicyForm }) => {
+      mutationFn: async ({
+        id,
+        payload,
+      }: {
+        id: string;
+        payload: PolicyForm;
+      }) => {
         const token = localStorage.getItem("authToken");
-        const response = await api.put(
-          `/merchants/policies/${id}/`,
-          payload,
-          { headers: { Authorization: `Bearer ${token}` } },
-        );
+        const response = await api.put(`/merchants/policies/${id}/`, payload, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         return response.data;
       },
     });
@@ -341,7 +346,13 @@ function Providers() {
   const rules: Rule[] = rulesData?.data || rulesData || [];
 
   const { mutateAsync: createRule, isPending: isCreatingRule } = useMutation({
-    mutationFn: async ({ policyId, payload }: { policyId: string; payload: any }) => {
+    mutationFn: async ({
+      policyId,
+      payload,
+    }: {
+      policyId: string;
+      payload: any;
+    }) => {
       const token = localStorage.getItem("authToken");
       const response = await api.post(
         `/merchants/policies/${policyId}/rules/`,
@@ -381,10 +392,9 @@ function Providers() {
       ruleId: string;
     }) => {
       const token = localStorage.getItem("authToken");
-      await api.delete(
-        `/merchants/policies/${policyId}/rules/${ruleId}/`,
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
+      await api.delete(`/merchants/policies/${policyId}/rules/${ruleId}/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
     },
   });
 
@@ -452,7 +462,9 @@ function Providers() {
         credential_type: "api_key",
         credentials,
       });
-      await queryClient.invalidateQueries({ queryKey: ["settings", userEmail] });
+      await queryClient.invalidateQueries({
+        queryKey: ["settings", userEmail],
+      });
       closeEnvModal();
     } catch (error) {
       console.error("Failed to setup provider:", error);
@@ -546,7 +558,10 @@ function Providers() {
       if (selectedPolicy?.id === policy.id) {
         setSelectedPolicy((prev) =>
           prev
-            ? { ...prev, status: prev.status === "active" ? "inactive" : "active" }
+            ? {
+                ...prev,
+                status: prev.status === "active" ? "inactive" : "active",
+              }
             : prev,
         );
       }
@@ -656,7 +671,6 @@ function Providers() {
         })),
       };
 
-
       if (policyView === "edit-rule" && selectedRule) {
         await updateRule({
           policyId: selectedPolicy.id,
@@ -677,7 +691,10 @@ function Providers() {
     if (!ruleToDelete || !selectedPolicy) return;
     setIsDeletingRule(true);
     try {
-      await deleteRule({ policyId: selectedPolicy.id, ruleId: ruleToDelete.id });
+      await deleteRule({
+        policyId: selectedPolicy.id,
+        ruleId: ruleToDelete.id,
+      });
       await refetchRules();
       setRuleToDelete(null);
     } catch (error) {
@@ -721,7 +738,6 @@ function Providers() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-
       {/* Page Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -729,7 +745,8 @@ function Providers() {
             Providers &amp; Routing
           </h1>
           <p className="text-slate-600 text-sm sm:text-base">
-            Connect your payment providers and decide how payments are routed between them.
+            Connect your payment providers and decide how payments are routed
+            between them.
           </p>
         </div>
         <button
@@ -824,7 +841,11 @@ function Providers() {
                         <button
                           type="button"
                           onClick={() =>
-                            openEnvModal(config.provider, "sandbox", config.testSecretKey)
+                            openEnvModal(
+                              config.provider,
+                              "sandbox",
+                              config.testSecretKey,
+                            )
                           }
                           className="flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-blue-600 transition-colors cursor-pointer"
                         >
@@ -834,7 +855,12 @@ function Providers() {
                         <button
                           type="button"
                           onClick={() =>
-                            openEnvModal(config.provider, "sandbox", undefined, true)
+                            openEnvModal(
+                              config.provider,
+                              "sandbox",
+                              undefined,
+                              true,
+                            )
                           }
                           className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors cursor-pointer"
                         >
@@ -867,7 +893,11 @@ function Providers() {
                         <button
                           type="button"
                           onClick={() =>
-                            openEnvModal(config.provider, "live", config.liveSecretKey)
+                            openEnvModal(
+                              config.provider,
+                              "live",
+                              config.liveSecretKey,
+                            )
                           }
                           className="flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-blue-600 transition-colors cursor-pointer"
                         >
@@ -877,7 +907,12 @@ function Providers() {
                         <button
                           type="button"
                           onClick={() =>
-                            openEnvModal(config.provider, "live", undefined, true)
+                            openEnvModal(
+                              config.provider,
+                              "live",
+                              undefined,
+                              true,
+                            )
                           }
                           className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors cursor-pointer"
                         >
@@ -908,7 +943,9 @@ function Providers() {
 
       {/* Smart Route summary */}
       {(() => {
-        const activePolicy = policies.find((policy) => policy.status === "active");
+        const activePolicy = policies.find(
+          (policy) => policy.status === "active",
+        );
         const activeRules = [...(activePolicy?.rules ?? [])]
           .filter((rule) => rule.is_active)
           .sort((a, b) => a.priority - b.priority);
@@ -917,9 +954,12 @@ function Providers() {
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="px-6 py-5 border-b border-slate-200 flex items-center justify-between gap-4">
               <div>
-                <h3 className="text-sm font-semibold text-slate-900">Smart Route</h3>
+                <h3 className="text-sm font-semibold text-slate-900">
+                  Smart Route
+                </h3>
                 <p className="text-xs text-slate-500 mt-1">
-                  Used by payments sent to the Smart Route endpoint, where you don't name a provider.{" "}
+                  Used by payments sent to the Smart Route endpoint, where you
+                  don't name a provider.{" "}
                   <a
                     href="/docs/smart-routes"
                     target="_blank"
@@ -940,28 +980,35 @@ function Providers() {
             </div>
 
             {isLoadingPolicies ? (
-              <div className="p-8 text-center text-sm text-slate-500">Loading routing policies…</div>
+              <div className="p-8 text-center text-sm text-slate-500">
+                Loading routing policies…
+              </div>
             ) : !activePolicy ? (
               <div className="p-6 text-sm text-slate-600 space-y-2">
-                <p className="font-medium text-slate-900">No active routing policy</p>
+                <p className="font-medium text-slate-900">
+                  No active routing policy
+                </p>
                 <p>
-                  Without one, Smart Route picks whichever of your providers has the best success
-                  rate over the last hour. This needs at least two connected providers. Create a
-                  policy to route by amount, currency or time of day instead.
+                  Without one, Smart Route picks whichever of your providers has
+                  the best success rate over the last hour. This needs at least
+                  two connected providers. Create a policy to route by amount,
+                  currency or time of day instead.
                 </p>
               </div>
             ) : (
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <span className="text-sm font-semibold text-slate-900">{activePolicy.name}</span>
+                  <span className="text-sm font-semibold text-slate-900">
+                    {activePolicy.name}
+                  </span>
                   <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-wider">
                     Active
                   </span>
                 </div>
                 {activeRules.length === 0 ? (
                   <p className="text-sm text-slate-500">
-                    This policy has no active rules yet, so Smart Route falls back to provider
-                    success rates.
+                    This policy has no active rules yet, so Smart Route falls
+                    back to provider success rates.
                   </p>
                 ) : (
                   <ol className="space-y-2">
@@ -973,7 +1020,9 @@ function Providers() {
                         <span className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center shrink-0">
                           {index + 1}
                         </span>
-                        <span className="font-medium text-slate-900 flex-1 truncate">{rule.name}</span>
+                        <span className="font-medium text-slate-900 flex-1 truncate">
+                          {rule.name}
+                        </span>
                         <span className="text-slate-500 hidden sm:block">
                           {rule.condition_count === 0
                             ? "any payment"
@@ -987,8 +1036,8 @@ function Providers() {
                   </ol>
                 )}
                 <p className="text-xs text-slate-500 mt-4">
-                  Rules are checked in order and the first match wins. If none match, providers are
-                  compared on recent success rate.
+                  Rules are checked in order and the first match wins. If none
+                  match, providers are compared on recent success rate.
                 </p>
               </div>
             )}
@@ -1047,7 +1096,9 @@ function Providers() {
                   <div className="flex items-center gap-2 px-3 py-2.5 border border-slate-200 rounded-xl bg-slate-100 text-slate-700 text-sm">
                     <Key className="w-4 h-4 text-blue-600" />
                     <span className="font-medium">{envModal.provider}</span>
-                    <span className="ml-auto text-xs text-slate-400">Locked</span>
+                    <span className="ml-auto text-xs text-slate-400">
+                      Locked
+                    </span>
                   </div>
                 ) : (
                   <select
@@ -1059,7 +1110,9 @@ function Providers() {
                     className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-slate-50 text-slate-900 transition-colors text-sm appearance-none cursor-pointer"
                   >
                     {AVAILABLE_PROVIDERS.map((p) => {
-                      const alreadyAdded = apiKeys.some((k) => k.provider === p);
+                      const alreadyAdded = apiKeys.some(
+                        (k) => k.provider === p,
+                      );
                       return (
                         <option key={p} value={p} disabled={alreadyAdded}>
                           {p}
@@ -1118,33 +1171,46 @@ function Providers() {
               {envModal.provider === "Nomba" ? (
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor="grant-type" className="block text-sm font-medium text-slate-700 mb-2">
+                    <label
+                      htmlFor="grant-type"
+                      className="block text-sm font-medium text-slate-700 mb-2"
+                    >
                       Grant Type
                     </label>
                     <input
                       id="grant-type"
                       type="text"
                       value={envModal.grantType}
-                      onChange={(e) => setEnvModal({ ...envModal, grantType: e.target.value })}
+                      onChange={(e) =>
+                        setEnvModal({ ...envModal, grantType: e.target.value })
+                      }
                       placeholder="e.g. client_credentials"
                       className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white text-slate-900 sm:text-sm"
                     />
                   </div>
                   <div>
-                    <label htmlFor="client-id" className="block text-sm font-medium text-slate-700 mb-2">
+                    <label
+                      htmlFor="client-id"
+                      className="block text-sm font-medium text-slate-700 mb-2"
+                    >
                       Client ID
                     </label>
                     <input
                       id="client-id"
                       type="text"
                       value={envModal.clientId}
-                      onChange={(e) => setEnvModal({ ...envModal, clientId: e.target.value })}
+                      onChange={(e) =>
+                        setEnvModal({ ...envModal, clientId: e.target.value })
+                      }
                       placeholder="Enter Client ID"
                       className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white text-slate-900 sm:text-sm"
                     />
                   </div>
                   <div>
-                    <label htmlFor="client-secret" className="block text-sm font-medium text-slate-700 mb-2">
+                    <label
+                      htmlFor="client-secret"
+                      className="block text-sm font-medium text-slate-700 mb-2"
+                    >
                       Client Secret
                     </label>
                     <div className="relative">
@@ -1152,7 +1218,12 @@ function Providers() {
                         id="client-secret"
                         type={showKey ? "text" : "password"}
                         value={envModal.clientSecret}
-                        onChange={(e) => setEnvModal({ ...envModal, clientSecret: e.target.value })}
+                        onChange={(e) =>
+                          setEnvModal({
+                            ...envModal,
+                            clientSecret: e.target.value,
+                          })
+                        }
                         placeholder="Enter Client Secret"
                         className="block w-full px-3 py-2.5 pr-10 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white text-slate-900 sm:text-sm"
                       />
@@ -1162,19 +1233,28 @@ function Providers() {
                         className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
                         tabIndex={-1}
                       >
-                        {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {showKey ? (
+                          <EyeOff className="w-4 h-4" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
                       </button>
                     </div>
                   </div>
                   <div>
-                    <label htmlFor="account-id" className="block text-sm font-medium text-slate-700 mb-2">
+                    <label
+                      htmlFor="account-id"
+                      className="block text-sm font-medium text-slate-700 mb-2"
+                    >
                       Account ID
                     </label>
                     <input
                       id="account-id"
                       type="text"
                       value={envModal.accountId}
-                      onChange={(e) => setEnvModal({ ...envModal, accountId: e.target.value })}
+                      onChange={(e) =>
+                        setEnvModal({ ...envModal, accountId: e.target.value })
+                      }
                       placeholder="Enter Account ID"
                       className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white text-slate-900 sm:text-sm"
                     />
@@ -1182,7 +1262,10 @@ function Providers() {
                 </div>
               ) : (
                 <div>
-                  <label htmlFor="secret-key" className="block text-sm font-medium text-slate-700 mb-2">
+                  <label
+                    htmlFor="secret-key"
+                    className="block text-sm font-medium text-slate-700 mb-2"
+                  >
                     Secret Key
                   </label>
                   <div className="relative">
@@ -1222,12 +1305,17 @@ function Providers() {
                       className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
                       tabIndex={-1}
                     >
-                      {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showKey ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
                     </button>
                   </div>
                   {envModal.isEdit && (
                     <p className="mt-2 text-xs text-slate-400">
-                      Clear the field and enter a new key. Key must be more than 10 characters.
+                      Clear the field and enter a new key. Key must be more than
+                      10 characters.
                     </p>
                   )}
                 </div>
@@ -1292,11 +1380,13 @@ function Providers() {
               <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-4">
                 <Trash2 className="w-6 h-6" />
               </div>
-              <h3 className="font-semibold text-slate-900 mb-1">Remove Integration</h3>
+              <h3 className="font-semibold text-slate-900 mb-1">
+                Remove Integration
+              </h3>
               <p className="text-sm text-slate-500 mb-6">
                 Are you sure you want to remove the{" "}
-                <span className="font-semibold">{keyToDelete}</span> integration?
-                You can re-add it later.
+                <span className="font-semibold">{keyToDelete}</span>{" "}
+                integration? You can re-add it later.
               </p>
               <div className="flex items-center gap-3">
                 <button
@@ -1331,13 +1421,14 @@ function Providers() {
           <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" />
 
           <div className="relative bg-white rounded-2xl w-full max-w-xl overflow-hidden shadow-xl animate-in zoom-in-95 duration-200">
-
             {/* ── VIEW: policies-list ─────────────────────────────────────────── */}
             {policyView === "policies-list" && (
               <>
                 <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
                   <div>
-                    <h3 className="font-semibold text-slate-900">Routing Policies</h3>
+                    <h3 className="font-semibold text-slate-900">
+                      Routing Policies
+                    </h3>
                     <p className="text-xs text-slate-500 mt-0.5">
                       Click a policy to manage its rules.
                     </p>
@@ -1371,7 +1462,9 @@ function Providers() {
                       <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mb-4">
                         <Shield className="w-6 h-6 text-slate-400" />
                       </div>
-                      <p className="font-medium text-slate-900 mb-1">No policies yet</p>
+                      <p className="font-medium text-slate-900 mb-1">
+                        No policies yet
+                      </p>
                       <p className="text-sm text-slate-500">
                         Click "Add Policy" to create your first routing policy.
                       </p>
@@ -1407,7 +1500,9 @@ function Providers() {
                                           : "bg-slate-400"
                                       }`}
                                     />
-                                    {policy.status === "active" ? "Active" : "Inactive"}
+                                    {policy.status === "active"
+                                      ? "Active"
+                                      : "Inactive"}
                                   </span>
                                 </div>
                                 <p className="text-xs text-slate-500 line-clamp-1">
@@ -1468,7 +1563,8 @@ function Providers() {
 
                 <div className="px-6 py-3 border-t border-slate-100 bg-slate-50 rounded-b-2xl">
                   <p className="text-[11px] text-slate-400">
-                    {policies.length} {policies.length === 1 ? "policy" : "policies"} configured
+                    {policies.length}{" "}
+                    {policies.length === 1 ? "policy" : "policies"} configured
                   </p>
                 </div>
               </>
@@ -1487,7 +1583,9 @@ function Providers() {
                   </button>
                   <div>
                     <h3 className="font-semibold text-slate-900">
-                      {policyView === "edit-policy" ? "Edit Policy" : "New Policy"}
+                      {policyView === "edit-policy"
+                        ? "Edit Policy"
+                        : "New Policy"}
                     </h3>
                     <p className="text-xs text-slate-500 mt-0.5">
                       {policyView === "edit-policy"
@@ -1535,7 +1633,10 @@ function Providers() {
                       id="policy-desc"
                       value={policyForm.description}
                       onChange={(e) =>
-                        setPolicyForm({ ...policyForm, description: e.target.value })
+                        setPolicyForm({
+                          ...policyForm,
+                          description: e.target.value,
+                        })
                       }
                       placeholder="Describe what this policy does..."
                       rows={4}
@@ -1556,9 +1657,7 @@ function Providers() {
                     type="button"
                     onClick={handleSavePolicy}
                     disabled={
-                      !isPolicyFormValid ||
-                      isCreatingPolicy ||
-                      isUpdatingPolicy
+                      !isPolicyFormValid || isCreatingPolicy || isUpdatingPolicy
                     }
                     className="px-5 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm shadow-blue-500/20 text-sm flex items-center gap-2"
                   >
@@ -1609,7 +1708,9 @@ function Providers() {
                                 : "bg-slate-400"
                             }`}
                           />
-                          {selectedPolicy.status === "active" ? "Active" : "Inactive"}
+                          {selectedPolicy.status === "active"
+                            ? "Active"
+                            : "Inactive"}
                         </span>
                       </div>
                       <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">
@@ -1631,7 +1732,9 @@ function Providers() {
                   <div className="px-6 py-4 flex items-center justify-between border-b border-slate-100">
                     <div className="flex items-center gap-2">
                       <ListFilter className="w-4 h-4 text-slate-400" />
-                      <span className="text-sm font-medium text-slate-700">Rules</span>
+                      <span className="text-sm font-medium text-slate-700">
+                        Rules
+                      </span>
                       {!isLoadingRules && (
                         <span className="text-xs text-slate-400">
                           ({rules.length} / 3)
@@ -1697,7 +1800,8 @@ function Providers() {
                               {(rule.conditions || []).length > 0 && (
                                 <div className="flex flex-wrap gap-1.5">
                                   {rule.conditions.map((c, i) => {
-                                    const cfg = CONDITION_CONFIG[c.condition_type];
+                                    const cfg =
+                                      CONDITION_CONFIG[c.condition_type];
                                     if (!cfg) return null;
                                     const summary = getConditionSummary(c);
                                     return (
@@ -1763,7 +1867,9 @@ function Providers() {
                     <h3 className="font-semibold text-slate-900">
                       {policyView === "edit-rule" ? "Edit Rule" : "Add Rule"}
                     </h3>
-                    <p className="text-xs text-slate-500 mt-0.5">{selectedPolicy?.name}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      {selectedPolicy?.name}
+                    </p>
                   </div>
                   <button
                     type="button"
@@ -1776,17 +1882,21 @@ function Providers() {
 
                 {/* Form body */}
                 <div className="p-6 space-y-5 overflow-y-auto max-h-[62vh]">
-
                   {/* Name */}
                   <div>
-                    <label htmlFor="rule-name" className="block text-sm font-medium text-slate-700 mb-2">
+                    <label
+                      htmlFor="rule-name"
+                      className="block text-sm font-medium text-slate-700 mb-2"
+                    >
                       Rule Name
                     </label>
                     <input
                       id="rule-name"
                       type="text"
                       value={ruleForm.name}
-                      onChange={(e) => setRuleForm({ ...ruleForm, name: e.target.value })}
+                      onChange={(e) =>
+                        setRuleForm({ ...ruleForm, name: e.target.value })
+                      }
                       placeholder="e.g. High-value card routing"
                       className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white text-slate-900 sm:text-sm"
                       autoFocus
@@ -1796,35 +1906,52 @@ function Providers() {
                   {/* Priority + Provider row */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="rule-priority" className="block text-sm font-medium text-slate-700 mb-2">
+                      <label
+                        htmlFor="rule-priority"
+                        className="block text-sm font-medium text-slate-700 mb-2"
+                      >
                         Priority
                       </label>
                       <select
                         id="rule-priority"
                         value={ruleForm.priority}
-                        onChange={(e) => setRuleForm({ ...ruleForm, priority: e.target.value })}
+                        onChange={(e) =>
+                          setRuleForm({ ...ruleForm, priority: e.target.value })
+                        }
                         className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white text-slate-900 sm:text-sm appearance-none cursor-pointer"
                       >
-                        {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
-                          <option key={n} value={n}>
-                            {n}
-                          </option>
-                        ))}
+                        {Array.from({ length: 10 }, (_, i) => i + 1).map(
+                          (n) => (
+                            <option key={n} value={n}>
+                              {n}
+                            </option>
+                          ),
+                        )}
                       </select>
                     </div>
                     <div>
-                      <label htmlFor="rule-provider" className="block text-sm font-medium text-slate-700 mb-2">
+                      <label
+                        htmlFor="rule-provider"
+                        className="block text-sm font-medium text-slate-700 mb-2"
+                      >
                         Provider
                       </label>
                       <select
                         id="rule-provider"
                         value={ruleForm.provider}
-                        onChange={(e) => setRuleForm({ ...ruleForm, provider: e.target.value })}
+                        onChange={(e) =>
+                          setRuleForm({ ...ruleForm, provider: e.target.value })
+                        }
                         className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white text-slate-900 sm:text-sm appearance-none cursor-pointer"
                       >
-                        <option value="" disabled>Select provider</option>
+                        <option value="" disabled>
+                          Select provider
+                        </option>
                         {apiKeys.map((k) => (
-                          <option key={k.provider} value={k.provider.toLowerCase()}>
+                          <option
+                            key={k.provider}
+                            value={k.provider.toLowerCase()}
+                          >
                             {k.provider}
                           </option>
                         ))}
@@ -1835,14 +1962,22 @@ function Providers() {
                   {/* Payment channel + Is active row */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="rule-channel" className="block text-sm font-medium text-slate-700 mb-2">
+                      <label
+                        htmlFor="rule-channel"
+                        className="block text-sm font-medium text-slate-700 mb-2"
+                      >
                         Payment Channel
                       </label>
                       <input
                         id="rule-channel"
                         type="text"
                         value={ruleForm.payment_channel}
-                        onChange={(e) => setRuleForm({ ...ruleForm, payment_channel: e.target.value })}
+                        onChange={(e) =>
+                          setRuleForm({
+                            ...ruleForm,
+                            payment_channel: e.target.value,
+                          })
+                        }
                         className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white text-slate-900 sm:text-sm"
                       />
                     </div>
@@ -1852,7 +1987,12 @@ function Providers() {
                       </label>
                       <button
                         type="button"
-                        onClick={() => setRuleForm({ ...ruleForm, is_active: !ruleForm.is_active })}
+                        onClick={() =>
+                          setRuleForm({
+                            ...ruleForm,
+                            is_active: !ruleForm.is_active,
+                          })
+                        }
                         className={`flex items-center gap-2 px-3 py-2.5 w-full rounded-xl border text-sm font-medium transition-colors cursor-pointer ${
                           ruleForm.is_active
                             ? "border-emerald-200 bg-emerald-50 text-emerald-700"
@@ -1861,7 +2001,9 @@ function Providers() {
                       >
                         <span
                           className={`w-2 h-2 rounded-full shrink-0 ${
-                            ruleForm.is_active ? "bg-emerald-500" : "bg-slate-400"
+                            ruleForm.is_active
+                              ? "bg-emerald-500"
+                              : "bg-slate-400"
                           }`}
                         />
                         {ruleForm.is_active ? "Active" : "Inactive"}
@@ -1884,7 +2026,8 @@ function Providers() {
                     {ruleForm.conditions.length > 0 && (
                       <div className="space-y-3 mb-3">
                         {ruleForm.conditions.map((cond) => {
-                          const { label, Icon } = CONDITION_CONFIG[cond.condition_type];
+                          const { label, Icon } =
+                            CONDITION_CONFIG[cond.condition_type];
                           return (
                             <div
                               key={cond._id}
@@ -1893,7 +2036,9 @@ function Providers() {
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                   <Icon className="w-4 h-4 text-blue-600" />
-                                  <span className="text-sm font-medium text-slate-700">{label}</span>
+                                  <span className="text-sm font-medium text-slate-700">
+                                    {label}
+                                  </span>
                                 </div>
                                 <button
                                   type="button"
@@ -1915,7 +2060,9 @@ function Providers() {
                                       type="time"
                                       value={cond.time_start}
                                       onChange={(e) =>
-                                        updateCondition(cond._id, { time_start: e.target.value })
+                                        updateCondition(cond._id, {
+                                          time_start: e.target.value,
+                                        })
                                       }
                                       className="block w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white text-slate-900 text-sm"
                                     />
@@ -1928,7 +2075,9 @@ function Providers() {
                                       type="time"
                                       value={cond.time_end}
                                       onChange={(e) =>
-                                        updateCondition(cond._id, { time_end: e.target.value })
+                                        updateCondition(cond._id, {
+                                          time_end: e.target.value,
+                                        })
                                       }
                                       className="block w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white text-slate-900 text-sm"
                                     />
@@ -1948,7 +2097,9 @@ function Providers() {
                                       min={0}
                                       value={cond.amount_min}
                                       onChange={(e) =>
-                                        updateCondition(cond._id, { amount_min: e.target.value })
+                                        updateCondition(cond._id, {
+                                          amount_min: e.target.value,
+                                        })
                                       }
                                       placeholder="e.g. 100"
                                       className="block w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white text-slate-900 text-sm"
@@ -1963,7 +2114,9 @@ function Providers() {
                                       min={0}
                                       value={cond.amount_max}
                                       onChange={(e) =>
-                                        updateCondition(cond._id, { amount_max: e.target.value })
+                                        updateCondition(cond._id, {
+                                          amount_max: e.target.value,
+                                        })
                                       }
                                       placeholder="e.g. 50000"
                                       className="block w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white text-slate-900 text-sm"
@@ -2001,34 +2154,41 @@ function Providers() {
                     {/* Add condition buttons */}
                     {addedConditionTypes.length < 3 && (
                       <div>
-                        <p className="text-xs text-slate-500 mb-2">Add condition:</p>
+                        <p className="text-xs text-slate-500 mb-2">
+                          Add condition:
+                        </p>
                         <div className="grid grid-cols-3 gap-2">
-                          {(["time_of_day", "amount_range", "currency"] as PolicyConditionType[]).map(
-                            (type) => {
-                              const { label, Icon } = CONDITION_CONFIG[type];
-                              const alreadyAdded = addedConditionTypes.includes(type);
-                              return (
-                                <button
-                                  key={type}
-                                  type="button"
-                                  disabled={alreadyAdded}
-                                  onClick={() => addCondition(type)}
-                                  className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all text-center ${
-                                    alreadyAdded
-                                      ? "border-slate-200 bg-slate-50 opacity-40 cursor-not-allowed"
-                                      : "border-slate-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer"
-                                  }`}
-                                >
-                                  <Icon
-                                    className={`w-4 h-4 ${alreadyAdded ? "text-slate-400" : "text-blue-500"}`}
-                                  />
-                                  <span className="text-[11px] font-medium text-slate-600 leading-tight">
-                                    {label}
-                                  </span>
-                                </button>
-                              );
-                            },
-                          )}
+                          {(
+                            [
+                              "time_of_day",
+                              "amount_range",
+                              "currency",
+                            ] as PolicyConditionType[]
+                          ).map((type) => {
+                            const { label, Icon } = CONDITION_CONFIG[type];
+                            const alreadyAdded =
+                              addedConditionTypes.includes(type);
+                            return (
+                              <button
+                                key={type}
+                                type="button"
+                                disabled={alreadyAdded}
+                                onClick={() => addCondition(type)}
+                                className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all text-center ${
+                                  alreadyAdded
+                                    ? "border-slate-200 bg-slate-50 opacity-40 cursor-not-allowed"
+                                    : "border-slate-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer"
+                                }`}
+                              >
+                                <Icon
+                                  className={`w-4 h-4 ${alreadyAdded ? "text-slate-400" : "text-blue-500"}`}
+                                />
+                                <span className="text-[11px] font-medium text-slate-600 leading-tight">
+                                  {label}
+                                </span>
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
                     )}
@@ -2053,7 +2213,9 @@ function Providers() {
                   <button
                     type="button"
                     onClick={handleSaveRule}
-                    disabled={!isRuleFormValid || isCreatingRule || isUpdatingRule}
+                    disabled={
+                      !isRuleFormValid || isCreatingRule || isUpdatingRule
+                    }
                     className="px-5 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm shadow-blue-500/20 text-sm flex items-center gap-2"
                   >
                     {isCreatingRule || isUpdatingRule ? (
@@ -2083,7 +2245,9 @@ function Providers() {
               <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-4">
                 <Trash2 className="w-6 h-6" />
               </div>
-              <h3 className="font-semibold text-slate-900 mb-1">Delete Policy</h3>
+              <h3 className="font-semibold text-slate-900 mb-1">
+                Delete Policy
+              </h3>
               <p className="text-sm text-slate-500 mb-6">
                 Are you sure you want to delete{" "}
                 <span className="font-semibold">{policyToDelete.name}</span>?

@@ -1,7 +1,7 @@
 /**
  * Centralized feature flags configuration.
  * These flags are controlled via environment variables.
- * 
+ *
  * Note: Vite environment variables must be prefixed with 'VITE_' to be exposed to the client.
  */
 
