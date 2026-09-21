@@ -460,12 +460,13 @@ function Dashboard() {
               {walletStatus === "empty" ? (
                 <>
                   <strong>Live payments and payouts are paused.</strong> Your
-                  wallet can't cover the fee for a new transaction.
+                  wallet has nothing left to pay the fee on new transactions.
                 </>
               ) : (
                 <>
-                  <strong>Your wallet is running low.</strong> About{" "}
-                  {wallet?.transactions_remaining} live transactions left.
+                  <strong>Your wallet is running low.</strong>{" "}
+                  {formatNaira(Number(wallet?.available ?? 0))} left. Larger
+                  transactions need a bigger fee than that.
                 </>
               )}
             </span>

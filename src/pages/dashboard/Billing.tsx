@@ -19,13 +19,16 @@ import {
   PageHeader,
   Pagination,
 } from "../../components/dashboard/ui";
-import { MIN_TOPUP_NGN, topUpBreakdown } from "../../config/pricing";
+import {
+  formatPercent,
+  MIN_TOPUP_NGN,
+  topUpBreakdown,
+} from "../../config/pricing";
 import { useAuth } from "../../contexts/AuthContext";
 import { api } from "../../lib/api";
 import {
   formatDateTime,
   formatNaira,
-  formatNumber,
   titleCase,
   unwrap,
   type WalletSummary,
@@ -66,7 +69,7 @@ function Pill({ value }: { value?: string }) {
   );
 }
 
-/** A signed naira amount for the statement: +₦500, −₦20, or a dash when it did not move. */
+/** A signed naira amount for the statement: +₦500, −₦1, or a dash when it did not move. */
 function signed(value: string | number) {
   const n = Number(value);
   if (!n) return <span className="text-slate-300">—</span>;
@@ -137,13 +140,17 @@ function Billing() {
   };
 
   const summary = wallet.data;
-  const fee = Number(summary?.fee_per_transaction ?? 20);
+  const feePercent = Number(summary?.fee_percent ?? 0.1);
   const minTopUp = Number(summary?.min_topup ?? MIN_TOPUP_NGN);
   const bonusPercent = Number(summary?.topup_bonus_percent ?? 10);
 
   const amount = Number(amountInput.replace(/,/g, ""));
   const validAmount = Number.isFinite(amount) && amount >= minTopUp;
-  const preview = topUpBreakdown(validAmount ? amount : 0, fee, bonusPercent);
+  const preview = topUpBreakdown(
+    validAmount ? amount : 0,
+    feePercent,
+    bonusPercent,
+  );
 
   const startTopUp = useMutation({
     mutationFn: async () =>
@@ -286,7 +293,7 @@ function Billing() {
     <div className="max-w-6xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
       <PageHeader
         title="Wallet"
-        description={`Prepay for platform fees. ${formatNaira(fee)} is taken for each successful live payment or payout. Failed transactions and the sandbox are free.`}
+        description={`Prepay for platform fees. ${formatPercent(feePercent)} of each successful live payment or payout is taken as the fee. Failed transactions and the sandbox are free.`}
       />
 
       {notice && (
@@ -327,8 +334,8 @@ function Billing() {
             </p>
             <p className="mt-1">
               {state === "empty"
-                ? "There isn't enough in your wallet to cover the fee for a new transaction. Add funds to resume. Sandbox is unaffected."
-                : `You have enough for about ${formatNumber(summary?.transactions_remaining)} more transactions. Add funds so live traffic doesn't stop.`}
+                ? "There's nothing left in your wallet to pay the fee on new transactions. Add funds to resume. Sandbox is unaffected."
+                : `Only ${formatNaira(Number(summary?.available ?? 0))} is left. Larger payments and payouts need a bigger fee than that. Add funds so live traffic doesn't stop.`}
             </p>
           </div>
         </div>
@@ -343,11 +350,11 @@ function Billing() {
             {formatNaira(Number(summary?.available ?? 0))}
           </p>
           <p className="mt-2 text-sm text-slate-500">
-            Enough for about{" "}
+            Pays the {formatPercent(feePercent)} fee on about{" "}
             <strong className="text-slate-800">
-              {formatNumber(summary?.transactions_remaining)}
+              {formatNaira(Number(summary?.volume_covered ?? 0))}
             </strong>{" "}
-            more live transactions.
+            of live transactions.
           </p>
 
           <dl className="mt-6 grid sm:grid-cols-3 gap-4 border-t border-slate-100 pt-5 text-sm">
@@ -438,8 +445,8 @@ function Billing() {
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 pt-1">
-                  About {formatNumber(preview.transactions)} transactions at{" "}
-                  {formatNaira(fee)} each.
+                  Pays the {formatPercent(feePercent)} fee on about{" "}
+                  {formatNaira(preview.volume)} of transactions.
                 </p>
               </>
             ) : (

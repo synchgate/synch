@@ -32,8 +32,9 @@ import { HeroRouter } from "../components/home/HeroRouter";
 import Navbar from "../components/Navbar";
 import {
   formatNaira,
+  formatPercent,
   MIN_TOPUP_NGN,
-  PLATFORM_FEE_NGN,
+  PLATFORM_FEE_PERCENT,
   TOPUP_BONUS_PERCENT,
 } from "../config/pricing";
 
@@ -197,7 +198,7 @@ const FAQS = [
   },
   {
     q: "What does it cost?",
-    a: `There is no monthly fee. You fund a wallet (from ${formatNaira(MIN_TOPUP_NGN)}, with ${TOPUP_BONUS_PERCENT}% extra on every top-up) and ${formatNaira(PLATFORM_FEE_NGN)} is taken for each successful live payment or payout. Failed transactions cost nothing, unused cash can be refunded, and the sandbox is free.`,
+    a: `There is no monthly fee. You fund a wallet (from ${formatNaira(MIN_TOPUP_NGN)}, with ${TOPUP_BONUS_PERCENT}% extra on every top-up) and ${formatPercent(PLATFORM_FEE_PERCENT)} of each successful live payment or payout is taken as the fee (${formatNaira(1)} on ${formatNaira(1000)}). Failed transactions cost nothing, unused cash can be refunded, and the sandbox is free.`,
   },
 ];
 
@@ -332,7 +333,7 @@ function LandingPage() {
             </motion.div>
 
             <p className="mt-5 text-xs text-slate-500">
-              No monthly fee · {formatNaira(PLATFORM_FEE_NGN)} only on
+              No monthly fee · {formatPercent(PLATFORM_FEE_PERCENT)} only on
               successful transactions · Test in the sandbox first
             </p>
 
@@ -569,8 +570,8 @@ function LandingPage() {
             <div className="mx-auto grid max-w-3xl gap-6 md:grid-cols-3">
               {[
                 {
-                  price: formatNaira(PLATFORM_FEE_NGN),
-                  note: "per successful transaction, payments and payouts alike",
+                  price: formatPercent(PLATFORM_FEE_PERCENT),
+                  note: `of each successful transaction, payments and payouts alike. ${formatNaira(1)} on ${formatNaira(1000)}.`,
                   highlight: true,
                 },
                 {

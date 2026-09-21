@@ -305,7 +305,7 @@ function InitiatePayment() {
             cells: [
               "402",
               "insufficient_wallet_balance",
-              "Your wallet cannot cover the fee for a live payment. Add funds in the dashboard. Sandbox needs no wallet.",
+              "Your wallet cannot cover the fee for this payment (0.1% of its amount). Add funds in the dashboard. Sandbox needs no wallet.",
             ],
           },
         ]}
