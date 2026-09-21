@@ -12,6 +12,9 @@ interface AuthContextType {
   userName: string;
   userEmail: string;
   kycStatus: string;
+  /** Whether KYC approval has made this account live. Decided by the server, never by the user. */
+  accountLive: boolean;
+  /** Which dashboard is showing, "test" or "live". Only a view: it never changes the account. */
   merchantMode: string;
   login: (
     token: string,
@@ -21,7 +24,10 @@ interface AuthContextType {
     merchantMode?: string,
   ) => void;
   logout: () => void;
+  /** Which dashboard to show. Live is refused unless the account is live. */
   updateMerchantMode: (mode: string) => void;
+  /** Takes the account's real status from the server. */
+  syncAccount: (account: { kycStatus?: string; accountLive?: boolean }) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,8 +45,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [kycStatus, setKycStatus] = useState<string>(() => {
     return localStorage.getItem("kycStatus") || "";
   });
+  const [accountLive, setAccountLive] = useState<boolean>(() => {
+    const stored = localStorage.getItem("accountLive");
+    if (stored !== null) return stored === "true";
+    // A session from before this was tracked: what was stored then was the account's mode.
+    return localStorage.getItem("merchantMode") === "live";
+  });
   const [merchantMode, setMerchantMode] = useState<string>(() => {
-    return localStorage.getItem("merchantMode") || "test";
+    const view = localStorage.getItem("merchantMode") || "test";
+    const live =
+      localStorage.getItem("accountLive") === "true" ||
+      (localStorage.getItem("accountLive") === null && view === "live");
+    return live && view === "live" ? "live" : "test";
   });
 
   useEffect(() => {
@@ -96,15 +112,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setKycStatus(kycStatus);
     }
     if (merchantMode) {
-      localStorage.setItem("merchantMode", merchantMode);
-      setMerchantMode(merchantMode);
+      // What the server says about the account. A live account opens on the live dashboard.
+      const live = merchantMode === "live";
+      localStorage.setItem("accountLive", String(live));
+      setAccountLive(live);
+      const view = live ? "live" : "test";
+      localStorage.setItem("merchantMode", view);
+      setMerchantMode(view);
     }
     setIsAuthenticated(true);
   };
 
   const updateMerchantMode = (mode: string) => {
+    if (mode === "live" && !accountLive) return;
     localStorage.setItem("merchantMode", mode);
     setMerchantMode(mode);
+  };
+
+  const syncAccount = ({
+    kycStatus: kyc,
+    accountLive: live,
+  }: {
+    kycStatus?: string;
+    accountLive?: boolean;
+  }) => {
+    if (kyc) {
+      localStorage.setItem("kycStatus", kyc);
+      setKycStatus(kyc);
+    }
+    if (live !== undefined) {
+      localStorage.setItem("accountLive", String(live));
+      setAccountLive(live);
+      if (!live) {
+        // Approval was withdrawn, so there is no live dashboard to look at.
+        localStorage.setItem("merchantMode", "test");
+        setMerchantMode("test");
+      }
+    }
   };
 
   const logout = () => {
@@ -124,10 +168,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         userName,
         userEmail,
         kycStatus,
+        accountLive,
         merchantMode,
         login,
         logout,
         updateMerchantMode,
+        syncAccount,
       }}
     >
       {children}

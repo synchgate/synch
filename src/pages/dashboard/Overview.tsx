@@ -77,7 +77,7 @@ function useTransactionTotal(environment: "live" | "sandbox") {
 }
 
 function Overview() {
-  const { userEmail, userName, kycStatus, merchantMode } = useAuth();
+  const { userEmail, userName, kycStatus, accountLive } = useAuth();
   const environment = useEnvironment();
   const thisYear = new Date().getFullYear();
   const years = [thisYear, thisYear - 1, thisYear - 2];
@@ -181,7 +181,7 @@ function Overview() {
     {
       key: "kyc",
       title: "Verify your business",
-      text: "Complete KYC so you can switch to live mode.",
+      text: "Complete KYC to get live access.",
       done: kycStatus === "verified",
       to: "/dashboard/settings",
       state: { tab: "kyc" },
@@ -190,8 +190,10 @@ function Overview() {
     {
       key: "live",
       title: "Go live",
-      text: "Turn on live mode with the Test / Live switch at the top of the page.",
-      done: merchantMode === "live",
+      text: accountLive
+        ? "Your account is live. The Test / Live switch only changes which data you see."
+        : "Switched on for you once your business is verified. The Test / Live switch only changes which data you see.",
+      done: accountLive,
     },
     {
       key: "first-live",
