@@ -88,25 +88,24 @@ export type WalletSummary = {
   held_amount: string | number;
   available: string | number;
   refundable: string | number;
-  fee_per_transaction: string | number;
-  transactions_remaining: number;
+  /** The fee as a percentage of each successful transaction, e.g. 0.1 for 0.1%. */
+  fee_percent: string | number;
+  /** How much in transactions the available balance can pay the fee on. */
+  volume_covered: string | number;
+  /** Below this much available, warn that live traffic is close to stopping. */
+  low_balance: string | number;
   min_topup: string | number;
   topup_bonus_percent: string | number;
 };
 
-/** Below this many transactions' worth of balance, the dashboard starts warning. */
-export const LOW_BALANCE_TRANSACTIONS = 25;
-
 /**
- * How the wallet stands for live traffic: `empty` when live payments and payouts are refused,
- * `low` when they are close to being, otherwise null. Mirrors the backend check.
+ * How the wallet stands for live traffic: `empty` when nothing is left to pay fees with, `low` when
+ * it is close to that, otherwise null. Whether one particular transaction is allowed depends on its
+ * own fee, which only the server can work out.
  */
 export function walletState(wallet?: WalletSummary): "empty" | "low" | null {
   if (!wallet) return null;
-  if (Number(wallet.available) < Number(wallet.fee_per_transaction)) {
-    return "empty";
-  }
-  return wallet.transactions_remaining <= LOW_BALANCE_TRANSACTIONS
-    ? "low"
-    : null;
+  const available = Number(wallet.available);
+  if (available <= 0) return "empty";
+  return available < Number(wallet.low_balance) ? "low" : null;
 }
