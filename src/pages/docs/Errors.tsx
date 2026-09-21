@@ -132,7 +132,7 @@ function Errors() {
             key: "402",
             cells: [
               "402",
-              "Your wallet cannot cover the platform fee for a live transaction. Add funds to resume.",
+              "Your wallet cannot cover the platform fee (0.1% of the amount) for a live transaction. Add funds to resume.",
             ],
           },
           {
@@ -222,7 +222,7 @@ function Errors() {
             cells: [
               "insufficient_wallet_balance",
               "402",
-              "Live payments and payouts are paused because your wallet cannot cover the fee for a new transaction. Add funds in the dashboard. The sandbox is unaffected.",
+              "Your wallet cannot cover the fee for this transaction, which is 0.1% of its amount. The message says how much is needed and how much is available. Add funds in the dashboard. The sandbox is unaffected.",
             ],
           },
           {

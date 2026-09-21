@@ -18,7 +18,7 @@ import {
   Terminal,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { useAuth } from "../contexts/AuthContext";
@@ -86,12 +86,13 @@ function Dashboard() {
     logout,
     userName,
     kycStatus,
+    accountLive,
     merchantMode,
     updateMerchantMode,
+    syncAccount,
     userEmail,
   } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isTogglingMode, setIsTogglingMode] = useState(false);
   const [showKycPopup, setShowKycPopup] = useState(false);
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
 
@@ -111,6 +112,28 @@ function Dashboard() {
   });
   const walletStatus = walletState(wallet);
 
+  // Whether the account is live comes from the server, and follows KYC approval. Asking again on
+  // load and on returning to the tab means an approval shows up without logging out and back in.
+  const { data: account } = useQuery({
+    queryKey: ["account-status", userEmail],
+    queryFn: async () =>
+      unwrap<{ merchants?: { live_mode?: boolean; kyc_status?: string }[] }>(
+        await api.get("/accounts/user/details/"),
+      ),
+    enabled: !!userEmail,
+    retry: false,
+    staleTime: 60_000,
+  });
+  const ownMerchant = account?.merchants?.[0];
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only the server's values should trigger this
+  useEffect(() => {
+    if (!ownMerchant) return;
+    syncAccount({
+      kycStatus: ownMerchant.kyc_status,
+      accountLive: ownMerchant.live_mode === true,
+    });
+  }, [ownMerchant?.live_mode, ownMerchant?.kyc_status]);
+
   const getInitials = (name: string) => {
     if (!name) return "UU";
     const parts = name.trim().split(" ").filter(Boolean);
@@ -120,35 +143,15 @@ function Dashboard() {
     return name.slice(0, 2).toUpperCase();
   };
 
-  const handleToggleMode = async () => {
+  // Chooses which dashboard to look at. It does not touch the account: whether live keys work is
+  // decided by KYC approval alone.
+  const handleToggleMode = () => {
     const nextMode = merchantMode === "test" ? "live" : "test";
-    const wantsLive = nextMode === "live";
-
-    setIsTogglingMode(true);
-    // Optimistic UI update via Context
-    updateMerchantMode(nextMode);
-
-    if (wantsLive && (kycStatus === "pending" || !kycStatus)) {
-      // Simulate network request before showing popup
-      setTimeout(() => {
-        setIsTogglingMode(false);
-        updateMerchantMode("test");
-        setShowKycPopup(true);
-      }, 800);
+    if (nextMode === "live" && !accountLive) {
+      setShowKycPopup(true);
       return;
     }
-
-    try {
-      await api.patch("/merchants/switch/toggle-merchant-mode/", {
-        live_mode: wantsLive,
-      });
-    } catch (error) {
-      console.error("Failed to toggle mode:", error);
-      // Revert if API call fails
-      updateMerchantMode(merchantMode);
-    } finally {
-      setIsTogglingMode(false);
-    }
+    updateMerchantMode(nextMode);
   };
 
   const linkClass = (active: boolean) =>
@@ -184,7 +187,8 @@ function Dashboard() {
               Verification Required
             </h3>
             <p className="text-sm text-slate-500 mb-6">
-              Please complete your KYC verification to switch to live mode.
+              Live mode turns on once your business has been verified (KYC).
+              Until then you can keep testing with your sandbox key.
             </p>
             <div className="flex gap-3 justify-center">
               <button
@@ -373,9 +377,8 @@ function Dashboard() {
               <button
                 type="button"
                 onClick={handleToggleMode}
-                disabled={isTogglingMode}
-                aria-label="Switch between test and live mode"
-                className={`relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-colors ${isTogglingMode ? "cursor-wait opacity-80" : "cursor-pointer"} focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${
+                aria-label="Switch the dashboard between test and live data"
+                className={`relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${
                   merchantMode === "live" ? "bg-emerald-500" : "bg-amber-500"
                 }`}
               >
@@ -385,11 +388,7 @@ function Dashboard() {
                       ? "translate-x-5 sm:translate-x-6"
                       : "translate-x-1"
                   }`}
-                >
-                  {isTogglingMode && (
-                    <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 border border-slate-200 border-t-slate-500 rounded-full animate-spin" />
-                  )}
-                </span>
+                />
               </button>
               <span
                 className={`text-[10px] sm:text-xs font-semibold transition-colors ${
@@ -418,7 +417,7 @@ function Dashboard() {
               <strong>Test mode.</strong> You're viewing sandbox data. Nothing
               here moves real money.
             </span>
-            {kycStatus === "pending" || !kycStatus ? (
+            {!accountLive ? (
               <Link
                 to="/dashboard/settings"
                 state={{ tab: "kyc" }}
@@ -430,10 +429,9 @@ function Dashboard() {
               <button
                 type="button"
                 onClick={handleToggleMode}
-                disabled={isTogglingMode}
                 className="font-semibold underline underline-offset-2 hover:text-amber-700 cursor-pointer whitespace-nowrap"
               >
-                Switch to live
+                View live data
               </button>
             )}
           </div>
@@ -462,12 +460,13 @@ function Dashboard() {
               {walletStatus === "empty" ? (
                 <>
                   <strong>Live payments and payouts are paused.</strong> Your
-                  wallet can't cover the fee for a new transaction.
+                  wallet has nothing left to pay the fee on new transactions.
                 </>
               ) : (
                 <>
-                  <strong>Your wallet is running low.</strong> About{" "}
-                  {wallet?.transactions_remaining} live transactions left.
+                  <strong>Your wallet is running low.</strong>{" "}
+                  {formatNaira(Number(wallet?.available ?? 0))} left. Larger
+                  transactions need a bigger fee than that.
                 </>
               )}
             </span>

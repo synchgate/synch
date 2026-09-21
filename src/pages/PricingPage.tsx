@@ -5,13 +5,17 @@ import { Link } from "react-router-dom";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import {
+  feeFor,
   formatNaira,
+  formatPercent,
   MIN_TOPUP_NGN,
-  PLATFORM_FEE_NGN,
+  PLATFORM_FEE_PERCENT,
   TOPUP_BONUS_PERCENT,
   topUpBreakdown,
 } from "../config/pricing";
 import { useAuth } from "../contexts/AuthContext";
+
+const FEE = formatPercent(PLATFORM_FEE_PERCENT);
 
 const STEPS = [
   {
@@ -24,7 +28,7 @@ const STEPS = [
   },
   {
     title: "Pay only on success",
-    text: `${formatNaira(PLATFORM_FEE_NGN)} is taken when a payment or payout succeeds. Nothing is taken when one fails.`,
+    text: `${FEE} of the amount is taken when a payment or payout succeeds. Nothing is taken when one fails.`,
   },
 ];
 
@@ -37,8 +41,10 @@ const INCLUDED = [
   "Unused cash refunded on request",
 ];
 
+const EXAMPLE_AMOUNTS = [1000, 50000, 1000000];
+
 const BILLING_NOTES = [
-  `A flat ${formatNaira(PLATFORM_FEE_NGN)} is taken for each successful live payment and each successful payout, on top of the fees your payment provider charges you.`,
+  `The fee is ${FEE} of the amount of each successful live payment and each successful payout, on top of the fees your payment provider charges you. It scales with the transaction: ${formatNaira(feeFor(1000))} on ${formatNaira(1000)}, ${formatNaira(feeFor(100000))} on ${formatNaira(100000)}.`,
   "Failed and abandoned transactions cost nothing. The fee is set aside when a transaction starts and given back if it doesn't succeed.",
   "If a bank sends a payout back, the fee for it is refunded.",
   `The ${TOPUP_BONUS_PERCENT}% top-up bonus is spent after your own cash and can't be refunded. Cash you haven't used can be paid back to your bank account.`,
@@ -77,8 +83,8 @@ const PricingPage = () => {
               Pay only when <span className="text-blue-600">money moves.</span>
             </h1>
             <p className="text-lg text-slate-600 font-light">
-              No monthly fee. Fund a wallet, and {formatNaira(PLATFORM_FEE_NGN)}{" "}
-              is taken for each successful live payment or payout.
+              No monthly fee. Fund a wallet, and {FEE} of each successful live
+              payment or payout is taken as the fee.
             </p>
           </div>
 
@@ -114,12 +120,26 @@ const PricingPage = () => {
               </h2>
               <div className="mt-4 flex items-baseline gap-2">
                 <span className="text-5xl font-black tracking-tighter text-slate-900">
-                  {formatNaira(PLATFORM_FEE_NGN)}
+                  {FEE}
                 </span>
                 <span className="text-lg font-bold text-slate-500">
-                  per successful transaction
+                  of each successful transaction
                 </span>
               </div>
+
+              <dl className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 divide-y divide-slate-200 text-sm">
+                {EXAMPLE_AMOUNTS.map((value) => (
+                  <div key={value} className="flex justify-between px-4 py-3">
+                    <dt className="text-slate-600">
+                      A {formatNaira(value)} transaction
+                    </dt>
+                    <dd className="font-bold text-slate-900">
+                      {formatNaira(feeFor(value))} fee
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+
               <ul className="mt-8 space-y-4">
                 {INCLUDED.map((item) => (
                   <li key={item} className="flex items-start gap-3">
@@ -197,11 +217,10 @@ const PricingPage = () => {
 
               <div className="mt-8 rounded-2xl bg-white p-5 text-center border border-slate-200">
                 <p className="text-4xl font-black text-blue-600">
-                  {example.transactions.toLocaleString("en-NG")}
+                  {formatNaira(example.volume)}
                 </p>
                 <p className="mt-1 text-sm font-medium text-slate-600">
-                  successful transactions at {formatNaira(PLATFORM_FEE_NGN)}{" "}
-                  each
+                  of successful transactions covered at {FEE}
                 </p>
               </div>
             </div>
