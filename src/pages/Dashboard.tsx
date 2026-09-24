@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { LucideIcon } from "lucide-react";
 import {
   Activity,
+  AlertTriangle,
   BarChart3,
   Building2,
   Code2,
@@ -453,26 +454,24 @@ function Dashboard() {
         )}
 
         {walletStatus && (
-          <div
-            className={`px-4 py-2 text-white text-xs sm:text-sm flex flex-wrap items-center justify-center gap-x-3 gap-y-1 shrink-0 ${walletStatus === "empty" ? "bg-red-600" : "bg-amber-600"}`}
-          >
+          <div className="bg-orange-50 border-b border-orange-200 px-4 py-1.5 text-orange-900 text-xs flex items-center justify-center gap-x-2 shrink-0">
+            <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
             <span>
               {walletStatus === "empty" ? (
                 <>
-                  <strong>Live payments and payouts are paused.</strong> Your
-                  wallet has nothing left to pay the fee on new transactions.
+                  <strong>Live payments are paused.</strong> Your wallet is
+                  empty.
                 </>
               ) : (
                 <>
-                  <strong>Your wallet is running low.</strong>{" "}
-                  {formatNaira(Number(wallet?.available ?? 0))} left. Larger
-                  transactions need a bigger fee than that.
+                  <strong>Wallet running low:</strong>{" "}
+                  {formatNaira(Number(wallet?.available ?? 0))} left.
                 </>
               )}
             </span>
             <Link
               to="/dashboard/billing"
-              className="bg-white text-slate-900 px-3 py-1 rounded-full font-semibold hover:bg-slate-100 transition-colors text-xs whitespace-nowrap"
+              className="font-semibold underline underline-offset-2 hover:text-orange-700 whitespace-nowrap"
             >
               Add funds
             </Link>
